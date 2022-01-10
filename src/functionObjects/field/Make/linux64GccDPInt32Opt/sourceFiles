@@ -1,0 +1,5 @@
+SOURCE = \
+normalizedHelicity/normalizedHelicity.C \
+densitySpherePostProcess/densitySpherePostProcess.C \
+
+# sources
