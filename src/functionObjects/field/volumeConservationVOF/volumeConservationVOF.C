@@ -26,7 +26,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "densitySpherePostProcess.H"
+#include "volumeConservationVOF.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -35,18 +35,17 @@ namespace Foam
 {
 namespace functionObjects
 {
-    defineTypeNameAndDebug(densitySpherePostProcess, 0);
-    addToRunTimeSelectionTable(functionObject, densitySpherePostProcess, dictionary);
+    defineTypeNameAndDebug(volumeConservationVOF, 0);
+    addToRunTimeSelectionTable(functionObject, volumeConservationVOF, dictionary);
 }
 }
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void Foam::functionObjects::densitySpherePostProcess::output
+void Foam::functionObjects::volumeConservationVOF::output
 (
     const word& fieldName,
     const word& outputName,
-    const scalar& shapePreservation,
     const scalar& volumeConservation
 )
 {
@@ -56,21 +55,18 @@ void Foam::functionObjects::densitySpherePostProcess::output
     
     writeTabbed(file, fieldName);
     
-    file << token::TAB << shapePreservation;
     file << token::TAB << volumeConservation;
     
     file << endl;
     
-    Log << " value of shapePreservation is " << shapePreservation << endl;
     Log << " value of volumeConservation is " << volumeConservation << endl;
 
     // Write state/results information
     word nameStr('(' + outputName + ')');
-    this->setResult("value" + nameStr, shapePreservation);
     this->setResult("value" + nameStr, volumeConservation);
 }
 
-void Foam::functionObjects::densitySpherePostProcess::writeFileHeader(Ostream& os)
+void Foam::functionObjects::volumeConservationVOF::writeFileHeader(Ostream& os)
 {
     if (!fieldSet_.updateSelection())
     {
@@ -83,13 +79,12 @@ void Foam::functionObjects::densitySpherePostProcess::writeFileHeader(Ostream& o
     }
     else
     {
-        writeHeader(os, "Comparison to initial alpha field");
+        writeHeader(os, "Conservation of volume in VOF method");
     }
 
     writeCommented(os, "Time");
     
     writeTabbed(os, "field");
-    writeTabbed(os, "shapePreservation");
     writeTabbed(os, "volumeConservation");
 
     os  << endl;
@@ -97,62 +92,7 @@ void Foam::functionObjects::densitySpherePostProcess::writeFileHeader(Ostream& o
     writtenHeader_ = true;
 }
 
-Foam::scalar Foam::functionObjects::densitySpherePostProcess::calcShapePreservation
-(
-            const scalarField& cellVolume,
-            const volScalarField& alphaFieldZeroTime,
-            const volScalarField& alphaFieldCurrTime
-)
-{
-	// Calculate the volume summations for the shape preservation
-        
-        // \sum_i V_i |\alpha_i(t) - \alpha_i(t=0)|
-        scalar alphaDifferenceSum = 0;
-        
-        // \sum_i V_i \alpha_i(t=0)
-        scalar alphaZeroTimeSum = 0;
-        
-        // Loop over all cells to make the calculation
-        forAll(alphaFieldZeroTime, cellI)
-        {
-		const scalar alphaDifference = mag(alphaFieldCurrTime[cellI] - alphaFieldZeroTime[cellI]);
-		
-		alphaDifferenceSum += (cellVolume[cellI] * alphaDifference);
-		
-		alphaZeroTimeSum += (cellVolume[cellI] * alphaFieldZeroTime[cellI]);
-        }
-        
-        return alphaDifferenceSum / alphaZeroTimeSum;
-}
-
-Foam::scalar Foam::functionObjects::densitySpherePostProcess::calcVolumeConservation
-(
-            const scalarField& cellVolume,
-            const volScalarField& alphaFieldZeroTime,
-            const volScalarField& alphaFieldCurrTime
-)
-{
-	// Calculate the volume summations for the volume conservation
-	
-	// \sum_i \alpha_i(t=0) V_i (Field at zero time)
-	scalar zeroTimeSum = 0;
-	
-	// \sum_i \alpha_i(t) V_i (Field at current time)
-	scalar currTimeSum = 0;
-	
-	// Loop over all cells to make the calculation
-	forAll(alphaFieldZeroTime, cellI)
-	{
-		zeroTimeSum += (alphaFieldZeroTime[cellI] * cellVolume[cellI]);
-		
-		currTimeSum += (alphaFieldCurrTime[cellI] * cellVolume[cellI]);
-	}
-	
-	return (currTimeSum - zeroTimeSum) / zeroTimeSum;
-	
-}
-
-void Foam::functionObjects::densitySpherePostProcess::calcDensitySpherePostProcess(const word& fieldName)
+void Foam::functionObjects::volumeConservationVOF::calcVolumeConservation(const word& fieldName)
 {
     // If the field exists as a scalarfield, calculate the shape preservation
     if (obr_.foundObject<volScalarField>(fieldName))
@@ -191,15 +131,29 @@ void Foam::functionObjects::densitySpherePostProcess::calcDensitySpherePostProce
         	mesh_
         ); 
         
-        scalar shapePreservation = calcShapePreservation(cellVolume, alphaFieldZeroTime, alphaFieldCurrTime);
         
-        scalar volumeConservation = calcVolumeConservation(cellVolume, alphaFieldZeroTime, alphaFieldCurrTime);
+        // Calculate the volume summations for the volume conservation
+	
+	// \sum_i \alpha_i(t=0) V_i (Field at zero time)
+	scalar zeroTimeSum = 0;
+	
+	// \sum_i \alpha_i(t) V_i (Field at current time)
+	scalar currTimeSum = 0;
+	
+	// Loop over all cells to make the calculation
+	forAll(alphaFieldZeroTime, cellI)
+	{
+		zeroTimeSum += (alphaFieldZeroTime[cellI] * cellVolume[cellI]);
+		
+		currTimeSum += (alphaFieldCurrTime[cellI] * cellVolume[cellI]);
+	}
+	
+	scalar volumeConservation = (currTimeSum - zeroTimeSum) / zeroTimeSum;
         
         output
     	(
         	alphaFieldZeroTime.name(),
         	fieldName,
-        	shapePreservation,
         	volumeConservation
     	);
     }
@@ -207,9 +161,10 @@ void Foam::functionObjects::densitySpherePostProcess::calcDensitySpherePostProce
     
 }
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::functionObjects::densitySpherePostProcess::densitySpherePostProcess
+Foam::functionObjects::volumeConservationVOF::volumeConservationVOF
 (
     const word& name,
     const Time& runTime,
@@ -226,7 +181,7 @@ Foam::functionObjects::densitySpherePostProcess::densitySpherePostProcess
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool Foam::functionObjects::densitySpherePostProcess::read(const dictionary& dict)
+bool Foam::functionObjects::volumeConservationVOF::read(const dictionary& dict)
 {
     fvMeshFunctionObject::read(dict);
     writeFile::read(dict);
@@ -237,22 +192,23 @@ bool Foam::functionObjects::densitySpherePostProcess::read(const dictionary& dic
 }
 
 
-bool Foam::functionObjects::densitySpherePostProcess::execute()
+bool Foam::functionObjects::volumeConservationVOF::execute()
 {
     return true;
 }
 
 
-bool Foam::functionObjects::densitySpherePostProcess::write()
+bool Foam::functionObjects::volumeConservationVOF::write()
 {
     writeFileHeader(file());
 
     Log << type() << " " << name() <<  " write:" << nl;
-
+    
+    //Assign field names
     for (const word& fieldName : fieldSet_.selectionNames())
     {
-        calcDensitySpherePostProcess(fieldName);
-        
+    	calcVolumeConservation(fieldName);
+
     }
 
     Log << endl;

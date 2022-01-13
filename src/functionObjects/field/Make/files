@@ -1,3 +1,4 @@
 normalizedHelicity/normalizedHelicity.C
-densitySpherePostProcess/densitySpherePostProcess.C
+shapeConservationVOF/shapeConservationVOF.C
+volumeConservationVOF/volumeConservationVOF.C
 LIB = $(FOAM_USER_LIBBIN)/libmyFieldFunctionObjects

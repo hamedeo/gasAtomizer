@@ -25,7 +25,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::functionObjects::densitySpherePostProcess
+    Foam::functionObjects::volumeConservationVOF
 
 Group
     grpFieldFunctionObjects
@@ -52,10 +52,10 @@ Description
 Usage
     Minimal example by using \c system/controlDict.functions:
     \verbatim
-    densitySpherePostProcess1
+    volumeConservationVOF1
     {
         // Mandatory entries (unmodifiable)
-        type        densitySpherePostProcess;
+        type        volumeConservationVOF;
         libs        (myFieldFunctionObjects);
 
         // Mandatory entries (runtime modifiable)
@@ -73,7 +73,7 @@ Usage
     where the entries mean:
     \table
       Property     | Description                        | Type | Req'd | Dflt
-      type         | Type name: densitySpherePostProcess             | word |  yes  | -
+      type         | Type name: volumeConservationVOF             | word |  yes  | -
       libs         | Library name: fieldFunctionObjects | word |  yes  | -
       fields       | List of operand fields             | wordList | yes | -
       location     | Write location of the min/max value | bool | no   | true
@@ -90,16 +90,16 @@ See also
     - Foam::functionObject
     - Foam::functionObjects::fvMeshFunctionObject
     - Foam::functionObjects::writeFile
-    - ExtendedCodeGuide::functionObjects::field::densitySpherePostProcess
+    - ExtendedCodeGuide::functionObjects::field::volumeConservationVOF
 
 SourceFiles
-    densitySpherePostProcess.C
-    densitySpherePostProcessTemplates.C
+    volumeConservationVOF.C
+    volumeConservationVOFTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef functionObjects_densitySpherePostProcess_H
-#define functionObjects_densitySpherePostProcess_H
+#ifndef functionObjects_volumeConservationVOF_H
+#define functionObjects_volumeConservationVOF_H
 
 #include "fvMeshFunctionObject.H"
 #include "writeFile.H"
@@ -115,10 +115,10 @@ namespace functionObjects
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class densitySpherePostProcess Declaration
+                         Class volumeConservationVOF Declaration
 \*---------------------------------------------------------------------------*/
 
-class densitySpherePostProcess
+class volumeConservationVOF
 :
     public fvMeshFunctionObject,
     public writeFile
@@ -138,44 +138,28 @@ protected:
         (
             const word& fieldName,
             const word& outputName,
-            const scalar& shapePreservation,
             const scalar& volumeConservation
         );
 
         //- Output file header information
         virtual void writeFileHeader(Ostream& os);
 
-	//- Calculate the preservation of the shape
-        void calcDensitySpherePostProcess
+	//- Post processing function
+        void calcVolumeConservation
         (
 	    const word& fieldName
         );
-        
-        Foam::scalar calcShapePreservation
-        (
-            const scalarField& cellVolume,
-            const volScalarField& alphaFieldZeroTime,
-            const volScalarField& alphaFieldCurrTime
-        );
-        
-        Foam::scalar calcVolumeConservation
-        (
-            const scalarField& cellVolume,
-            const volScalarField& alphaFieldZeroTime,
-            const volScalarField& alphaFieldCurrTime
-        );
-
 
 public:
 
     //- Runtime type information
-    TypeName("densitySpherePostProcess");
+    TypeName("volumeConservationVOF");
 
 
     // Constructors
 
         //- Construct from Time and dictionary
-        densitySpherePostProcess
+        volumeConservationVOF
         (
             const word& name,
             const Time& runTime,
@@ -183,14 +167,14 @@ public:
         );
 
         //- No copy construct
-        densitySpherePostProcess(const densitySpherePostProcess&) = delete;
+        volumeConservationVOF(const volumeConservationVOF&) = delete;
 
         //- No copy assignment
-        void operator=(const densitySpherePostProcess&) = delete;
+        void operator=(const volumeConservationVOF&) = delete;
 
 
     //- Destructor
-    virtual ~densitySpherePostProcess() = default;
+    virtual ~volumeConservationVOF() = default;
 
 
     // Member Functions
@@ -201,7 +185,7 @@ public:
         //- Execute, currently does nothing
         virtual bool execute();
 
-        //- Write the densitySpherePostProcess
+        //- Write the volumeConservationVOF
         virtual bool write();
 };
 

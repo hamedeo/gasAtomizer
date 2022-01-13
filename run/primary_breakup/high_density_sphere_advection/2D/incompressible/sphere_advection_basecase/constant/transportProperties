@@ -21,7 +21,7 @@ liquid
 {
     transportModel  Newtonian;
     nu              0;
-    rho             1e6;
+    rho             1e3;
 }
 
 gas

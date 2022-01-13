@@ -59,10 +59,21 @@ functions
     
     postProcess1
     {
-    	type		densitySpherePostProcess;
+    	type		shapeConservationVOF;
     	libs		(myFieldFunctionObjects);
     	writeControl	onEnd;
 
+    	fields		("alpha.liquid");
+    	
+    	location	true;
+    }
+    
+    postProcess2
+    {
+    	type		volumeConservationVOF;
+    	libs		(myFieldFunctionObjects);
+    	writeControl	writeTime;
+    	
     	fields		("alpha.liquid");
     	
     	location	true;

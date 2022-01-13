@@ -1,5 +1,6 @@
 SOURCE = \
 normalizedHelicity/normalizedHelicity.C \
-densitySpherePostProcess/densitySpherePostProcess.C \
+shapeConservationVOF/shapeConservationVOF.C \
+volumeConservationVOF/volumeConservationVOF.C \
 
 # sources
