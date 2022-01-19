@@ -51,7 +51,7 @@ runTimeModifiable yes;
 
 functions
 {
-    /*distribution1
+    distribution1
     {
         // Mandatory entries
         type            particleDistribution;
@@ -81,7 +81,7 @@ functions
         executeInterval 1;
         writeControl    writeTime;
         writeInterval   -1;
-    }*/
+    }
 }
 
 

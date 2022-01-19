@@ -9,21 +9,18 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    object      N2;
+    class       dictionary;
+    object      combustionProperties;
 }
-// ************************************************************************* //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions          [0 0 0 0 0 0 0];
+combustionModel PaSR;
 
-internalField       uniform 0.766;
+active          yes;
 
-boundaryField
+PaSRCoeffs
 {
-    walls
-    {
-        type                zeroGradient;
-    }
+    Cmix                1.0;
 }
 
 
