@@ -57,7 +57,7 @@ maxDeltaT       0.1;
 functions
 {
     
-    postProcess1
+    shapeConservation
     {
     	type		shapeConservationVOF;
     	libs		(myFieldFunctionObjects);
@@ -68,7 +68,7 @@ functions
     	location	true;
     }
     
-    postProcess2
+    volumeConservation
     {
     	type		volumeConservationVOF;
     	libs		(myFieldFunctionObjects);
@@ -77,6 +77,16 @@ functions
     	fields		("alpha.liquid");
     	
     	location	true;
+    }
+    
+    normKineticEnergy
+    {
+    	type		normalizedKineticEnergy;
+    	libs		(myFieldFunctionObjects);
+    	writeControl	writeTime;
+    	
+    	fields		("U");
+    	
     }
     
     /*surfaces

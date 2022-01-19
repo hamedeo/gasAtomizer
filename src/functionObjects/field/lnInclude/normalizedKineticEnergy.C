@@ -1,0 +1,1 @@
+../normalizedKineticEnergy/normalizedKineticEnergy.C
