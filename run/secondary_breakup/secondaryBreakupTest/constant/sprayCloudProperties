@@ -78,7 +78,7 @@ subModels
         model1
         {
             type            coneNozzleInjection;
-            SOI             0;
+            SOI             0;			// start of injection
             massTotal       6.0e-6;
             parcelBasisType mass;
             injectionMethod disc;
@@ -86,10 +86,11 @@ subModels
             outerDiameter   1.9e-4;
             innerDiameter   0;
             duration        1.25e-3;
-            position        (0 0.0995 0);
+            position        (0 0.0295 0);
             direction       (0 -1 0);
             parcelsPerSecond 20000000;
-            flowRateProfile table
+	    flowRateProfile constant 8;
+            /*flowRateProfile table
             (
                 (0              0.1272)
                 (4.16667e-05    6.1634)
@@ -124,7 +125,7 @@ subModels
                 (0.00125        3.9213)
                 (0.001251       0.0000)
                 (1000           0.0000)
-            );
+            );*/
 
             Cd              constant 0.9;
 
@@ -160,7 +161,7 @@ subModels
 
     atomizationModel none;
 
-    breakupModel    ReitzDiwakar; // ReitzKHRT;
+    breakupModel     none;	//ReitzDiwakar; // ReitzKHRT;
 
     stochasticCollisionModel none;
 

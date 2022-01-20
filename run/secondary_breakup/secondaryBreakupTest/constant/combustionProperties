@@ -14,14 +14,15 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-combustionModel PaSR;
+combustionModel none;
 
-active          yes;
+active          no;
 
+/*
 PaSRCoeffs
 {
     Cmix                1.0;
 }
-
+*/
 
 // ************************************************************************* //

@@ -16,10 +16,10 @@ FoamFile
 
 chemistryType
 {
-    solver            ode;
+    solver            noChemistrySolver;
 }
 
-chemistry       on;
+chemistry       off;
 
 initialChemicalTimeStep 1e-07;
 
