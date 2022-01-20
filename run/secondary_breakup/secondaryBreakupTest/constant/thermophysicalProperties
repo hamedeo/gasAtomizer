@@ -25,17 +25,28 @@ thermoType
     specie          specie;
 }
 
-CHEMKINFile         "<case>/chemkin/chem.inp";
+// FOAMCHEMISTRY FOR CHEMISTRY
+/*chemistryReader     foamChemistryReader;
+foamChemistryFile   "<constant>/foam.inp";
+foamChemistryThermoFile "<constant>/foam.dat";*/
+
+// FOAMCHEMISTRY FOR CHEMISTRY COMPRESSIBLE GAS
+chemistryReader	foamChemistryReader;
+foamChemistryFile	"<constant>/reactions";
+foamChemistryThermoFile "<constant>/thermo.compressibleGas"; 
+
+// CHEMKIN FILES FOR CHEMISTRY
+/*CHEMKINFile         "<case>/chemkin/chem.inp";
 CHEMKINThermoFile   "<case>/chemkin/therm.dat";
 CHEMKINTransportFile "<case>/chemkin/transportProperties";
 
-newFormat       yes;
+newFormat       yes;*/
 
 inertSpecie     N2;
 
 liquids
 {
-    C7H16;
+    H2O;
 }
 
 solids

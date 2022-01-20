@@ -134,14 +134,13 @@ subModels
 
             sizeDistribution
             {
-                type        RosinRammler;
-
-                RosinRammlerDistribution
+                type        uniform;
+                uniformDistribution
                 {
-                    minValue        1e-06;
+                    minValue        0.00015;
                     maxValue        0.00015;
                     d               0.00015;
-                    n               3;
+                    n               1;
                 }
             }
         }
@@ -155,7 +154,7 @@ subModels
 
     compositionModel singlePhaseMixture;
 
-    phaseChangeModel liquidEvaporationBoil;
+    phaseChangeModel none; //liquidEvaporationBoil;
 
     surfaceFilmModel none;
 
@@ -183,7 +182,7 @@ subModels
         (
             liquid
             {
-                C7H16               1;
+                H2O               1;
             }
         );
     }
@@ -192,7 +191,7 @@ subModels
     {
         enthalpyTransfer enthalpyDifference;
 
-        activeLiquids    ( C7H16 );
+        activeLiquids    ( H2O );
     }
 
     ReitzDiwakarCoeffs
