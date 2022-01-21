@@ -25,22 +25,10 @@ thermoType
     specie          specie;
 }
 
-// FOAMCHEMISTRY FOR CHEMISTRY
-/*chemistryReader     foamChemistryReader;
-foamChemistryFile   "<constant>/foam.inp";
-foamChemistryThermoFile "<constant>/foam.dat";*/
-
-// FOAMCHEMISTRY FOR CHEMISTRY COMPRESSIBLE GAS
+// FOAMCHEMISTRY
 chemistryReader	foamChemistryReader;
-foamChemistryFile	"<constant>/reactions";
-foamChemistryThermoFile "<constant>/thermo.compressibleGas"; 
-
-// CHEMKIN FILES FOR CHEMISTRY
-/*CHEMKINFile         "<case>/chemkin/chem.inp";
-CHEMKINThermoFile   "<case>/chemkin/therm.dat";
-CHEMKINTransportFile "<case>/chemkin/transportProperties";
-
-newFormat       yes;*/
+foamChemistryFile	"<constant>/species";
+foamChemistryThermoFile "<constant>/thermo.species";
 
 inertSpecie     N2;
 

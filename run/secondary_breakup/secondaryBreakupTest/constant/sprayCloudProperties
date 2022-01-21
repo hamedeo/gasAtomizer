@@ -79,17 +79,17 @@ subModels
         {
             type            coneNozzleInjection;
             SOI             0;			// start of injection
-            massTotal       6.0e-6;
+            massTotal       8.0e-6;
             parcelBasisType mass;
             injectionMethod disc;
             flowType        flowRateAndDischarge;
-            outerDiameter   1.9e-4;
+            outerDiameter   3e-4;
             innerDiameter   0;
             duration        1.25e-3;
             position        (0 0.0295 0);
             direction       (0 -1 0);
             parcelsPerSecond 20000000;
-	    flowRateProfile constant 8;
+	    flowRateProfile constant 10;
             /*flowRateProfile table
             (
                 (0              0.1272)
