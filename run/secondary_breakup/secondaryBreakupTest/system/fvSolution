@@ -61,7 +61,7 @@ solvers
         relTol          0;
     }
 
-    "(Yi|O2|N2|H2O)"
+    "(Yi|N2|H2O)"
     {
         solver          PBiCGStab;
         preconditioner  DILU;

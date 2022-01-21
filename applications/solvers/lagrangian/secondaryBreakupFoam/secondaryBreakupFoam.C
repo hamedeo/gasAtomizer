@@ -39,7 +39,6 @@ Description
 #include "turbulentFluidThermoModel.H"
 #include "basicSprayCloud.H"
 #include "psiReactionThermo.H"
-#include "CombustionModel.H"
 #include "radiationModel.H"
 #include "SLGThermo.H"
 #include "pimpleControl.H"
@@ -112,10 +111,7 @@ int main(int argc, char *argv[])
 
             rho = thermo.rho();
 
-            if (runTime.write())
-            {
-                combustion->Qdot()().write();
-            }
+            runTime.write();
         }
         else
         {

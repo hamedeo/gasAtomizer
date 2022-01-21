@@ -23,11 +23,11 @@ chemistry       off;
 
 initialChemicalTimeStep 1e-07;
 
-odeCoeffs
+/*odeCoeffs
 {
     solver          seulex;
     eps             0.05;
-}
+}*/
 
 
 // ************************************************************************* //
