@@ -1,7 +1,7 @@
 species
 (
-	H2O
 	N2
+	Fe
 );
 
 reactions

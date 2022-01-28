@@ -34,7 +34,7 @@ inertSpecie     N2;
 
 liquids
 {
-    H2O;
+    Fe;
 }
 
 solids

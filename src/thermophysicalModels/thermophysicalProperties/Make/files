@@ -1,0 +1,2 @@
+liquidProperties/Fe/Fe.C
+LIB = $(FOAM_USER_LIBBIN)/libmyThermophysicalProperties

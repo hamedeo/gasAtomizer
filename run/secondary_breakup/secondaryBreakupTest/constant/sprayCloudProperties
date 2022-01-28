@@ -55,7 +55,7 @@ solution
 
 constantProperties
 {
-    T0              320;
+    T0              1700;//90;
 
     // place holders for rho0 and Cp0
     // - reset from liquid properties using T0
@@ -146,7 +146,7 @@ subModels
         (
             liquid
             {
-                H2O               1;
+                Fe               1;
             }
         );
     }

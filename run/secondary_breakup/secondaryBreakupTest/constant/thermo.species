@@ -14,29 +14,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-H2O
-{
-    specie
-    {
-        molWeight       18.0153;
-    }
-    thermodynamics
-    {
-        Tlow            200;
-        Thigh           5000;
-        Tcommon         1000;
-        highCpCoeffs    ( 2.67215 0.00305629 -8.73026e-07 1.201e-10 -6.39162e-15 -29899.2 6.86282 );
-        lowCpCoeffs     ( 3.38684 0.00347498 -6.3547e-06 6.96858e-09 -2.50659e-12 -30208.1 2.59023 );
-    }
-    transport
-    {
-        As              1.67212e-06;
-        Ts              170.672;
-    }
-}
-
-
 N2
 {
     specie
@@ -57,3 +34,25 @@ N2
         Ts              170.672;
     }
 }
+
+Fe
+{
+    specie
+    {
+        molWeight       55.847;
+    }
+    thermodynamics
+    {
+        Tlow            1665;
+        Thigh           1809;
+        Tcommon         1700;
+        highCpCoeffs    ( -435.752 0.768222 -0.000446743 8.66768e-08 0 187860 2449.72 );
+        lowCpCoeffs     7 { 0 };
+    }
+    transport
+    {
+        As              1.67212e-06;
+        Ts              170.672;
+    }
+}
+
