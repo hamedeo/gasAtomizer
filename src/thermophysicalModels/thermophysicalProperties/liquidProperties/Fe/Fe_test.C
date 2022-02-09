@@ -44,48 +44,24 @@ Foam::Fe::Fe()
     liquidProperties
     (
         55.845,	//Fe
-        8227,		//Fe
+        8500,		//Fe
         510e8,		//Au -> Fe not available
         2.6823e-7,	// Vc = (Zc*R*Tc)/pc	
         0.2,		// Near 0.2 for liquid metals, see: Kulinskii, V.L. (2014), The critical compressibility factor value: associative fluids and liquid alkali metals
         1548.6,	//Fe
         0.16,		//Fe
-        2862,		//Fe
+        3135,		//Fe
         6.1709e-30,	//H2O
         0.3449,	//H2O
         4.7813e+4	//H2O
     ),
-    6980,	//rho_(98.343885, 0.30542, 647.13, 0.081),	//Fe
-    pv_(11.353, -19574, 0, 0, 0),				//Fe
-    6340765	//hl_(647.13, 2889425.47876769, 0.3199, -0.212, 0.25795, 0), //Fe
-    450,	/*Cp_	//Fe
-    (
-        15341.1046350264,
-       -116.019983347211,
-        0.451013044684985,
-       -0.000783569247849015,
-        5.20127671384957e-07,
-        0
-    ),*/
-    2220432,
-    /*h_
-    (
-       -17957283.7993676,
-        15341.1046350264,
-       -58.0099916736053,
-        0.150337681561662,
-       -0.000195892311962254,
-        1.04025534276991e-07
-    ),*/
-    477.1,/*Cpg_
-    (
-        1851.73466555648,
-        1487.53816264224,
-        2609.3,
-        493.366638912018,
-        1167.6
-    ),*/
-    B_		//H2O
+    rho_(6980, 0, 0, 0, 0, 0),		//Fe
+    pv_(11.353, -19574, 0, 0, 0),		//Fe
+    hl_(6340765, 0, 0, 0, 0, 0),		//Fe
+    Cp_(450, 0, 0, 0, 0, 0),			//Fe
+    h_(2220432, 0, 0, 0, 0, 0),		//Fe
+    Cpg_(477.1, 0, 0, 0, 0, 0),		//Air
+    B_						//H2O
     (
        -0.0012789342214821,
         1.4909797391063,
@@ -93,12 +69,12 @@ Foam::Fe::Fe()
         1.85445462114904e+19,
        -7.68082153760755e+21
     ),
-    1e-2,//mu_(-51.964, 3670.6, 5.7331, -5.3495e-29, 10),
-    2e-5,//mug_(2.6986e-06, 0.498, 1257.7, -19570), guess
-    38, //kappa_(-0.4267, 0.0056903, -8.0065e-06, 1.815e-09, 0, 0),
+    mu_(1e-2, 0, 0, 0, 0, 0),			//Fe
+    mug_(2e-5, 0, 0, 0, 0, 0),		//Guess, based on air
+    kappa_(38, 0, 0, 0, 0, 0),		//Fe
     kappag_(6.977e-05, 1.1243, 844.9, -148850),	//H2O
-    1.78, //sigma_(647.13, 0.18548, 2.717, -3.554, 2.047, 0),
-    D_(15.0, 15.0, 18.015, 28)			//H2O
+    sigma_(1.78, 0, 0, 0, 0, 0),		//Fe
+    D_(15.0, 15.0, 18.015, 28)		//H2O
 {}
 
 
@@ -119,19 +95,19 @@ Foam::Fe::Fe
             const NSRDSfunc6& surfaceTension,
             const APIdiffCoefFunc& vapourDiffussivity*/
             
-            const liquidProperties& l,    	    
-            const scalar&	density,
-            const NSRDSfunc1&	vapourPressure,
-            const scalar&	heatOfVapourisation,
-            const scalar&	heatCapacity,
-            const scalar& 	enthalpy,
-            const scalar& 	idealGasHeatCapacity,
-            const NSRDSfunc4&	secondVirialCoeff,
-            const scalar&	dynamicViscosity,
-            const scalar& 	vapourDynamicViscosity,
-            const scalar& 	thermalConductivity,
-            const NSRDSfunc2&	vapourThermalConductivity,
-            const scalar& 	surfaceTension,
+            const liquidProperties& l,
+            const NSRDSfunc0& density,
+            const NSRDSfunc1& vapourPressure,
+            const NSRDSfunc0& heatOfVapourisation,
+            const NSRDSfunc0& heatCapacity,
+            const NSRDSfunc0& enthalpy,
+            const NSRDSfunc0& idealGasHeatCapacity,
+            const NSRDSfunc4& secondVirialCoeff,
+            const NSRDSfunc0& dynamicViscosity,
+            const NSRDSfunc0& vapourDynamicViscosity,
+            const NSRDSfunc0& thermalConductivity,
+            const NSRDSfunc2& vapourThermalConductivity,
+            const NSRDSfunc0& surfaceTension,
             const APIdiffCoefFunc& vapourDiffussivity
 )
 :

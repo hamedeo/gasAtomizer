@@ -55,7 +55,7 @@ Foam::Fe::Fe()
         0.3449,
         4.7813e+4
     ),
-    rho_(98.343885, 0.30542, 647.13, 0.081),
+    rho_(997.7),
     pv_(73.649, -7258.2, -7.3037, 4.1653e-06, 2),
     hl_(647.13, 2889425.47876769, 0.3199, -0.212, 0.25795, 0),
     Cp_
@@ -98,13 +98,15 @@ Foam::Fe::Fe()
     kappag_(6.977e-05, 1.1243, 844.9, -148850),
     sigma_(647.13, 0.18548, 2.717, -3.554, 2.047, 0),
     D_(15.0, 15.0, 18.015, 28)
-{}
+{
+	
+}
 
 
 Foam::Fe::Fe
 (
     const liquidProperties& l,
-    const NSRDSfunc5& density,
+    const thermophysicalConstant& density,
     const NSRDSfunc1& vapourPressure,
     const NSRDSfunc6& heatOfVapourisation,
     const NSRDSfunc0& heatCapacity,

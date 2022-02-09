@@ -47,6 +47,7 @@ SourceFiles
 #include "NSRDSfunc6.H"
 #include "NSRDSfunc7.H"
 #include "APIdiffCoefFunc.H"
+#include "thermophysicalConstant.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -63,7 +64,7 @@ class Fe
 {
     // Private data
 
-        NSRDSfunc5 rho_;
+        thermophysicalConstant rho_;
         NSRDSfunc1 pv_;
         NSRDSfunc6 hl_;
         NSRDSfunc0 Cp_;
@@ -95,7 +96,7 @@ public:
         Fe
         (
             const liquidProperties& l,
-            const NSRDSfunc5& density,
+            const thermophysicalConstant& density,
             const NSRDSfunc1& vapourPressure,
             const NSRDSfunc6& heatOfVapourisation,
             const NSRDSfunc0& heatCapacity,
@@ -108,21 +109,6 @@ public:
             const NSRDSfunc2& vapourThermalConductivity,
             const NSRDSfunc6& surfaceTension,
             const APIdiffCoefFunc& vapourDiffussivity
-            
-/*            const liquidProperties& l,    	    
-            const scalar&	density,
-            const NSRDSfunc1&	vapourPressure,
-            const scalar&	heatOfVapourisation,
-            const scalar&	heatCapacity,
-            const scalar& 	enthalpy,
-            const scalar& 	idealGasHeatCapacity,
-            const NSRDSfunc4&	secondVirialCoeff,
-            const scalar& 	dynamicViscosity,
-            const scalar& 	vapourDynamicViscosity,
-            const scalar& 	thermalConductivity,
-            const NSRDSfunc2&	vapourThermalConductivity,
-            const scalar& 	surfaceTension,
-            const APIdiffCoefFunc& vapourDiffussivity*/
         );
 
         //- Construct from dictionary
