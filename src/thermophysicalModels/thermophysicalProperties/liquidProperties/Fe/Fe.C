@@ -43,48 +43,25 @@ Foam::Fe::Fe()
 :
     liquidProperties
     (
-        18.015,
-        647.13,
-        2.2055e+7,
-        0.05595,
-        0.229,
-        273.16,
-        6.113e+2,
-        373.15,
-        6.1709e-30,
-        0.3449,
-        4.7813e+4
+        55.845,	//W -> molar mass				(Fe)
+        8500,		//Tc -> critical temperature			(Fe)
+        510e8,		//Pc -> critical pressure			(Au)
+        2.6823e-7,	//Vc -> critical volume			(Fe/Au)
+        0.2,		//Zc -> critical compressibility factor	(Fe) see: Kulinskii, V.L. (2014)
+        1548.6,	//Tt -> triple point temperature		(Fe)
+        0.16,		//Pt -> triple point pressure			(Fe)
+        3135,		//Tb -> normal boiling point			(Fe)
+        6.1709e-30,	//dimp -> dipole moment			(H2O)
+        0.3449,	//omega -> Pitzer's acentric factor		(H2O)
+        4.7813e+4	//delta -> solubility parameter		(H2O)
     ),
-    rho_(6890),
-    pv_(73.649, -7258.2, -7.3037, 4.1653e-06, 2),
-    hl_(647.13, 2889425.47876769, 0.3199, -0.212, 0.25795, 0),
-    Cp_
-    (
-        15341.1046350264,
-       -116.019983347211,
-        0.451013044684985,
-       -0.000783569247849015,
-        5.20127671384957e-07,
-        0
-    ),
-    h_
-    (
-       -17957283.7993676,
-        15341.1046350264,
-       -58.0099916736053,
-        0.150337681561662,
-       -0.000195892311962254,
-        1.04025534276991e-07
-    ),
-    Cpg_
-    (
-        1851.73466555648,
-        1487.53816264224,
-        2609.3,
-        493.366638912018,
-        1167.6
-    ),
-    B_
+    rho_(6890),			//density			(Fe)
+    pv_(11.353, -19574, 0, 0, 0),	//vapour pressure		(Fe)
+    hl_(6340765),			//heat of vapourisation	(Fe)
+    Cp_(450),				//heat capacity		(Fe)
+    h_(2220432),			//enthalpy			(Fe)
+    Cpg_(477.1),			//gas heat capacity		(Air)
+    B_					//2nd virial coefficient	(H2O)
     (
        -0.0012789342214821,
         1.4909797391063,
@@ -92,12 +69,18 @@ Foam::Fe::Fe()
         1.85445462114904e+19,
        -7.68082153760755e+21
     ),
-    mu_(-51.964, 3670.6, 5.7331, -5.3495e-29, 10),
-    mug_(2.6986e-06, 0.498, 1257.7, -19570),
-    kappa_(-0.4267, 0.0056903, -8.0065e-06, 1.815e-09, 0, 0),
-    kappag_(6.977e-05, 1.1243, 844.9, -148850),
-    sigma_(647.13, 0.18548, 2.717, -3.554, 2.047, 0),
-    D_(15.0, 15.0, 18.015, 28)
+    mu_(1e-2),				//dynamic viscosity		(Fe)
+    mug_(2e-5),			//gas dynamic viscosity	(Air)
+    kappa_(38),			//thermal conductivity		(Fe)
+    kappag_				//gas thermal conductivity	(H2O)
+    (
+    6.977e-05, 
+    1.1243, 
+    844.9, 
+    -148850
+    ),
+    sigma_(1.78),			//surface tension		(Fe)
+    D_(15.0, 15.0, 18.015, 28)	//vapour diffusivity		(H2O)
 {
 	
 }
@@ -108,16 +91,16 @@ Foam::Fe::Fe
     const liquidProperties& l,
     const thermophysicalConstant& density,
     const NSRDSfunc1& vapourPressure,
-    const NSRDSfunc6& heatOfVapourisation,
-    const NSRDSfunc0& heatCapacity,
-    const NSRDSfunc0& enthalpy,
-    const NSRDSfunc7& idealGasHeatCapacity,
+    const thermophysicalConstant& heatOfVapourisation,
+    const thermophysicalConstant& heatCapacity,
+    const thermophysicalConstant& enthalpy,
+    const thermophysicalConstant& idealGasHeatCapacity,
     const NSRDSfunc4& secondVirialCoeff,
-    const NSRDSfunc1& dynamicViscosity,
-    const NSRDSfunc2& vapourDynamicViscosity,
-    const NSRDSfunc0& thermalConductivity,
+    const thermophysicalConstant& dynamicViscosity,
+    const thermophysicalConstant& vapourDynamicViscosity,
+    const thermophysicalConstant& thermalConductivity,
     const NSRDSfunc2& vapourThermalConductivity,
-    const NSRDSfunc6& surfaceTension,
+    const thermophysicalConstant& surfaceTension,
     const APIdiffCoefFunc& vapourDiffussivity
 )
 :

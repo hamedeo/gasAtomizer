@@ -66,16 +66,16 @@ class Fe
 
         thermophysicalConstant rho_;
         NSRDSfunc1 pv_;
-        NSRDSfunc6 hl_;
-        NSRDSfunc0 Cp_;
-        NSRDSfunc0 h_;
-        NSRDSfunc7 Cpg_;
+        thermophysicalConstant hl_;
+        thermophysicalConstant Cp_;
+        thermophysicalConstant h_;
+        thermophysicalConstant Cpg_;
         NSRDSfunc4 B_;
-        NSRDSfunc1 mu_;
-        NSRDSfunc2 mug_;
-        NSRDSfunc0 kappa_;
+        thermophysicalConstant mu_;
+        thermophysicalConstant mug_;
+        thermophysicalConstant kappa_;
         NSRDSfunc2 kappag_;
-        NSRDSfunc6 sigma_;
+        thermophysicalConstant sigma_;
         APIdiffCoefFunc D_;
 
 
@@ -98,16 +98,16 @@ public:
             const liquidProperties& l,
             const thermophysicalConstant& density,
             const NSRDSfunc1& vapourPressure,
-            const NSRDSfunc6& heatOfVapourisation,
-            const NSRDSfunc0& heatCapacity,
-            const NSRDSfunc0& enthalpy,
-            const NSRDSfunc7& idealGasHeatCapacity,
+            const thermophysicalConstant& heatOfVapourisation,
+            const thermophysicalConstant& heatCapacity,
+            const thermophysicalConstant& enthalpy,
+            const thermophysicalConstant& idealGasHeatCapacity,
             const NSRDSfunc4& secondVirialCoeff,
-            const NSRDSfunc1& dynamicViscosity,
-            const NSRDSfunc2& vapourDynamicViscosity,
-            const NSRDSfunc0& thermalConductivity,
+            const thermophysicalConstant& dynamicViscosity,
+            const thermophysicalConstant& vapourDynamicViscosity,
+            const thermophysicalConstant& thermalConductivity,
             const NSRDSfunc2& vapourThermalConductivity,
-            const NSRDSfunc6& surfaceTension,
+            const thermophysicalConstant& surfaceTension,
             const APIdiffCoefFunc& vapourDiffussivity
         );
 
