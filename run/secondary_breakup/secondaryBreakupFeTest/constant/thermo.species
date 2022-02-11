@@ -43,9 +43,9 @@ Fe // properties of solid iron!!
     }
     thermodynamics
     {
-        Tlow            200;//1665;
+        Tlow            200;
         Thigh           2000;
-        Tcommon         1700;
+        Tcommon         1900; //Melting point Fe 1811 K
         highCpCoeffs    ( -435.752 0.768222 -0.000446743 8.66768e-08 0 187860 2449.72 );
         lowCpCoeffs     7 { 0 };
     }

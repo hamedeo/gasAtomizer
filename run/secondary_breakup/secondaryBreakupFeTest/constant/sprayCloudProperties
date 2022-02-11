@@ -55,12 +55,12 @@ solution
 
 constantProperties
 {
-    T0              363;//90;
+    T0              1900;
 
     // place holders for rho0 and Cp0
     // - reset from liquid properties using T0
-    rho0            3000;
-    Cp0             4187;
+    rho0            6890;
+    Cp0             825;
 
     constantVolume  false;
 }

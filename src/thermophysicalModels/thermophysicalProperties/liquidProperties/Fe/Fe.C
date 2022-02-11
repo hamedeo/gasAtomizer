@@ -44,9 +44,9 @@ Foam::Fe::Fe()
     liquidProperties
     (
         55.845,	//W -> molar mass				(Fe)
-        8500,		//Tc -> critical temperature			(Fe)
-        510e8,		//Pc -> critical pressure			(Au)
-        2.6823e-7,	//Vc -> critical volume			(Fe/Au)
+        9250,		//Tc -> critical temperature			(Fe) Beutl1994
+        8750e5,	//Pc -> critical pressure			(Fe) Beutl1994
+        1.758e-5,	//Vc -> critical volume			(Fe) Vc = Zc*R*Tc/pc
         0.2,		//Zc -> critical compressibility factor	(Fe) see: Kulinskii, V.L. (2014)
         1548.6,	//Tt -> triple point temperature		(Fe)
         0.16,		//Pt -> triple point pressure			(Fe)
@@ -55,10 +55,25 @@ Foam::Fe::Fe()
         0.3449,	//omega -> Pitzer's acentric factor		(H2O)
         4.7813e+4	//delta -> solubility parameter		(H2O)
     ),
-    rho_(6890),			//density			(Fe)
-    pv_(11.353, -19574, 0, 0, 0),	//vapour pressure		(Fe)
+    rho_				//density			(Fe) Beutl1994
+    (
+    8497.70,
+    -0.82268,
+    0,
+    0,
+    0,
+    0
+    ),
+    pv_				//vapour pressure		(Fe) Beutl1994
+    (
+    26.4317,
+    -48769,
+    -1.3217,
+    0,
+    0
+    ),	
     hl_(6340765),			//heat of vapourisation	(Fe)
-    Cp_(450),				//heat capacity		(Fe)
+    Cp_(825),				//heat capacity		(Fe)
     h_(2220432),			//enthalpy			(Fe)
     Cpg_(477.1),			//gas heat capacity		(Air)
     B_					//2nd virial coefficient	(H2O)
@@ -89,7 +104,7 @@ Foam::Fe::Fe()
 Foam::Fe::Fe
 (
     const liquidProperties& l,
-    const thermophysicalConstant& density,
+    const NSRDSfunc0& density,
     const NSRDSfunc1& vapourPressure,
     const thermophysicalConstant& heatOfVapourisation,
     const thermophysicalConstant& heatCapacity,

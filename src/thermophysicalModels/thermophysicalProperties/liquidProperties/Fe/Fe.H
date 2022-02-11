@@ -64,7 +64,7 @@ class Fe
 {
     // Private data
 
-        thermophysicalConstant rho_;
+        NSRDSfunc0 rho_;
         NSRDSfunc1 pv_;
         thermophysicalConstant hl_;
         thermophysicalConstant Cp_;
@@ -96,7 +96,7 @@ public:
         Fe
         (
             const liquidProperties& l,
-            const thermophysicalConstant& density,
+            const NSRDSfunc0& density,
             const NSRDSfunc1& vapourPressure,
             const thermophysicalConstant& heatOfVapourisation,
             const thermophysicalConstant& heatCapacity,
