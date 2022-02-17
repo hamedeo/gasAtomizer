@@ -51,9 +51,7 @@ Foam::Fe::Fe()
         1548.6,	//Tt -> triple point temperature		(Fe)
         0.16,		//Pt -> triple point pressure			(Fe)
         3135,		//Tb -> normal boiling point			(Fe)
-        6.1709e-30,	//dimp -> dipole moment			(H2O)
-        0.3449,	//omega -> Pitzer's acentric factor		(H2O)
-        4.7813e+4	//delta -> solubility parameter		(H2O)
+        1811		//Tm -> normal melting point			(Fe)
     ),
     rho_				//density			(Fe) Beutl1994
     (
@@ -96,9 +94,7 @@ Foam::Fe::Fe()
     ),
     sigma_(1.78),			//surface tension		(Fe)
     D_(15.0, 15.0, 18.015, 28)	//vapour diffusivity		(H2O)
-{
-	
-}
+{}
 
 
 Foam::Fe::Fe

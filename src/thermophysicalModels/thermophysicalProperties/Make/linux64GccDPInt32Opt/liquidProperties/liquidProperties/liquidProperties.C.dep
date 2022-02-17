@@ -1,7 +1,6 @@
-$(OBJECTS_DIR)/liquidProperties/Fe/Fe.C.dep: \
-liquidProperties/Fe/Fe.C \
-liquidProperties/Fe/Fe.H \
-liquidProperties/Fe/../liquidProperties/liquidProperties.H \
+$(OBJECTS_DIR)/liquidProperties/liquidProperties/liquidProperties.C.dep: \
+liquidProperties/liquidProperties/liquidProperties.C \
+liquidProperties/liquidProperties/liquidProperties.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/thermophysicalProperties.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/dictionary.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/entry.H \
@@ -155,21 +154,6 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/StringStream.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/ISstream.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/ISstreamI.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/thermophysicalPropertiesI.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/liquidPropertiesI.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NSRDSfunc0.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/thermophysicalFunction.H \
-$(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOstreams.H \
-$(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/prefixOSstream.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NSRDSfunc1.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NSRDSfunc2.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NSRDSfunc3.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NSRDSfunc4.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NSRDSfunc5.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NSRDSfunc6.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NSRDSfunc7.H \
-$(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/APIdiffCoefFunc.H \
-lnInclude/thermophysicalConstant.H \
-liquidProperties/Fe/FeI.H \
-$(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/addToRunTimeSelectionTable.H \
+liquidProperties/liquidProperties/liquidPropertiesI.H \
 
 #END

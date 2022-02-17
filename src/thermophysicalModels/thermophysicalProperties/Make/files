@@ -1,4 +1,6 @@
 thermophysicalFunctions/thermophysicalConstant/thermophysicalConstant.C
 
 liquidProperties/Fe/Fe.C
+liquidProperties/liquidProperties/liquidProperties.C
+
 LIB = $(FOAM_USER_LIBBIN)/libmyThermophysicalProperties

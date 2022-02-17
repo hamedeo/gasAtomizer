@@ -22,7 +22,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         1e-4;
+endTime         1e-5;
 
 deltaT          2.5e-06;
 
@@ -85,4 +85,5 @@ functions
 }
 
 libs ("libmyThermophysicalProperties.so");
+
 // ************************************************************************* //

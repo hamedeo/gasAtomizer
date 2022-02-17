@@ -37,7 +37,7 @@ SourceFiles
 #ifndef Fe_H
 #define Fe_H
 
-#include "liquidProperties.H"
+#include "../liquidProperties/liquidProperties.H"
 #include "NSRDSfunc0.H"
 #include "NSRDSfunc1.H"
 #include "NSRDSfunc2.H"

@@ -27,84 +27,98 @@ License
 
 inline Foam::scalar Foam::Fe::rho(scalar p, scalar T) const
 {
+    //Info << "Call for density f(p,T)" << endl;
     return rho_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::pv(scalar p, scalar T) const
 {
+    //Info << "Call for vapor pressure f(p,T)" << endl;
     return pv_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::hl(scalar p, scalar T) const
 {
+    //Info << "Call for heat of vaporisation f(p,T)" << endl;
     return hl_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::Cp(scalar p, scalar T) const
 {
+    //Info << "Call for heat capacity f(p,T)" << endl;
     return Cp_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::h(scalar p, scalar T) const
 {
+    //Info << "Call for liquid enthalpy f(p,T)" << endl;
     return h_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::Cpg(scalar p, scalar T) const
 {
+    //Info << "Call for gas heat capacity f(p,T)" << endl;
     return Cpg_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::B(scalar p, scalar T) const
 {
+    //Info << "Call for virial coefficient f(p,T)" << endl;
     return B_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::mu(scalar p, scalar T) const
 {
+    //Info << "Call for viscosity f(p,T)" << endl;
     return mu_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::mug(scalar p, scalar T) const
 {
+    //Info << "Call for gas viscosity f(p,T)" << endl;
     return mug_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::kappa(scalar p, scalar T) const
 {
+    //Info << "Call for thermal conductivity f(p,T)" << endl;
     return kappa_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::kappag(scalar p, scalar T) const
 {
+    //Info << "Call for vapor thermal conductivity f(p,T)" << endl;
     return kappag_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::sigma(scalar p, scalar T) const
 {
+    //Info << "Call for surface tension f(p,T)" << endl;
     return sigma_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::D(scalar p, scalar T) const
 {
+    //Info << "Call for vapor diffusivity f(p,T)" << endl;
     return D_.f(p, T);
 }
 
 
 inline Foam::scalar Foam::Fe::D(scalar p, scalar T, scalar Wb) const
 {
+    //Info << "Call for vapor diffusivity with binary pair f(p,T)" << endl;
     return D_.f(p, T, Wb);
 }
 
