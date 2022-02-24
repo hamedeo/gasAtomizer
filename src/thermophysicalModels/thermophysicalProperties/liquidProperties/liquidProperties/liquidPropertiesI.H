@@ -148,14 +148,9 @@ inline void Foam::liquidProperties::readIfPresent
     readIfPresent(l.hl_, "hl", dict);
     readIfPresent(l.Cp_, "Cp", dict);
     readIfPresent(l.h_, "h", dict);
-    readIfPresent(l.Cpg_, "Cpg", dict);
-    readIfPresent(l.B_, "B", dict);
     readIfPresent(l.mu_, "mu", dict);
-    readIfPresent(l.mug_, "mug", dict);
     readIfPresent(l.kappa_, "K", dict);
-    readIfPresent(l.kappag_, "kappag", dict);
     readIfPresent(l.sigma_, "sigma", dict);
-    readIfPresent(l.D_, "D", dict);
 }
 
 
@@ -172,14 +167,9 @@ inline void Foam::liquidProperties::writeData
     l.hl_.writeData(os); os << nl;
     l.Cp_.writeData(os); os << nl;
     l.h_.writeData(os); os << nl;
-    l.Cpg_.writeData(os); os << nl;
-    l.B_.writeData(os); os << nl;
     l.mu_.writeData(os); os << nl;
-    l.mug_.writeData(os); os << nl;
     l.kappa_.writeData(os); os << nl;
-    l.kappag_.writeData(os); os << nl;
-    l.sigma_.writeData(os); os << nl;
-    l.D_.writeData(os); os << endl;
+    l.sigma_.writeData(os); os << endl;
 }
 
 

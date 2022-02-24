@@ -69,14 +69,9 @@ class Fe
         thermophysicalConstant hl_;
         thermophysicalConstant Cp_;
         thermophysicalConstant h_;
-        thermophysicalConstant Cpg_;
-        NSRDSfunc4 B_;
         thermophysicalConstant mu_;
-        thermophysicalConstant mug_;
         thermophysicalConstant kappa_;
-        NSRDSfunc2 kappag_;
         thermophysicalConstant sigma_;
-        APIdiffCoefFunc D_;
 
 
 public:
@@ -101,14 +96,9 @@ public:
             const thermophysicalConstant& heatOfVapourisation,
             const thermophysicalConstant& heatCapacity,
             const thermophysicalConstant& enthalpy,
-            const thermophysicalConstant& idealGasHeatCapacity,
-            const NSRDSfunc4& secondVirialCoeff,
             const thermophysicalConstant& dynamicViscosity,
-            const thermophysicalConstant& vapourDynamicViscosity,
             const thermophysicalConstant& thermalConductivity,
-            const NSRDSfunc2& vapourThermalConductivity,
-            const thermophysicalConstant& surfaceTension,
-            const APIdiffCoefFunc& vapourDiffussivity
+            const thermophysicalConstant& surfaceTension
         );
 
         //- Construct from dictionary
@@ -138,23 +128,11 @@ public:
         //- Liquid Enthalpy [J/(kg)]
         inline scalar h(scalar p, scalar T) const;
 
-        //- Ideal gas heat capacity [J/(kg K)]
-        inline scalar Cpg(scalar p, scalar T) const;
-
-        //- Second Virial Coefficient [m^3/kg]
-        inline scalar B(scalar p, scalar T) const;
-
         //- Liquid viscosity [Pa s]
         inline scalar mu(scalar p, scalar T) const;
 
-        //- Vapour viscosity [Pa s]
-        inline scalar mug(scalar p, scalar T) const;
-
         //- Liquid thermal conductivity  [W/(m K)]
         inline scalar kappa(scalar p, scalar T) const;
-
-        //- Vapour thermal conductivity  [W/(m K)]
-        inline scalar kappag(scalar p, scalar T) const;
 
         //- Surface tension [N/m]
         inline scalar sigma(scalar p, scalar T) const;
