@@ -77,36 +77,48 @@ subModels
     {
         model1
         {
+        
             type            coneNozzleInjection;
             SOI             0;			// start of injection
-            massTotal       8.0e-5;
+            massTotal       8.0e-5;                   // 8.0e-5
             parcelBasisType mass;
+            
             injectionMethod disc;
             flowType        flowRateAndDischarge;
             outerDiameter   3e-4;
             innerDiameter   0;
-            duration        1.25e-3;
-            position        (0 0.0295 0);
-            direction       (0 -1 0);
-            parcelsPerSecond 20000000;
+            duration        1;
+            position        (0 -0.0047625 0.055);
+            direction       (0 1 0);
+            parcelsPerSecond 1;
+            //nParticle        1;
+            
 	    flowRateProfile constant 10;
 
             Cd              constant 0.9;
 
             thetaInner      constant 0.0;
-            thetaOuter      constant 10.0;
+            thetaOuter      constant 10;
+            
 
+          
             sizeDistribution
             {
                 type        uniform;
                 uniformDistribution
                 {
-                    minValue        0.00015;
-                    maxValue        0.00015;
-                    d               0.00015;
+                    minValue        0.00017;
+                    maxValue        0.00017;
+                    d               0.00017;
                     n               1;
                 }
             }
+            
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+            
+            
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
         }
     }
 
@@ -125,7 +137,7 @@ subModels
     atomizationModel none;
 
     breakupModel     none;	//ReitzDiwakar; // ReitzKHRT;
-
+    
     stochasticCollisionModel none;
 
     radiation       off;
@@ -215,3 +227,4 @@ cloudFunctions
 
 
 // ************************************************************************* //
+

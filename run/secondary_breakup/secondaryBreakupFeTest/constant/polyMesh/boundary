@@ -16,14 +16,21 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-1
+2
 (
+    inlet
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          128;
+        startFace       127616;
+    }
     walls
     {
         type            wall;
         inGroups        1(wall);
-        nFaces          2250;
-        startFace       19125;
+        nFaces          2464;
+        startFace       127744;
     }
 )
 
