@@ -1,0 +1,72 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2106                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+    // Load initial cellSet
+    {
+        name    c0;
+        type    cellSet;
+        action  new;
+        source  cylinderToCell;
+
+        p1      (0 0 0.056);//4.7625 0 58 //0.025 1 0.080 [P1X P1Y P1Z]
+        p2      (0 0 0.060); //0.025 0.049 0.080          [P2X P2Y P2Z]
+        radius  0.0025;
+    }
+
+    // Get all faces in cellSet and assign to injectorFaces
+    {
+        name    injectorFaces;
+        type    faceSet;
+        action  new;
+        source  cellToFace;
+
+        set     c0;
+        option  all;
+    }
+    // Invert
+    /*
+    {
+	name 	c0;
+    	type 	cellSet;
+    	action 	invert;
+    }
+    */
+
+    // Keep in injectorFaces all faces in boundary faces
+    {
+        name    injectorFaces;
+        type    faceSet;
+        action  subset;
+        source  cellToFace;
+        set     c0;
+        option  all;
+    }
+    /*
+    {
+    	name injectorFacesZone;
+    	type faceZoneSet;
+    	action new;
+    	source setToFaceZone;
+    	faceSet injectorFaces;
+    }
+    */
+    
+);
+
+
+// ************************************************************************* //
