@@ -18,11 +18,11 @@ application     secondaryBreakupFoam;
 
 startFrom       startTime;
 
-startTime       0;
+startTime       7e-4;
 
 stopAt          endTime;
 
-endTime         1e-4;
+endTime         1.5e-3;
 
 deltaT          2.5e-06;
 
@@ -51,7 +51,7 @@ runTimeModifiable yes;
 
 functions
 {
-   /* distribution1
+    distribution1
     {
         // Mandatory entries
         type            particleDistribution;
@@ -81,7 +81,7 @@ functions
         executeInterval 1;
         writeControl    writeTime;
         writeInterval   -1;
-    }*/
+    }
 }
 
 libs ("libmyThermophysicalProperties.so");

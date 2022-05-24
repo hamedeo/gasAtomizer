@@ -16,7 +16,8 @@ FoamFile
 
 defaultFieldValues
 (
-    //volScalarFieldValue N2 1
+    //volScalarFieldValue N2 0.001
+    //volScalarFieldValue Fe 0.001
 );
 
 regions
@@ -28,8 +29,26 @@ regions
         fieldValues
         (
             //volScalarFieldValue N2 1
-            volVectorFieldValue U (0 0 -200)
+            //volScalarFieldValue Fe 0.001
+            volVectorFieldValue U (0 0 -80)
+            /*(
+            (
+            0 0 -150)
+            (
+            0 0 -170
+            )
+            */
         );
+       
+        /*
+        type            pressureInletOutletVelocity;
+        inletValue      table
+        (
+            (0    (1 0 0))
+            (5    (2 0 0))
+            (10    (3 0 0))
+        );
+        */
     }
 );
 

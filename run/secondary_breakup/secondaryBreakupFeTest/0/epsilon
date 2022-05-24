@@ -26,13 +26,17 @@ boundaryField
         value           uniform 90;
     }
     
-    inlet 
+    inlet
     {
         type            epsilonWallFunction;
-        value           $internalField;
+        value           uniform 90;
     }
     
-
+    outlet
+    {
+        type            epsilonWallFunction;
+        value           uniform 90;
+    }
 }
 
 

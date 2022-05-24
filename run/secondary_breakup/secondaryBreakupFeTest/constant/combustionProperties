@@ -10,42 +10,18 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      thermophysicalProperties;
+    object      combustionProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-thermoType
+combustionModel PaSR;
+
+active          no;
+
+PaSRCoeffs
 {
-    type            hePsiThermo;
-    mixture         reactingMixture;
-    transport       sutherland;
-    thermo          janaf;
-    energy          sensibleEnthalpy;
-    equationOfState perfectGas;
-    specie          specie;
+    Cmix                1.0;
 }
-
-// FOAMCHEMISTRY
-chemistryReader	foamChemistryReader;
-foamChemistryFile	"<constant>/species";
-foamChemistryThermoFile "<constant>/thermo.species";
-
-
-
-
-newFormat       yes;
-
-inertSpecie     N2;
-
-liquids
-{
-    //Fe;
-    //H2O;
-    Benz;
-}
-
-solids
-{}
 
 
 // ************************************************************************* //

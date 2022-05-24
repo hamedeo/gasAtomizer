@@ -25,7 +25,7 @@ actions
 
         p1      (0 0 0.056);//4.7625 0 58 //0.025 1 0.080 [P1X P1Y P1Z]
         p2      (0 0 0.060); //0.025 0.049 0.080          [P2X P2Y P2Z]
-        radius  0.0025;
+        radius  0.0047625;
     }
 
     // Get all faces in cellSet and assign to injectorFaces
@@ -56,6 +56,7 @@ actions
         set     c0;
         option  all;
     }
+    
     /*
     {
     	name injectorFacesZone;

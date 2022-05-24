@@ -18,19 +18,19 @@ FoamFile
 
 2
 (
-    inlet
-    {
-        type            wall;
-        inGroups        1(wall);
-        nFaces          128;
-        startFace       127616;
-    }
     walls
     {
         type            wall;
         inGroups        1(wall);
-        nFaces          2464;
-        startFace       127744;
+        nFaces          1856;
+        startFace       127168;
+    }
+    outlet
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          512;
+        startFace       129024;
     }
 )
 

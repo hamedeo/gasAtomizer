@@ -30,7 +30,10 @@ boundaryField
         type                zeroGradient;
     }
     
-
+    outlet
+    {
+    	type zeroGradient;
+    }
 
 }
 

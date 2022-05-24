@@ -55,11 +55,11 @@ solution
 
 constantProperties
 {
-    T0              1900;
+    T0              300;//1900;
 
     // place holders for rho0 and Cp0
     // - reset from liquid properties using T0
-    rho0            6890;
+    rho0            842;//6890;
     Cp0             825;
 
     constantVolume  false;
@@ -71,34 +71,38 @@ subModels
     particleForces
     {
         sphereDrag;
+        gravity;
     }
 
     injectionModels
     {
+    
         model1
         {
         
             type            coneNozzleInjection;
-            SOI             0;			// start of injection
-            massTotal       8.0e-5;                   // 8.0e-5
-            parcelBasisType mass;
-            
+            SOI             7e-04;				// start of injection if velocity is at 200 m/s, after 10 timesteps.
+            massTotal       5.414987851402901e-06; //Benz //6.011070614439609e-06; //Water           // 8.0e-5 5.414987851402901e-06
+            parcelBasisType mass;				
             injectionMethod disc;
-            flowType        flowRateAndDischarge;
+            flowType        constantVelocity; 		//flowRateAndDischarge
+            UMag            16; 				//Same value as in Paper [16]
             outerDiameter   3e-4;
             innerDiameter   0;
-            duration        1;
+            duration        1.25e-3;
             position        (0 -0.0047625 0.055);
             direction       (0 1 0);
-            parcelsPerSecond 1;
+            parcelsPerSecond 2000000;
             //nParticle        1;
             
 	    flowRateProfile constant 10;
 
-            Cd              constant 0.9;
+            Cd              constant 0.9; //0.9
 
+
+// Inner and outer half-cone angles
             thetaInner      constant 0.0;
-            thetaOuter      constant 10;
+            thetaOuter      constant 0.0;
             
 
           
@@ -113,13 +117,42 @@ subModels
                     n               1;
                 }
             }
+          }
             
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
             
-            
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+/*
+	model1
+        {
+        
+	    type            injectedParticleInjection;
+	    SOI             0;
+	    massTotal       0; // Place holder only
+	    parcelBasisType fixed;
+	    nParticle       1; // 1 particle per parcel
+	    cloud           kinematicCloud;//eulerianParticleCloud;
+	    positionOffset  (0.0004 0.003 0.030);
+            direction       (0 0 -1);  
+            parcelsPerSecond 2000000;
+	               
+            duration        1.25e-3;
+            flowType        constantVelocity; //flowRateAndDischarge
+	                
+	    sizeDistribution
+            {
+                type        uniform;
+                uniformDistribution
+                {
+                    minValue        0.00017;
+                    maxValue        0.00017;
+                    d               0.00017;
+                    n               1;
+                }
+            }
         }
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+*/
     }
 
     dispersionModel none;
@@ -136,7 +169,7 @@ subModels
 
     atomizationModel none;
 
-    breakupModel     none;	//ReitzDiwakar; // ReitzKHRT;
+    breakupModel     ReitzDiwakar;	//ReitzDiwakar; // ReitzKHRT;
     
     stochasticCollisionModel none;
 
@@ -158,7 +191,9 @@ subModels
         (
             liquid
             {
-                Fe               1;
+                //Fe               1;
+                //H2O	 	1;
+                Benz		1;
             }
         );
     }
