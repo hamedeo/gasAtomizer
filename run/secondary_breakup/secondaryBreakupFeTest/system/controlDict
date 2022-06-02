@@ -18,11 +18,11 @@ application     secondaryBreakupFoam;
 
 startFrom       startTime;
 
-startTime       7e-4;
+startTime       1.5e-3;
 
 stopAt          endTime;
 
-endTime         1.5e-3;
+endTime         2e-3;
 
 deltaT          2.5e-06;
 
@@ -84,6 +84,9 @@ functions
     }
 }
 
-libs ("libmyThermophysicalProperties.so");
+libs (
+"libmyThermophysicalProperties.so"
+"libmylagrangianSpray.so"
+);
 
 // ************************************************************************* //

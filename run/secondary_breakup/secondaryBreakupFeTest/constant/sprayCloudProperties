@@ -81,19 +81,18 @@ subModels
         {
         
             type            coneNozzleInjection;
-            SOI             7e-04;				// start of injection if velocity is at 200 m/s, after 10 timesteps.
+            SOI             20e-04;				// start of injection if velocity is at 200 m/s, after 10 timesteps.
             massTotal       5.414987851402901e-06; //Benz //6.011070614439609e-06; //Water           // 8.0e-5 5.414987851402901e-06
             parcelBasisType mass;				
             injectionMethod disc;
             flowType        constantVelocity; 		//flowRateAndDischarge
             UMag            16; 				//Same value as in Paper [16]
-            outerDiameter   3e-4;
+            outerDiameter   170e-6;
             innerDiameter   0;
             duration        1.25e-3;
             position        (0 -0.0047625 0.055);
             direction       (0 1 0);
             parcelsPerSecond 2000000;
-            //nParticle        1;
             
 	    flowRateProfile constant 10;
 
@@ -159,7 +158,7 @@ subModels
 
     patchInteractionModel standardWallInteraction;
 
-    heatTransferModel RanzMarshall;
+    heatTransferModel none;//RanzMarshall;
 
     compositionModel singlePhaseMixture;
 
@@ -169,7 +168,7 @@ subModels
 
     atomizationModel none;
 
-    breakupModel     ReitzDiwakar;	//ReitzDiwakar; // ReitzKHRT;
+    breakupModel     KH_Stijn;	//ReitzDiwakar; // ReitzKHRT;
     
     stochasticCollisionModel none;
 
@@ -204,7 +203,7 @@ subModels
 
         activeLiquids    ( H2O );
     }*/
-
+/*
     ReitzDiwakarCoeffs
     {
         solveOscillationEq yes;
@@ -213,19 +212,19 @@ subModels
         Cstrip          0.5;
         Cs              10;
     }
+*/
 
-/*
-    ReitzKHRTCoeffs
+    KH_StijnCoeffs
     {
         solveOscillationEq yes;
         B0              0.61;
-        B1              40;
+        B1              1.73;
         Ctau            1;
         CRT             0.1;
         msLimit         0.2;
-        WeberLimit      6;
+        WeberLimit      500;
     }
-*/
+
     TABCoeffs
     {
         y0              0;

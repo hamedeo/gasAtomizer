@@ -43,7 +43,15 @@ boundaryField
  		const scalar tstep = 1e-5;			//time step used in the simulation [In controlDict]
  		const scalar vstep = -20;			//Desired increase in velocity per t [m/s]
  		const scalar vstep_actual = vstep/tstep;	//Transformation for to the right order for really increase with the desired vstep
- 		const scalar vmax = -200;			//Desired end velocity [m/s]
+ 		
+ 		/*--------------------------------*- C++ -*----------------------------------*\
+		| Cases	U				                               |
+		| 2           	59								|					
+		| 4            100                    					|
+		| 9            250          							|
+		|                                                  				|
+		\*---------------------------------------------------------------------------*/
+ 		const scalar vmax = -59;			//Desired end velocity [m/s]
  		
  		const scalar tmax = (vmax/vstep)*tstep;	//Needed time for developing the flowfield to vmax [for if-condition]
  	
