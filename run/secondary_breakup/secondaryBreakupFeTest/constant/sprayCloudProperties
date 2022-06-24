@@ -62,7 +62,7 @@ constantProperties
     rho0            842;//6890;
     Cp0             825;
 
-    constantVolume  false;
+    constantVolume  true;
 }
 
 
@@ -81,20 +81,21 @@ subModels
         {
         
             type            coneNozzleInjection;
-            SOI             20e-04;				// start of injection if velocity is at 200 m/s, after 10 timesteps.
-            massTotal       5.414987851402901e-06; //Benz //6.011070614439609e-06; //Water           // 8.0e-5 5.414987851402901e-06
+            SOI             3e-3;//3e-03;				// start of injection if velocity is at 200 m/s, after 10 timesteps.
+            massTotal       2.165995140561160e-09;//1.299597084336696e-07; //Benz 
             parcelBasisType mass;				
             injectionMethod disc;
             flowType        constantVelocity; 		//flowRateAndDischarge
             UMag            16; 				//Same value as in Paper [16]
-            outerDiameter   170e-6;
+            outerDiameter   170e-6;//3e-4;
             innerDiameter   0;
-            duration        1.25e-3;
-            position        (0 -0.0047625 0.055);
+            duration        2e-4;//2e-3;
+            position        (0 -0.0047625 0.055); //(0 -0.0047625 0.055);
             direction       (0 1 0);
-            parcelsPerSecond 2000000;
+            parcelsPerSecond 5e3;//5e3;
+            //nParticle        1;
             
-	    flowRateProfile constant 10;
+	    flowRateProfile constant 1;//10;
 
             Cd              constant 0.9; //0.9
 
@@ -103,8 +104,7 @@ subModels
             thetaInner      constant 0.0;
             thetaOuter      constant 0.0;
             
-
-          
+	 
             sizeDistribution
             {
                 type        uniform;
@@ -117,41 +117,7 @@ subModels
                 }
             }
           }
-            
-
-            
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-/*
-	model1
-        {
-        
-	    type            injectedParticleInjection;
-	    SOI             0;
-	    massTotal       0; // Place holder only
-	    parcelBasisType fixed;
-	    nParticle       1; // 1 particle per parcel
-	    cloud           kinematicCloud;//eulerianParticleCloud;
-	    positionOffset  (0.0004 0.003 0.030);
-            direction       (0 0 -1);  
-            parcelsPerSecond 2000000;
-	               
-            duration        1.25e-3;
-            flowType        constantVelocity; //flowRateAndDischarge
-	                
-	    sizeDistribution
-            {
-                type        uniform;
-                uniformDistribution
-                {
-                    minValue        0.00017;
-                    maxValue        0.00017;
-                    d               0.00017;
-                    n               1;
-                }
-            }
-        }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-*/
+                       
     }
 
     dispersionModel none;
@@ -168,7 +134,7 @@ subModels
 
     atomizationModel none;
 
-    breakupModel     KH_Stijn;	//ReitzDiwakar; // ReitzKHRT;
+    breakupModel     TAB;	//ReitzDiwakar; // ReitzKHRT;
     
     stochasticCollisionModel none;
 
@@ -176,7 +142,7 @@ subModels
 
     standardWallInteractionCoeffs
     {
-        type            rebound;
+        type            escape;//rebound;
     }
 
     RanzMarshallCoeffs
@@ -203,7 +169,7 @@ subModels
 
         activeLiquids    ( H2O );
     }*/
-/*
+
     ReitzDiwakarCoeffs
     {
         solveOscillationEq yes;
@@ -212,7 +178,7 @@ subModels
         Cstrip          0.5;
         Cs              10;
     }
-*/
+
 
     KH_StijnCoeffs
     {
@@ -221,17 +187,31 @@ subModels
         B1              1.73;
         Ctau            1;
         CRT             0.1;
-        msLimit         0.2;
-        WeberLimit      500;
+        msLimit         0.03;
+        WeberLimit      6;//6;
+    }
+
+    ReitzKHRTCoeffs
+    {
+        solveOscillationEq yes;
+        B0              0.61;
+        B1              1.73;//1.73;
+        Ctau            1;
+        CRT             0.1;
+        msLimit         0.03;//0.03;
+        WeberLimit      6;//6;
     }
 
     TABCoeffs
     {
+    
+        solveOscillationEq no;        
         y0              0;
-        yDot0           0;
-        Cmu             10;
-        Comega          8;
-        WeCrit          12;
+        yDot0           0;           
+        Cmu             5;//10;  
+        Comega          8;         
+        WeCrit          6;
+        SMDCalculationMethod 	method1;
     }
 }
 

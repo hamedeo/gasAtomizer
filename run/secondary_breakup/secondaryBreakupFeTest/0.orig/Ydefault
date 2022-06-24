@@ -9,21 +9,32 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      turbulenceProperties;
+    class       volScalarField;
+    object      Ydefault;
 }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// ************************************************************************* //
 
-simulationType  laminar;
+dimensions          [0 0 0 0 0 0 0];
 
-RAS
+internalField       uniform 0;
+
+boundaryField
 {
-    RASModel        kEpsilon;
+    walls
+    {
+        type                zeroGradient;
+    }
+    
+    inlet
+    {
+        type                zeroGradient;
+    }
+    
+    outlet
+    {
+    	type zeroGradient;
+    }
 
-    turbulence      on
-    ;
-
-    printCoeffs     on;
 }
 
 

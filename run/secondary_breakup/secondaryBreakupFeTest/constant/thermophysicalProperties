@@ -39,8 +39,8 @@ inertSpecie     N2;
 
 liquids
 {
-    //Fe;
-    //H2O;
+    Fe;
+    H2O;
     Benz;
 }
 

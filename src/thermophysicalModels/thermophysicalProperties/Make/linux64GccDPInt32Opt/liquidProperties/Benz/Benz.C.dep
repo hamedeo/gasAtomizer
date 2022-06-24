@@ -168,6 +168,7 @@ $(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NS
 $(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NSRDSfunc6.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/NSRDSfunc7.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/thermophysicalProperties/lnInclude/APIdiffCoefFunc.H \
+lnInclude/thermophysicalConstant.H \
 liquidProperties/Benz/BenzI.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/addToRunTimeSelectionTable.H \
 

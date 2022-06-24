@@ -116,19 +116,11 @@ bool Foam::KH_Stijn<CloudType>::update
     scalar mass = nParticle*d3*rhopi6;
     scalar mass0 = nParticle*d03*rhopi6;
 
-//Original
     scalar weGas = 0.5*rhoc*sqr(Urmag)*d/sigma;
     scalar weLiquid = 0.5*rho*sqr(Urmag)*d/sigma;
 
-   
-    //Different Weber number computation
-   // scalar weGas = 1.165*pow(Urmag,2)*d/sigma;  //rhoc*pow(Urmag,2)*d/sigma; 
-    //scalar weLiquid = 842*pow(Urmag,2)*d/sigma; //rho*pow(Urmag,2)*d/sigma;
-
     // Note: Reitz is using radius instead of diameter for Re-number
-    scalar reLiquid = rho*Urmag*d/mu;
-    
-   // scalar reLiquid = rho*Urmag*d/mu; 		//Use diameter for the Reynolds number of the liquid
+    scalar reLiquid = rho*Urmag*r/mu;
     scalar ohnesorge = sqrt(weLiquid)/(reLiquid + VSMALL);
     scalar taylor = ohnesorge*sqrt(weGas);
 
@@ -155,8 +147,7 @@ bool Foam::KH_Stijn<CloudType>::update
 
     // stable KH diameter
     scalar dc = 2.0*b0_*lambdaKH;
-//------------------------------------------------------------------------------------------------------------------------------------------------------
-/*
+
     // the frequency of the fastest growing RT wavelength.
     scalar helpVariable = mag(gt*(rho - rhoc));
     scalar omegaRT = sqrt
@@ -189,11 +180,8 @@ bool Foam::KH_Stijn<CloudType>::update
         scalar nDrops = d/lambdaRT;
         d = cbrt(d3/nDrops);
     }
-    */
-    // otherwise check for KH breakup ------------------------------ Starts from here------------------------------
-    //else 
-    
-    if (dc < d)
+    // otherwise check for KH breakup
+    else if (dc < d)
     {
         // no breakup below Weber = 12
         if (weGas > weberLimit_)
@@ -249,8 +237,7 @@ bool Foam::KH_Stijn<CloudType>::update
                 }
             }
         }
-   }
-     
+    }
     else if (KHindex < 0.5)
     {
         // Case of larger drops after breakup (Reitz, Atomization & Spray
@@ -263,8 +250,6 @@ bool Foam::KH_Stijn<CloudType>::update
         ms = 0.0;
         KHindex = 1.0;
     }
-    
-    
 
     // correct the number of parcels in parent
     scalar massDrop = pow3(d)*rhopi6;

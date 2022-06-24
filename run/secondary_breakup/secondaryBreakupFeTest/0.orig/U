@@ -46,13 +46,12 @@ boundaryField
  		
  		/*--------------------------------*- C++ -*----------------------------------*\
 		| Cases	U				                               |
-		| 2           	59	
-		| 3		72							|					
+		| 2           	59								|					
 		| 4            100                    					|
 		| 9            250          							|
 		|                                                  				|
 		\*---------------------------------------------------------------------------*/
- 		const scalar vmax = -100;			//Desired end velocity [m/s]
+ 		const scalar vmax = -59;			//Desired end velocity [m/s]
  		
  		const scalar tmax = (vmax/vstep)*tstep;	//Needed time for developing the flowfield to vmax [for if-condition]
  	
@@ -97,7 +96,6 @@ boundaryField
      outlet
     {
     	type zeroGradient;
-    	
     }
     
 }

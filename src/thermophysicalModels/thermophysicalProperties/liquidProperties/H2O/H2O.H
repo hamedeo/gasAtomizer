@@ -24,18 +24,18 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Benz
+    Foam::H2O
 
 Description
     water
 
 SourceFiles
-    Benz.C
+    H2O.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Benz_H
-#define Benz_H
+#ifndef H2O_H
+#define H2O_H
 
 #include "liquidProperties.H"
 #include "NSRDSfunc0.H"
@@ -47,7 +47,6 @@ SourceFiles
 #include "NSRDSfunc6.H"
 #include "NSRDSfunc7.H"
 #include "APIdiffCoefFunc.H"
-#include "thermophysicalConstant.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,28 +54,27 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class Benz Declaration
+                           Class H2O Declaration
 \*---------------------------------------------------------------------------*/
 
-class Benz
+class H2O
 :
     public liquidProperties
 {
     // Private data
 
-        thermophysicalConstant rho_;
+        NSRDSfunc5 rho_;
         NSRDSfunc1 pv_;
         NSRDSfunc6 hl_;
         NSRDSfunc0 Cp_;
         NSRDSfunc0 h_;
         NSRDSfunc7 Cpg_;
         NSRDSfunc4 B_;
-        thermophysicalConstant mu_;
+        NSRDSfunc1 mu_;
         NSRDSfunc2 mug_;
         NSRDSfunc0 kappa_;
         NSRDSfunc2 kappag_;
-        //NSRDSfunc6 sigma_;
-        thermophysicalConstant sigma_;
+        NSRDSfunc6 sigma_;
         APIdiffCoefFunc D_;
 
 
@@ -85,41 +83,40 @@ public:
     friend class liquidProperties;
 
     //- Runtime type information
-    TypeName("Benz");
+    TypeName("H2O");
 
 
     // Constructors
 
         //- Construct null
-        Benz();
+        H2O();
 
         //- Construct from components
-        Benz
+        H2O
         (
             const liquidProperties& l,
-            const thermophysicalConstant& density,
+            const NSRDSfunc5& density,
             const NSRDSfunc1& vapourPressure,
             const NSRDSfunc6& heatOfVapourisation,
             const NSRDSfunc0& heatCapacity,
             const NSRDSfunc0& enthalpy,
             const NSRDSfunc7& idealGasHeatCapacity,
             const NSRDSfunc4& secondVirialCoeff,
-            const thermophysicalConstant& dynamicViscosity,
+            const NSRDSfunc1& dynamicViscosity,
             const NSRDSfunc2& vapourDynamicViscosity,
             const NSRDSfunc0& thermalConductivity,
-            const NSRDSfunc2& vapourThermalConductivity,            
-    	    //const NSRDSfunc6& surfaceTension,  
-            const thermophysicalConstant& surfaceTension,
+            const NSRDSfunc2& vapourThermalConductivity,
+            const NSRDSfunc6& surfaceTension,
             const APIdiffCoefFunc& vapourDiffussivity
         );
 
         //- Construct from dictionary
-        Benz(const dictionary& dict);
+        H2O(const dictionary& dict);
 
         //- Construct and return clone
         virtual autoPtr<liquidProperties> clone() const
         {
-            return autoPtr<liquidProperties>::NewFrom<Benz>(*this);
+            return autoPtr<liquidProperties>::NewFrom<H2O>(*this);
         }
 
 
@@ -174,11 +171,11 @@ public:
         void writeData(Ostream& os) const;
 
         //- Ostream Operator
-        friend Ostream& operator<<(Ostream& os, const Benz& l);
+        friend Ostream& operator<<(Ostream& os, const H2O& l);
 };
 
 
-Ostream& operator<<(Ostream& os, const Benz& l);
+Ostream& operator<<(Ostream& os, const H2O& l);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -187,7 +184,7 @@ Ostream& operator<<(Ostream& os, const Benz& l);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "BenzI.H"
+#include "H2OI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

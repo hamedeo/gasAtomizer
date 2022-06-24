@@ -25,21 +25,21 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Benz.H"
+#include "H2O.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(Benz, 0);
-    addToRunTimeSelectionTable(liquidProperties, Benz,);
-    addToRunTimeSelectionTable(liquidProperties, Benz, dictionary);
+    defineTypeNameAndDebug(H2O, 0);
+    addToRunTimeSelectionTable(liquidProperties, H2O,);
+    addToRunTimeSelectionTable(liquidProperties, H2O, dictionary);
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::Benz::Benz()
+Foam::H2O::H2O()
 :
     liquidProperties
     (
@@ -55,9 +55,7 @@ Foam::Benz::Benz()
         0.3449,
         4.7813e+4
     ),
-rho_(									//Density (Benz)
-    824
-    ),
+    rho_(98.343885, 0.30542, 647.13, 0.081),
     pv_(73.649, -7258.2, -7.3037, 4.1653e-06, 2),
     hl_(647.13, 2889425.47876769, 0.3199, -0.212, 0.25795, 0),
     Cp_
@@ -94,51 +92,31 @@ rho_(									//Density (Benz)
         1.85445462114904e+19,
        -7.68082153760755e+21
     ),
-    mu_(2.17e-3),							//Dynamic viscosity (Benz) 2.17e-3
+    mu_(-51.964, 3670.6, 5.7331, -5.3495e-29, 10),
     mug_(2.6986e-06, 0.498, 1257.7, -19570),
     kappa_(-0.4267, 0.0056903, -8.0065e-06, 1.815e-09, 0, 0),
     kappag_(6.977e-05, 1.1243, 844.9, -148850),
-    //sigma_(647.13, 0.18548, 2.717, -3.554, 2.047, 0),
-    sigma_(0.02), //0,02							//Surface tension (Benz)
+    sigma_(647.13, 0.18548, 2.717, -3.554, 2.047, 0),
     D_(15.0, 15.0, 18.015, 28)
 {}
 
 
-Foam::Benz::Benz
+Foam::H2O::H2O
 (
-
     const liquidProperties& l,
-    const thermophysicalConstant& density,
+    const NSRDSfunc5& density,
     const NSRDSfunc1& vapourPressure,
     const NSRDSfunc6& heatOfVapourisation,
     const NSRDSfunc0& heatCapacity,
     const NSRDSfunc0& enthalpy,
     const NSRDSfunc7& idealGasHeatCapacity,
     const NSRDSfunc4& secondVirialCoeff,
-    const thermophysicalConstant& dynamicViscosity,
+    const NSRDSfunc1& dynamicViscosity,
     const NSRDSfunc2& vapourDynamicViscosity,
     const NSRDSfunc0& thermalConductivity,
     const NSRDSfunc2& vapourThermalConductivity,
-    //const NSRDSfunc6& surfaceTension,    
-    const thermophysicalConstant& surfaceTension,
+    const NSRDSfunc6& surfaceTension,
     const APIdiffCoefFunc& vapourDiffussivity
-    
-    /*
-    const liquidProperties& l,
-    const thermophysicalConstant& density,
-    const NSRDSfunc0& vapourPressure,
-    const NSRDSfunc1& heatOfVapourisation,
-    const NSRDSfunc2& heatCapacity,
-    const NSRDSfunc3& enthalpy,
-    const NSRDSfunc4& idealGasHeatCapacity,
-    const NSRDSfunc5& secondVirialCoeff,
-    const thermophysicalConstant& dynamicViscosity,
-    const NSRDSfunc6& vapourDynamicViscosity,
-    const NSRDSfunc7& thermalConductivity,
-    const NSRDSfunc8& vapourThermalConductivity,
-    const thermophysicalConstant& surfaceTension
-    const APIdiffCoefFunc& vapourDiffussivity
-    */
 )
 :
     liquidProperties(l),
@@ -157,74 +135,10 @@ Foam::Benz::Benz
     D_(vapourDiffussivity)
 {}
 
-/*
- liquidProperties
-    (
-        55.845,	//W -> molar mass				(Fe)
-        9250,		//Tc -> critical temperature			(Fe) Beutl1994
-        8750e5,	//Pc -> critical pressure			(Fe) Beutl1994
-        1.758e-5,	//Vc -> critical volume			(Fe) Vc = Zc*R*Tc/pc
-        0.2,		//Zc -> critical compressibility factor	(Fe) see: Kulinskii, V.L. (2014)
-        1548.6,	//Tt -> triple point temperature		(Fe)
-        0.16,		//Pt -> triple point pressure			(Fe)
-        3135,		//Tb -> normal boiling point			(Fe)
-        1811		//Tm -> normal melting point			(Fe)
-    ),
-    rho_				//density			(Fe) Beutl1994
-    (
-    8497.70,
-    -0.82268,
-    0,
-    0,
-    0,
-    0
-    ),
-    pv_				//vapour pressure		(Fe) Beutl1994
-    (
-    26.4317,
-    -48769,
-    -1.3217,
-    0,
-    0
-    ),	
-    hl_(6340765),			//heat of vapourisation	(Fe)
-    Cp_(825),				//heat capacity		(Fe)
-    h_(2220432),			//enthalpy			(Fe)
-    mu_(1e-2),				//dynamic viscosity		(Fe)
-    kappa_(38),			//thermal conductivity		(Fe)
-    sigma_(1.78)			//surface tension		(Fe)
-{}
 
-
-Foam::Fe::Fe
-(
-    const liquidProperties& l,
-    const NSRDSfunc0& density,
-    const NSRDSfunc1& vapourPressure,
-    const thermophysicalConstant& heatOfVapourisation,
-    const thermophysicalConstant& heatCapacity,
-    const thermophysicalConstant& enthalpy,
-    const thermophysicalConstant& dynamicViscosity,
-    const thermophysicalConstant& thermalConductivity,
-    const thermophysicalConstant& surfaceTension
-)
+Foam::H2O::H2O(const dictionary& dict)
 :
-    liquidProperties(l),
-    rho_(density),
-    pv_(vapourPressure),
-    hl_(heatOfVapourisation),
-    Cp_(heatCapacity),
-    h_(enthalpy),
-    mu_(dynamicViscosity),
-    kappa_(thermalConductivity),
-    sigma_(surfaceTension)
-{}
-*/
-
-
-Foam::Benz::Benz(const dictionary& dict)
-:
-    Benz()
+    H2O()
 {
     readIfPresent(*this, dict);
 }
@@ -232,7 +146,7 @@ Foam::Benz::Benz(const dictionary& dict)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::Benz::writeData(Ostream& os) const
+void Foam::H2O::writeData(Ostream& os) const
 {
     liquidProperties::writeData(*this, os);
 }
@@ -240,7 +154,7 @@ void Foam::Benz::writeData(Ostream& os) const
 
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
-Foam::Ostream& Foam::operator<<(Ostream& os, const Benz& l)
+Foam::Ostream& Foam::operator<<(Ostream& os, const H2O& l)
 {
     l.writeData(os);
     return os;
