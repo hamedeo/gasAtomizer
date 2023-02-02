@@ -25,12 +25,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ReitzKHRT.H"
+#include "KelvinHelmholtz.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::ReitzKHRT<CloudType>::ReitzKHRT
+Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz
 (
     const dictionary& dict,
     CloudType& owner
@@ -57,7 +57,7 @@ Foam::ReitzKHRT<CloudType>::ReitzKHRT
 
 
 template<class CloudType>
-Foam::ReitzKHRT<CloudType>::ReitzKHRT(const ReitzKHRT<CloudType>& bum)
+Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz(const KelvinHelmholtz<CloudType>& bum)
 :
     BreakupModel<CloudType>(bum),
     b0_(bum.b0_),
@@ -72,14 +72,14 @@ Foam::ReitzKHRT<CloudType>::ReitzKHRT(const ReitzKHRT<CloudType>& bum)
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::ReitzKHRT<CloudType>::~ReitzKHRT()
+Foam::KelvinHelmholtz<CloudType>::~KelvinHelmholtz()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class CloudType>
-bool Foam::ReitzKHRT<CloudType>::update
+bool Foam::KelvinHelmholtz<CloudType>::update
 (
     const scalar dt,
     const vector& g,
@@ -116,17 +116,15 @@ bool Foam::ReitzKHRT<CloudType>::update
     scalar mass = nParticle*d3*rhopi6;
     scalar mass0 = nParticle*d03*rhopi6;
 
-    scalar weGas = 0.5*rhoc*sqr(Urmag)*d/sigma;
-    scalar weLiquid = 0.5*rho*sqr(Urmag)*d/sigma;
+    scalar weGas = rhoc*sqr(Urmag)*r/sigma;
+    scalar weLiquid = rho*sqr(Urmag)*r/sigma;
 
     // Note: Reitz is using radius instead of diameter for Re-number
+    //scalar reLiquid = rho*Urmag*d/mu; 	//Use diameter for the Reynolds number of the liquid
     scalar reLiquid = rho*Urmag*r/mu;
+
     scalar ohnesorge = sqrt(weLiquid)/(reLiquid + VSMALL);
     scalar taylor = ohnesorge*sqrt(weGas);
-
-    vector acceleration = Urel/tMom;
-    vector trajectory = U/mag(U);
-    scalar gt = (g + acceleration) & trajectory;
 
     // frequency of the fastest growing KH-wave
     scalar omegaKH =
@@ -147,41 +145,8 @@ bool Foam::ReitzKHRT<CloudType>::update
 
     // stable KH diameter
     scalar dc = 2.0*b0_*lambdaKH;
-
-    // the frequency of the fastest growing RT wavelength.
-    scalar helpVariable = mag(gt*(rho - rhoc));
-    scalar omegaRT = sqrt
-    (
-        2.0*pow(helpVariable, 1.5)
-       /(3.0*sqrt(3.0*sigma)*(rhoc + rho))
-    );
-
-    // RT wave number
-    scalar KRT = sqrt(helpVariable/(3.0*sigma + VSMALL));
-
-    // wavelength of the fastest growing RT frequency
-    scalar lambdaRT = constant::mathematical::twoPi*cRT_/(KRT + VSMALL);
-
-    // if lambdaRT < diameter, then RT waves are growing on the surface
-    // and we start to keep track of how long they have been growing
-    if ((tc > 0) || (lambdaRT < d) )
-    {
-        tc += dt;
-    }
-
-    // characteristic RT breakup time
-    scalar tauRT = cTau_/(omegaRT + VSMALL);
-
-    // check if we have RT breakup
-    if ((tc > tauRT) && (lambdaRT < d))
-    {
-        // the RT breakup creates diameter/lambdaRT new droplets
-        tc = -GREAT;
-        scalar nDrops = d/lambdaRT;
-        d = cbrt(d3/nDrops);
-    }
-    // otherwise check for KH breakup
-    else if (dc < d)
+    
+    if (dc < d)
     {
         // no breakup below Weber = 12
         if (weGas > weberLimit_)
@@ -237,7 +202,8 @@ bool Foam::ReitzKHRT<CloudType>::update
                 }
             }
         }
-    }
+   }
+     
     else if (KHindex < 0.5)
     {
         // Case of larger drops after breakup (Reitz, Atomization & Spray

@@ -5,8 +5,8 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
-    Copyright (C) 2019 OpenCFD Ltd.
+    Copyright (C) 2011-2015 OpenFOAM Foundation
+    Copyright (C) 2020-2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -24,53 +24,14 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::basicSprayParcel
-
-Description
-    Definition of spray parcel
-
-SourceFiles
-    basicSprayParcel.C
-    basicSprayParcelIO.C
-
 \*---------------------------------------------------------------------------*/
-
-#ifndef basicSprayParcel_H
-#define basicSprayParcel_H
-
-#include "contiguous.H"
-#include "particle.H"
-#include "KinematicParcel.H"
-#include "ThermoParcel.H"
-#include "ReactingParcel.H"
-#include "SprayParcel.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-    typedef SprayParcel
-    <
-        ReactingParcel
-        <
-            ThermoParcel
-            <
-                KinematicParcel
-                <
-                    particle
-                >
-            >
-        >
-    > basicSprayParcel;
-
-    //- Non-contiguous data for basicSprayParcel
-    template<> struct is_contiguous<basicSprayParcel> : std::false_type {};
-}
+#include "basicSprayCloud.H"
+#include "makeSprayParcelBreakupModelsAdd.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#endif
+// Spray sub-models
+makeSprayParcelBreakupModelsAdd(basicSprayCloud);
 
 // ************************************************************************* //

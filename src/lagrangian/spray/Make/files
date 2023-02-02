@@ -1,7 +1,4 @@
-clouds/baseClasses/sprayCloud/sprayCloud.C
-
 SPRAYPARCEL=parcels/derived/basicSprayParcel
-$(SPRAYPARCEL)/defineBasicSprayParcel.C
-$(SPRAYPARCEL)/makeBasicSprayParcelSubmodels.C
+$(SPRAYPARCEL)/makeBasicSprayParcelSubmodelsAdd.C
 
 LIB = $(FOAM_USER_LIBBIN)/libmylagrangianSpray

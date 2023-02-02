@@ -25,34 +25,19 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef makeSprayParcelBreakupModels_H
-#define makeSprayParcelBreakupModels_H
+#ifndef makeSprayParcelBreakupModelsAdd_H
+#define makeSprayParcelBreakupModelsAdd_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "NoBreakup.H"
-#include "PilchErdman.H"
-#include "ReitzDiwakar.H"
-#include "ReitzKHRT.H"
-#include "TAB.H"
-#include "ETAB.H"
-#include "SHF.H"
-#include "KH_Stijn.H"
+#include "KelvinHelmholtz.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define makeSprayParcelBreakupModels(CloudType)                                \
+#define makeSprayParcelBreakupModelsAdd(CloudType)                                \
                                                                                \
     makeBreakupModel(CloudType)                                                \
-    makeBreakupModelType(NoBreakup, CloudType);                                \
-    makeBreakupModelType(PilchErdman, CloudType);                              \
-    makeBreakupModelType(ReitzDiwakar, CloudType);                             \
-    makeBreakupModelType(ReitzKHRT, CloudType);                                \
-    makeBreakupModelType(TAB, CloudType);                                      \
-    makeBreakupModelType(ETAB, CloudType);                                     \
-    makeBreakupModelType(SHF, CloudType);					  \
-    makeBreakupModelType(KH_Stijn, CloudType);
-
+    makeBreakupModelType(KelvinHelmholtz, CloudType);                          \
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

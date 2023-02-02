@@ -24,101 +24,75 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::TAB
+    Foam::KelvinHelmholtz
 
 Group
     grpLagrangianIntermediateBreakupSubModels
 
 Description
-    The TAB Method for Numerical Calculation of Spray Droplet Breakup.
-
-    \verbatim
-        O'Rourke, P.J. and Amsden, A.A.,
-        "The TAB Method for Numerical Calculation of Spray Droplet Breakup,"
-        1987 SAE International Fuels and Lubricants Meeting and Exposition,
-        Toronto, Ontario, November 2-5, 1987,
-        Los Alamos National Laboratory document LA-UR-87-2105;
-        SAE Technical Paper Series, Paper 872089.
-    \endverbatim
-
-    This implementation follows the kiva version.
-
-See also
-    The Enhanced %TAB model - ETAB
+    Secondary breakup model which uses the Kelvin-Helmholtz
+    instability theory to predict the 'stripped' droplets... and
+    the Raleigh-Taylor instability as well.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef TAB_H
-#define TAB_H
+#ifndef KelvinHelmholtz_H
+#define KelvinHelmholtz_H
 
 #include "BreakupModel.H"
-#include "FixedList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
 /*---------------------------------------------------------------------------*\
-                           Class TAB Declaration
+                         Class KelvinHelmholtz Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class CloudType>
-class TAB
+class KelvinHelmholtz
 :
     public BreakupModel<CloudType>
 {
-public:
-
-    //- Enumeration for the SMD breakup calculation
-    enum SMDMethods
-    {
-        method1,
-        method2
-    };
-
-
 private:
 
     // Private data
 
-        // Inverse function approximation of the Rossin-Rammler Distribution
-        // used when calculating the droplet size after breakup
-        FixedList<scalar, 100> rrd_;
-
-
-        // Model constants
-
-            word SMDCalcMethod_;
-            SMDMethods SMDMethod_;
+        // model constants
+        scalar b0_;
+        scalar b1_;
+        scalar cTau_;
+        scalar cRT_;
+        scalar msLimit_;
+        scalar weberLimit_;
 
 
 public:
 
     //- Runtime type information
-    TypeName("TAB");
+    TypeName("KelvinHelmholtz");
 
 
     // Constructors
 
         //- Construct from dictionary
-        TAB(const dictionary& dict, CloudType& owner);
+        KelvinHelmholtz(const dictionary&, CloudType&);
 
         //- Construct copy
-        TAB(const TAB<CloudType>& im);
+        KelvinHelmholtz(const KelvinHelmholtz<CloudType>& bum);
 
         //- Construct and return a clone
         virtual autoPtr<BreakupModel<CloudType>> clone() const
         {
             return autoPtr<BreakupModel<CloudType>>
             (
-                new TAB<CloudType>(*this)
+                new KelvinHelmholtz<CloudType>(*this)
             );
         }
 
 
     //- Destructor
-    virtual ~TAB();
+    virtual ~KelvinHelmholtz();
 
 
     // Member Functions
@@ -147,7 +121,7 @@ public:
             const scalar tMom,
             scalar& dChild,
             scalar& massChild
-    );
+        );
 };
 
 
@@ -158,7 +132,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "TAB.C"
+    #include "KelvinHelmholtz.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
