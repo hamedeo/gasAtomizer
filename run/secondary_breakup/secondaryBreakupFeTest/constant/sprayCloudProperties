@@ -134,7 +134,7 @@ subModels
 
     atomizationModel none;
 
-    breakupModel     TAB;	//ReitzDiwakar; // ReitzKHRT;
+    breakupModel     KelvinHelmholtz;//TAB;	//ReitzDiwakar; // ReitzKHRT;
     
     stochasticCollisionModel none;
 
@@ -180,7 +180,7 @@ subModels
     }
 
 
-    KH_StijnCoeffs
+    KelvinHelmholtzCoeffs
     {
         solveOscillationEq yes;
         B0              0.61;

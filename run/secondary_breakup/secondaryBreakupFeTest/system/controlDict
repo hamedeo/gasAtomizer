@@ -86,9 +86,6 @@ functions
 */    
 }
 
-libs (
-"libmyThermophysicalProperties.so"
-"libmylagrangianSpray.so"
-);
+libs ("libmyThermophysicalProperties.so" "libmylagrangianSpray");
 
 // ************************************************************************* //
