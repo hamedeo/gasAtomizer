@@ -1,4 +1,0 @@
-SOURCE = \
-parabolicVelocityFvPatchVectorField.C \
-
-# sources

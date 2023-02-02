@@ -1,1 +1,0 @@
-../normalizedHelicity/normalizedHelicity.C

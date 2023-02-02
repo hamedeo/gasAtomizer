@@ -1,7 +1,0 @@
-SOURCE = \
-normalizedHelicity/normalizedHelicity.C \
-normalizedKineticEnergy/normalizedKineticEnergy.C \
-shapeConservationVOF/shapeConservationVOF.C \
-volumeConservationVOF/volumeConservationVOF.C \
-
-# sources

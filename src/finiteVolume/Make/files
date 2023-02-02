@@ -1,3 +1,0 @@
-fields/fvPatchFields/derived/parabolicVelocity/parabolicVelocityFvPatchVectorField.C
-
-LIB = $(FOAM_USER_LIBBIN)/libmyFiniteVolume
