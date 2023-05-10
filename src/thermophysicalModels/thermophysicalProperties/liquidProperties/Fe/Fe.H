@@ -69,9 +69,9 @@ class Fe
         thermophysicalConstant hl_;
         thermophysicalConstant Cp_;
         thermophysicalConstant h_;
-        thermophysicalConstant mu_;
+        NSRDSfunc3 mu_;
         thermophysicalConstant kappa_;
-        thermophysicalConstant sigma_;
+        NSRDSfunc0 sigma_;
 
 
 public:
@@ -96,9 +96,9 @@ public:
             const thermophysicalConstant& heatOfVapourisation,
             const thermophysicalConstant& heatCapacity,
             const thermophysicalConstant& enthalpy,
-            const thermophysicalConstant& dynamicViscosity,
+            const NSRDSfunc3& dynamicViscosity,
             const thermophysicalConstant& thermalConductivity,
-            const thermophysicalConstant& surfaceTension
+            const NSRDSfunc0& surfaceTension
         );
 
         //- Construct from dictionary

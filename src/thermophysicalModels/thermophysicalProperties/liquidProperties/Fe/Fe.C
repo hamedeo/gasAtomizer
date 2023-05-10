@@ -51,31 +51,45 @@ Foam::Fe::Fe()
         1548.6,	//Tt -> triple point temperature		(Fe)
         0.16,		//Pt -> triple point pressure			(Fe)
         3135,		//Tb -> normal boiling point			(Fe)
-        1811		//Tm -> normal melting point			(Fe)
+        1811		//Tm or Tref -> normal melting point			(Fe)
     ),
     rho_				//density			(Fe) Beutl1994
     (
-    8497.70,
-    -0.82268,
-    0,
-    0,
-    0,
-    0
+        8711.946, //7034.96+0.926*1811  //8497.70,
+        -0.926, //-0.82268,
+        0,
+        0,
+        0,
+        0
     ),
     pv_				//vapour pressure		(Fe) Beutl1994
     (
-    26.4317,
-    -48769,
-    -1.3217,
-    0,
-    0
+        26.4317,
+        -48769,
+        -1.3217,
+        0,
+        0
     ),	
     hl_(6340765),			//heat of vapourisation	(Fe)
     Cp_(825),				//heat capacity		(Fe)
     h_(2220432),			//enthalpy			(Fe)
-    mu_(1e-2),				//dynamic viscosity		(Fe)
-    kappa_(38),			//thermal conductivity		(Fe)
-    sigma_(1.78)			//surface tension		(Fe)
+    mu_     				//dynamic viscosity		(Fe) NSRDS3   //1e-2 cte
+    (
+        0,
+        0.00190151606,      //10e-2/exp(-0.7209),
+        -6205.35,           //-2694.95*ln(10),
+        1
+    ),
+    kappa_(38),	    		//thermal conductivity		(Fe)
+    sigma_      			//surface tension		(Fe) //1.78 cte
+    (
+        1.900586,              //1.29+3.97e-4*1538,
+        -3.97e-4,
+        0,
+        0,
+        0,
+        0
+    )
 {}
 
 
@@ -87,9 +101,9 @@ Foam::Fe::Fe
     const thermophysicalConstant& heatOfVapourisation,
     const thermophysicalConstant& heatCapacity,
     const thermophysicalConstant& enthalpy,
-    const thermophysicalConstant& dynamicViscosity,
+    const NSRDSfunc3& dynamicViscosity,
     const thermophysicalConstant& thermalConductivity,
-    const thermophysicalConstant& surfaceTension
+    const NSRDSfunc0& surfaceTension
 )
 :
     liquidProperties(l),
