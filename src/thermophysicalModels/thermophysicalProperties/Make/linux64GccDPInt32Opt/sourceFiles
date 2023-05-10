@@ -1,0 +1,7 @@
+SOURCE = \
+thermophysicalFunctions/thermophysicalConstant/thermophysicalConstant.C \
+liquidProperties/Fe/Fe.C \
+liquidProperties/Benz/Benz.C \
+liquidProperties/liquidProperties/liquidProperties.C \
+
+# sources
