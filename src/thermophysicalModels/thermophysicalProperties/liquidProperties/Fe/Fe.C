@@ -53,10 +53,10 @@ Foam::Fe::Fe()
         3135,		//Tb -> normal boiling point			(Fe)
         1811		//Tm or Tref -> normal melting point			(Fe)
     ),
-    rho_				//density			(Fe) Beutl1994
+    rho_				//density	(Fe) Brillo 2005 "Surface tension of ...  iron and their binary alloys" NSRDS0
     (
-        8711.946, //7034.96+0.926*1811  //8497.70,
-        -0.926, //-0.82268,
+        8711.946,
+        -0.926,
         0,
         0,
         0,
@@ -69,21 +69,21 @@ Foam::Fe::Fe()
         -1.3217,
         0,
         0
-    ),	
+    ),
     hl_(6340765),			//heat of vapourisation	(Fe)
     Cp_(825),				//heat capacity		(Fe)
     h_(2220432),			//enthalpy			(Fe)
-    mu_     				//dynamic viscosity		(Fe) NSRDS3   //1e-2 cte
+    mu_     				//dynamic viscosity		(Fe) Assael 2006 "Reference Data for the Density ... Iron" NSRDS3   
     (
         0,
-        0.00190151606,      //10e-2/exp(-0.7209),
-        -6205.35,           //-2694.95*ln(10),
+        0.00190151606,
+        -6205.35,
         1
     ),
     kappa_(38),	    		//thermal conductivity		(Fe)
-    sigma_      			//surface tension		(Fe) //1.78 cte
+    sigma_      		//surface tension		(Fe) Reference Data for the Density and Viscosity of Liquid Aluminum and Liquid Iron" NSRDS0
     (
-        1.900586,              //1.29+3.97e-4*1538,
+        1.900586,         
         -3.97e-4,
         0,
         0,
