@@ -55,12 +55,12 @@ solution
 
 constantProperties
 {
-    T0              300;//1900;
+    T0              300;
 
     // place holders for rho0 and Cp0
     // - reset from liquid properties using T0
-    rho0            842;//6890;
-    Cp0             825;
+    rho0            842; // Benz: 842 // Fe: 7874
+    Cp0             825; // Benz:825 // Fe: 451
 
     constantVolume  true;
 }
@@ -70,52 +70,81 @@ subModels
 {
     particleForces
     {
-        sphereDrag;
+        distortedSphereDrag;                        // Sphere shaped Drop Drag Force as it diforms along breakup over time based on Liu et al. 1993
         gravity;
     }
 
-    injectionModels
+    // "Fuel" nozzle & droplet modelling
+
+    injectionModels                                 // Modelling Injection of the FUEL into chamber from the Nozzle 
     {
     
         model1
         {
         
-            type            coneNozzleInjection;
-            SOI             3e-3;//3e-03;				// start of injection if velocity is at 200 m/s, after 10 timesteps.
-            massTotal       2.165995140561160e-09;//1.299597084336696e-07; //Benz 
-            parcelBasisType mass;				
-            injectionMethod disc;
-            flowType        constantVelocity; 		//flowRateAndDischarge
-            UMag            16; 				//Same value as in Paper [16]
-            outerDiameter   170e-6;//3e-4;
-            innerDiameter   0;
-            duration        2e-4;//2e-3;
-            position        (0 -0.0047625 0.055); //(0 -0.0047625 0.055);
-            direction       (0 1 0);
-            parcelsPerSecond 5e3;//5e3;
-            //nParticle        1;
+            type            coneNozzleInjection;   
             
-	    flowRateProfile constant 1;//10;
+        // Times    
+            SOI             3e-3;   				// injectionStartTime: specifies the time at which the injection process starts.
+            duration        2e-4;                   // injectionDuration: specifies the duration of the injection process.
 
-            Cd              constant 0.9; //0.9
+        // Quantities    
+            //!!!  "massTotal" only be used while using injecttion with flow rate and discharge "otherwise ==0"
+            //massTotal is the total mass of the injection process which has a dimension of kg, the SOI time and massTotal will combine with 
+            //flowRateProfile to get the mass flow rate and calculate how much mass of fuel should be injected at each time step 
+            massTotal       0;                      // Total mass to inject [kg]. --> metal droplet material: // Benz: 2.165995140561160e-09    // Fe:
+            parcelBasisType mass;				    // Lagrangian particle tracking model that tracks the movement of individual fuel droplets or particles based on their mass.
+                                                    //  Parcels based on Opt: -fixed -number -mass
+            parcelsPerSecond 5e3;                   // number of parcels injected into the simulation domain every second
+	        flowRateProfile constant 1;             // Profile of droplets which There is no physical meaning for the value, it will be normalized
+                                                    //  according to duration time and massTotal to get the mass injection at each time step by interpolation. 
+            // !IGNORED by OpenFOAM / Wrong Usage??
+            //nParticle        1;                     // number of particls injected into the simulation domain per timestep
+            //parcelsPerSecond 1000000;
 
+        // Size distribution of the injected parcels (Parcel diameters)	 
+            sizeDistribution                        // size distribution of the particles injected into the flow  
+            {
+                type        uniform;                // all the droplets injected will have the same diameter
+                                                    // the initial particle size is only controlled by breakup and evaporation process.
+                    uniformDistribution             // defines how the uniform distribution range is 
+                    {
+                        minValue        0.00017;
+                        maxValue        0.00017;
+                        // !IGNORED by OpenFOAM / Wrong Usage / Not Defined in the UniformDistribution
+                        //seems to be defined by outerDiameter
+                        //d               0.00017;
+                        //n               1;
+                    }
+            }
 
-// Inner and outer half-cone angles
+        // Geometry
+            // Inner and outer half-cone angles    // angle between the axis of the particle and the inner and outer walls of the injection device
+            direction       (0 1 0);                // nozzleAxis: specifies the axis of the nozzle cone.
+            position        (0 -0.0047625 0.055);   // nozzlePosition: specifies the position of the nozzle in the simulation domain
             thetaInner      constant 0.0;
             thetaOuter      constant 0.0;
-            
-	 
-            sizeDistribution
-            {
-                type        uniform;
-                uniformDistribution
-                {
-                    minValue        0.00017;
-                    maxValue        0.00017;
-                    d               0.00017;
-                    n               1;
-                }
-            }
+
+            //inject over a disc:
+            injectionMethod disc;                   // simulates the injection of a fuel spray from a disc-shaped orifice Opt: -point -disc
+            innerDiameter   0;                      // inner diameter of FUEL Nozzle
+            outerDiameter   170e-6;                 // outer diameter of FUEL Nozzle
+        
+        //Parcel Velocity - Calculate the partical initial velocity profile
+            // - Inject with constant velocity
+            flowType        constantVelocity; 		// the type of velocity profile for the injected particles
+            UMag            16; 				    // the magnitude of the initial velocity of the fuel droplets at the nozzle exit. // Liu et al. 1993
+
+            //// flow rate and "Discharge coefficient": ratio of the mass flow rate at the discharge end of the nozzle to that of an ideal nozzle
+            // hose velocity are the magnitude and the direction of it are calculated from a random process according to the injector type and cone angle.
+            ////   This also requires massTotal, dInner and dOuter
+            //flowType        flowRateAndDischarge;   // U = V_dot/(A*Cd)
+            //Cd              0.9;                    // determing the intial velocity magnitude if we chose the flowType as flowRateAndDischarge. 
+
+            //// Pressure driven velocity - The pressure difference between injector and ambient pressure
+            //flowType        pressureDrivenVelocity;
+            //Pinj            10e5;
+
           }
                        
     }
@@ -134,7 +163,7 @@ subModels
 
     atomizationModel none;
 
-    breakupModel     KelvinHelmholtz;//TAB;	//ReitzDiwakar; // ReitzKHRT;
+    breakupModel     KelvinHelmholtz;   //KelvinHelmholtz;   //TAB;	//ReitzDiwakar; // ReitzKHRT;
     
     stochasticCollisionModel none;
 
@@ -142,7 +171,7 @@ subModels
 
     standardWallInteractionCoeffs
     {
-        type            escape;//rebound;
+        type            escape; //rebound;
     }
 
     RanzMarshallCoeffs
@@ -156,9 +185,9 @@ subModels
         (
             liquid
             {
-                //Fe               1;
-                //H2O	 	1;
-                Benz		1;
+                Fe          0;
+                H2O	 	    0;
+                Benz		1; // Mass Fraction of the phase
             }
         );
     }
@@ -184,7 +213,7 @@ subModels
     {
         solveOscillationEq yes;
         B0              0.61;
-        B1              1.73;
+        B1              1.73; //Sqrt(3)
         Ctau            1;
         CRT             0.1;
         msLimit         0.03;
@@ -195,11 +224,11 @@ subModels
     {
         solveOscillationEq yes;
         B0              0.61;
-        B1              1.73;//1.73;
+        B1              1.73;   // sqrt(3)
         Ctau            1;
         CRT             0.1;
-        msLimit         0.03;//0.03;
-        WeberLimit      6;//6;
+        msLimit         0.03;   //0.03
+        WeberLimit      6;      // set a limit on We to avoid excessive droplet distortion due to the Kelvin-Helmholtz instability   imperical nimber :6;
     }
 
     TABCoeffs
