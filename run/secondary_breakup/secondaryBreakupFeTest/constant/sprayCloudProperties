@@ -92,7 +92,7 @@ subModels
             //!!!  "massTotal" only be used while using injecttion with flow rate and discharge "otherwise ==0"
             //massTotal is the total mass of the injection process which has a dimension of kg, the SOI time and massTotal will combine with 
             //flowRateProfile to get the mass flow rate and calculate how much mass of fuel should be injected at each time step 
-            massTotal       0;                      // Total mass to inject [kg]. --> metal droplet material: // Benz: 2.165995140561160e-09    // Fe:
+            massTotal       2.165995140561160e-09;                      // Total mass to inject [kg]. --> metal droplet material: // Benz: 2.165995140561160e-09    // Fe:
             parcelBasisType mass;				    // Lagrangian particle tracking model that tracks the movement of individual fuel droplets or particles based on their mass.
                                                     //  Parcels based on Opt: -fixed -number -mass
             parcelsPerSecond 5e3;                   // number of parcels injected into the simulation domain every second
@@ -213,11 +213,11 @@ subModels
     {
         solveOscillationEq yes;
         B0              0.61;
-        B1              1.73; //Sqrt(3)
+        B1              1.73;           //Sqrt(3)
         Ctau            1;
         CRT             0.1;
         msLimit         0.03;
-        WeberLimit      6;//6;
+        WeberLimit      6;              //6;
     }
 
     ReitzKHRTCoeffs
