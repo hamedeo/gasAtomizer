@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-rho0            824;                    // Benz: 824 // Fe: 7874
+rho0            7874;                    // Benz: 824 // Fe: 7874
 
 solution
 {
@@ -62,7 +62,7 @@ constantProperties
     // place holders for rho0 and Cp0
     // - reset from liquid properties using T0
     rho0            $rho0; // Benz: 824 // Fe: 7874
-    Cp0             825; // Benz:825 // Fe: 451
+    Cp0             451; // Benz:825 // Fe: 451
 
     constantVolume  true;
 }
@@ -202,9 +202,9 @@ subModels
         (
             liquid
             {
-                Fe          0;
-                H2O	 	    0;
-                Benz		1; // Mass Fraction of the phase
+                Fe          	1;
+                H2O		0;
+                Benz		0; // Mass Fraction of the phase
             }
         );
     }

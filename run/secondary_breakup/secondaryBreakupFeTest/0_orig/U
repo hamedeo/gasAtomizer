@@ -26,7 +26,7 @@ boundaryField
     {
    	type            codedFixedValue;
     	value           uniform (0 0 0);
-    	redirectType    parabolicProfile;
+    	name            parabolicProfile;		//redirectType
    
 	code
     	#{
