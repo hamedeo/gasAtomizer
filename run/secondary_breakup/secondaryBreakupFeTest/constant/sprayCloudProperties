@@ -120,8 +120,9 @@ subModels
                         minValue        0.00017;        //  Max. Diameter 
                         maxValue        0.00017;        //  Min. Diameter 
                         // !IGNORED by OpenFOAM / Wrong Usage / Not Defined in the UniformDistribution
+                        //The Rosin-Rammler distribution assumes that the particles are spherical and monodisperse, i.e., all particles have the same density.
                         //d               0.00017;      // Rosin-Rammler Mean Diameter
-                        //n               1;            // Rosin-Rammler Spread Parameter 
+                        //n               1;            // Rosin-Rammler Spread Parameter: n controls the shape of the distribution curve and higher values of n result in a narrower and more sharply peaked distribution
                     }
                 */
             }
@@ -159,7 +160,7 @@ subModels
             //!!!  "massTotal =/=0" must be defined 
             //massTotal is the total mass of the injection process which has a dimension of kg, the SOI time and massTotal will combine with 
             //flowRateProfile to get the mass flow rate and calculate how much mass of fuel should be injected at each time step 
-            massTotal       #eval {$rho0 * 4/3 * pi() * pow($outerDiameter/2, 3) * $duration * $parcelsPerSecond};                      // Total mass to inject [kg]. --> metal droplet material: // Benz: 2.165995140561160e-09    // Fe:
+            massTotal       #eval {$rho0 * 4/3 * pi() * pow($outerDiameter/2, 3) * $duration * $parcelsPerSecond};                      // Total mass to inject [kg]. --> metal droplet material: // Benz: 2.119691206e-09    // Fe:
 
           }
                        
