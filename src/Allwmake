@@ -2,4 +2,4 @@
 wmake $WM_PROJECT_USER_DIR/src/lagrangian/spray
 wmake $WM_PROJECT_USER_DIR/src/thermophysicalModels/thermophysicalProperties
 wmake $WM_PROJECT_USER_DIR/applications/solvers/lagrangian/secondaryBreakupFoam
-wmake $WM_PROJECT_USER_DIR/applications/solvers/lagrangian/intermediate
+#wmake $WM_PROJECT_USER_DIR/applications/solvers/lagrangian/intermediate

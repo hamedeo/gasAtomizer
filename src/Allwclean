@@ -2,4 +2,4 @@
 wclean $WM_PROJECT_USER_DIR/src/lagrangian/spray
 wclean $WM_PROJECT_USER_DIR/src/thermophysicalModels/thermoPhysicalProperties
 wclean $WM_PROJECT_USER_DIR/applications/solvers/lagrangian/secondaryBreakupFoam
-wclean $WM_PROJECT_USER_DIR/applications/solvers/lagrangian/intermediate
+# wclean $WM_PROJECT_USER_DIR/applications/solvers/lagrangian/intermediate

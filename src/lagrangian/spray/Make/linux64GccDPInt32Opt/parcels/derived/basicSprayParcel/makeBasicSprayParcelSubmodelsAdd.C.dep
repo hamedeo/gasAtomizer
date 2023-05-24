@@ -1110,5 +1110,7 @@ $(WM_PROJECT_DIR)/src/lagrangian/spray/lnInclude/SprayParcelIO.C \
 lnInclude/makeSprayParcelBreakupModelsAdd.H \
 lnInclude/KelvinHelmholtz.H \
 lnInclude/KelvinHelmholtz.C \
+/home/dennis/OpenFOAM/deo-v2212/src/lagrangian/intermediate/lnInclude/myDistortedSphereDragForce.H \
+/home/dennis/OpenFOAM/deo-v2212/src/lagrangian/intermediate/lnInclude/myDistortedSphereDragForce.C \
 
 #END
