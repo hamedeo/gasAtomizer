@@ -5,7 +5,8 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011-2016 OpenFOAM Foundation
+    Copyright (C) 2011-2015 OpenFOAM Foundation
+    Copyright (C) 2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -25,23 +26,18 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef makeSprayParcelBreakupModelsAdd_H
-#define makeSprayParcelBreakupModelsAdd_H
+//#include "basicKinematicCloud.H"
+#include "basicSprayCloud.H"
+// #include "makeParcelCloudFunctionObjects.H"
+
+// Kinematic
+#include "myMakeParcelForces.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "KelvinHelmholtz.H"
+// makeParcelCloudFunctionObjects(basicKinematicCloud);
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#define makeSprayParcelBreakupModelsAdd(CloudType)                             \
-                                                                               \
-    makeBreakupModel(CloudType)                                                \
-    makeBreakupModelType(KelvinHelmholtz, CloudType);                          \
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
+// Kinematic sub-models
+myMakeParcelForces(basicSprayCloud);
 
 // ************************************************************************* //

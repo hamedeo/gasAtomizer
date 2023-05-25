@@ -27,15 +27,19 @@ License
 \*---------------------------------------------------------------------------*/
 #include "basicSprayCloud.H"
 #include "makeSprayParcelBreakupModelsAdd.H"
+//#include "makeSprayParcelDragModelsAdd.H"
 
 // Spray
-#include "myDistortedSphereDragForce.H"
+// #include "myDistortedSphereDragForce.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Spray sub-models
 makeSprayParcelBreakupModelsAdd(basicSprayCloud);
 
+// 
+// makeSprayParcelDragModelsAdd(basicSprayCloud);
+
 // Spray sub-models
-makeParticleForceModelType(myDistortedSphereDragForce, basicSprayCloud);
+// makeParticleForceModelType(myDistortedSphereDragForce, basicSprayCloud);
 // ************************************************************************* //

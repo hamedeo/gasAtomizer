@@ -1,0 +1,100 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2106                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      thermo.species;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+N2
+{
+    specie
+    {
+        molWeight       28.0134;
+    }
+    thermodynamics
+    {
+        Tlow            200;
+        Thigh           5000; //5000
+        Tcommon         300; //1000 [original] 300 K for Benz case
+        highCpCoeffs    ( 2.92664 0.00148798 -5.68476e-07 1.0097e-10 -6.75335e-15 -922.798 5.98053 );
+        lowCpCoeffs     ( 3.29868 0.00140824 -3.96322e-06 5.64152e-09 -2.44486e-12 -1020.9 3.95037 );
+    }
+    transport
+    {
+        As              1.67212e-06;
+        Ts              170.672;
+    }
+}
+
+Fe // properties of solid iron!!
+{
+    specie
+    {
+        molWeight       55.847;
+    }
+    thermodynamics
+    {
+        Tlow            200;
+        Thigh           2000; 	// 2000
+        Tcommon         1900; //Melting point Fe 1811 K
+        highCpCoeffs    ( -435.752 0.768222 -0.000446743 8.66768e-08 0 187860 2449.72 );
+        lowCpCoeffs     7 { 0 };
+    }
+    transport
+    {
+        As              1.67212e-06;
+        Ts              170.672;
+    }
+}
+
+H2O
+{
+specie
+{
+molWeight 18.0153;
+}
+thermodynamics
+{
+Tlow 200;
+Thigh 6000;
+Tcommon 1000;
+highCpCoeffs ( 2.67704 0.00297318 -7.73769e-07 9.44335e-11 -4.269e-15 -29885.9 6.88255 );
+lowCpCoeffs ( 4.19864 -0.0020364 6.52034e-06 -5.48793e-09 1.77197e-12 -30293.7 -0.849009 );
+}
+transport
+{
+As 1.67212e-06;
+Ts 170.672;
+}
+}
+
+
+Benz
+{
+specie
+{
+molWeight 18.0153;
+}
+thermodynamics
+{
+Tlow 200;
+Thigh 6000;
+Tcommon 1000;
+highCpCoeffs ( 2.67704 0.00297318 -7.73769e-07 9.44335e-11 -4.269e-15 -29885.9 6.88255 );
+lowCpCoeffs ( 4.19864 -0.0020364 6.52034e-06 -5.48793e-09 1.77197e-12 -30293.7 -0.849009 );
+}
+transport
+{
+As 1.67212e-06;
+Ts 170.672;
+}
+}

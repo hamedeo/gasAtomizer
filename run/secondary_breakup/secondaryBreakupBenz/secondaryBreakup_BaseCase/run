@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -d outPut ]; then
+    if [ -n "$(ls -A outPut)" ]; then
+        rm -r outPut/*
+    fi
+else
+    mkdir outPut
+fi
+
+
+foamCleanTutorials > /dev/null
+blockMesh > >( 2>&1 tee outPut/blockMesh.log) >( >&2 tee outPut/errors.log) #> /dev/null
+#blockMesh > 2>&1> (tee outPut/blockMesh.log) 2> >(tee outPut/errors.log) > /dev/null
+#decomposePar > (2>&1)> >(tee outPut/decomposePar.log) 2> >(tee -a outPut/errors.log) > /dev/null
+#mpirun -np 4 sprayFoam -parallel > (2>&1)> >(tee outPut/sprayFoam.log) 2> >(tee -a outPut/errors.log) > /dev/null
+cd outPut/
+gedit --new-window errors.log blockMesh.log # decomposePar.log sprayFoam.log & disown
+cd ../

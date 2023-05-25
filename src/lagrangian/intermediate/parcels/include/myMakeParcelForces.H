@@ -25,21 +25,21 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef makeSprayParcelBreakupModelsAdd_H
-#define makeSprayParcelBreakupModelsAdd_H
+#ifndef myMakeParcelForces_H
+#define myMakeParcelForces_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "KelvinHelmholtz.H"
-
+//#include "basicSprayCloud.H"
+#include "myDistortedSphereDragForce.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define makeSprayParcelBreakupModelsAdd(CloudType)                             \
+#define myMakeParcelForces(CloudType)                                          \
                                                                                \
-    makeBreakupModel(CloudType)                                                \
-    makeBreakupModelType(KelvinHelmholtz, CloudType);                          \
-
+    makeParticleForceModel(CloudType);     				                       \
+    makeParticleForceModelType(myDistortedSphereDragForce, CloudType);         \
+                         
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
