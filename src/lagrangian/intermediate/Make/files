@@ -1,0 +1,4 @@
+KINEMATICPARCEL=parcels/derived/basicKinematicParcel
+$(KINEMATICPARCEL)/myMakeBasicKinematicParcelSubmodels.C
+
+LIB = $(FOAM_USER_LIBBIN)/libmylagrangianIntermediate
