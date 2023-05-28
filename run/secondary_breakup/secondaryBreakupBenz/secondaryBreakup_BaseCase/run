@@ -1,5 +1,15 @@
 #!/bin/bash
 
+echo "Enter a solver to execute:"
+read solver
+read -p "you chose $solver as your solver ... is that correct? (y/n)  " answer
+
+if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
+    break
+else
+    exit
+fi
+
 if [ -d outPut ]; then
     if [ -n "$(ls -A outPut)" ]; then
         rm -r outPut/*
@@ -9,11 +19,53 @@ else
 fi
 
 
+spinner() {
+    local pid=$1
+    local delay=0.1
+    local spinstr='|/-\'
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf " [%c] " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
+}
+
+echo "Cleaning the case"
 foamCleanTutorials > /dev/null
-blockMesh > >( 2>&1 tee outPut/blockMesh.log) >( >&2 tee outPut/errors.log) #> /dev/null
-#blockMesh > 2>&1> (tee outPut/blockMesh.log) 2> >(tee outPut/errors.log) > /dev/null
-#decomposePar > (2>&1)> >(tee outPut/decomposePar.log) 2> >(tee -a outPut/errors.log) > /dev/null
-#mpirun -np 4 sprayFoam -parallel > (2>&1)> >(tee outPut/sprayFoam.log) 2> >(tee -a outPut/errors.log) > /dev/null
+
+#n=$(grep -o -E '\w+\.[A-Za-z]{2,6}' system/decomposeParDict | wc -l)
+n=$(grep numberOfSubdomains system/decomposeParDict | cut -d';' -f1 | awk '{print $NF}')
+echo "Number of domains: $n"
+
+echo "Building Mesh"
+blockMesh 2> >(tee outPut/errors.log 2>&1) | tee outPut/blockMesh.log >/dev/null & spinner $!
+
+echo "Decomposing model into $n processors"
+decomposePar 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/decomposePar.log > /dev/null & spinner $!
+
+echo "Running Solver in parallel"
+mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null & spinner $!
+
 cd outPut/
-gedit --new-window errors.log blockMesh.log # decomposePar.log sprayFoam.log & disown
-cd ../
+
+echo "Here are the searched terms"
+grep -r 'new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*' 2>&1 | tee search.log
+
+echo "These were Errors and Warnings"
+grep -n -B 3 -A 5 'Error*\|Warning*' blockMesh.log decomposePar.log $solver.log | tee -a errors.log | tee /dev/tty 
+
+echo "Opening the Results"
+sleep 3
+gedit --new-window search.log errors.log blockMesh.log decomposePar.log $solver.log & disown
+
+cd ..
+
+
+
+
+
+
+
