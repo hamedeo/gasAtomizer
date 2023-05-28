@@ -39,11 +39,11 @@ Foam::scalar Foam::myDistortedSphereDragForce<CloudType>::CdRe
     // (AOB:Eq. 35; LMR:Eq. 9)
     if (Re > 1000.0)
     {
-        Info << "Re >1000" << Re << endl; // #test
+        Info << "Test Re >1000 :" << Re << endl; // #test
         return 0.424*Re;
     }
 
-    Info << "Re <1000" << Re << endl;   // #test
+    Info << "Test Re <1000 :" << Re << endl;   // #test
     return 24.0*(1.0 + (1.0/6.0)*pow(Re, 2.0/3.0));
 
 }
