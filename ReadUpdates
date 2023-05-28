@@ -1,0 +1,21 @@
+
+# CURRENT STATE:
+
+	+ The level of distortion (y) is now being printed as "Level of distortion" by including myDistortedSphereDrag in lagrangian/intermediate
+
+# CURRENT ISSUES:
+
+#/*/////////////////////////////////////////////////////////////////////////////////////////////*/
+#/*---------------------------------------------------------------------------------------------*/
+#/******************         Level Of Distortion         ****************************************/
+#/*---------------------------------------------------------------------------------------------*/
+#/*---------------------------------------------------------------------------------------------*/
+
+	1. The value of y is consistently equal to zero, as we expected.
+	2. The initialization of myDistortedSphereDrag begins after the last droplet is introduced!
+
+ 
+#  CURRENT MEASUREMENTS
+
+	1. Trying to use DebugSwitch 
+	2. Tracking the code to understand how OpenFOAM utilizes the distortedSphereDrag functionality.
