@@ -13,9 +13,10 @@
 
 	1. The value of y is consistently equal to zero, as we expected.
 	2. The initialization of myDistortedSphereDrag begins after the last droplet is introduced!
-
+	3. Funny is that the "Level of distorion y" wont get printed into console (or openfoam doesnt read it) while using 4 processors to run sprayFoam!!!
  
 #  CURRENT MEASUREMENTS
 
 	1. Trying to use DebugSwitch 
 	2. Tracking the code to understand how OpenFOAM utilizes the distortedSphereDrag functionality.
+	3. I removed openfoam and installed it again but that was not an issue.
