@@ -5,7 +5,7 @@ read solver
 read -p "you chose $solver as your solver ... is that correct? (y/n)  " answer
 
 if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
-    break
+    echo ""
 else
     exit
 fi
