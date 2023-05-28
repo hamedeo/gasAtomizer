@@ -1,8 +1,0 @@
-Using: OpenFOAM-v2212 (2212) - visit www.openfoam.com
-Build: _f8e05934-20230403 (patch=230110)
-
-Expected 0 arguments but found 1
-
-See 'blockMesh -help' for usage
- or 'blockMesh -help-full' for extended usage
-
