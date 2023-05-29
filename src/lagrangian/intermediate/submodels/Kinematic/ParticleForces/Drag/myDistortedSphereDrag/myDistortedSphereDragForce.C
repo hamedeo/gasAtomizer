@@ -90,12 +90,17 @@ Foam::forceSuSp Foam::myDistortedSphereDragForce<CloudType>::calcCoupled
     const scalar muc
 ) const
 {
-    // Limit the drop distortion to y=0 (sphere) and y=1 (disk)
-    const scalar y = min(max(p.y(), scalar(0)), scalar(1));
 
-    // Print Level of distortion y into the console 
+    // Xtra
+	//p.y() = abs(p.y());
+
+    // Limit the drop distortion to y=0 (sphere) and y=1 (disk)
+    const scalar y = min(max(abs(p.y()), scalar(0)), scalar(1));
+
+    // Print Level of distortion y into the console
     Info<< "Level of distortion y: " << y << endl;
- 
+    Info<< "p.y() is "	<< p.y() << endl;
+
     // (LMR:Eq. 10)
     return
         forceSuSp

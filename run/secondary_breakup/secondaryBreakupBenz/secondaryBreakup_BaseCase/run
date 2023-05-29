@@ -1,23 +1,63 @@
 #!/bin/bash
 
-echo "Enter a solver to execute:"
-read solver
-read -p "you chose $solver as your solver ... is that correct? (y/n)  " answer
+#-------------------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
+#--------------------------------------  FOAM RUN  -----------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
 
-if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
-    echo ""
+if [ "$0" = "$BASH_SOURCE" ]; then
+  echo -e "\e[35mScript is being run directly\e[0m"
+
+#-------------------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
+
+	echo -e "\e[1;35mEnter a solver to execute:\e[0m"
+	read solver
+	read -p $'\e[1;35myou chose '$solver' as your solver ... is that correct? (y/n)   ' answer
+
+	#-----------------------------------------------------------------------------------------#
+
+	if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
+	    echo ""
+	else
+	    exit
+	fi
+
+	#-----------------------------------------------------------------------------------------#
+
+	echo -e "\e[35mDo you want to run parallel? (y/n)    \e[0m"
+	read parallel
+
+#-------------------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
+
 else
-    exit
+  echo -e "\e[35mScript is being sourced by another script\e[0m"
+  solver=${solver:-sprayFoam}; echo -e "\e[1;35msolver == sprayFoam\e[0m"
+  parallel=${parallel:-y}; echo -e "\e[1;35mmode == parallel\e[0m"
 fi
 
-if [ -d outPut ]; then
-    if [ -n "$(ls -A outPut)" ]; then
-        rm -r outPut/*
-    fi
+#-------------------------------------------------------------------------------------------------#
+
+if [ "$parallel" == "y" ]; then
+
+	if [ -d outPut ]; then
+	    echo -e "\e[32moutPut directory exists\e[0m"
+	    if [ -n "$(ls -A outPut)" ]; then
+		echo -e "\e[32mCleaning outPut directory\e[0m"
+	        rm -r outPut/*
+	    fi
+	else
+	    mkdir outPut
+	fi
 else
-    mkdir outPut
+	echo ""
 fi
 
+
+#-------------------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
 
 spinner() {
     local pid=$1
@@ -33,39 +73,118 @@ spinner() {
     printf "    \b\b\b\b"
 }
 
-echo "Cleaning the case"
+#-------------------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
+
+#########################
+start=$(date +%s.%N)
+#########################
+
+echo -e "\e[31mCleaning the case ...\e[0m"
 foamCleanTutorials > /dev/null
+
+#-------------------------------------------------------------------------------------------------#
 
 #n=$(grep -o -E '\w+\.[A-Za-z]{2,6}' system/decomposeParDict | wc -l)
 n=$(grep numberOfSubdomains system/decomposeParDict | cut -d';' -f1 | awk '{print $NF}')
-echo "Number of domains: $n"
+echo -e "\e[31mNumber of domains: $n\e[0m"
 
-echo "Building Mesh"
-blockMesh 2> >(tee outPut/errors.log 2>&1) | tee outPut/blockMesh.log >/dev/null & spinner $!
+#-------------------------------------------------------------------------------------------------#
 
-echo "Decomposing model into $n processors"
-decomposePar 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/decomposePar.log > /dev/null & spinner $!
+echo -e "\e[31mBuilding Mesh ...\e[0m"
+blockMesh 2> >(tee outPut/errors.log 2>&1) | tee outPut/blockMesh.log > /dev/null & spinner $!
 
-echo "Running Solver in parallel"
-mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null & spinner $!
+#-------------------------------------------------------------------------------------------------#
+
+if [ "$parallel" == "y" ]; then
+	echo -e "\e[31mDecomposing model into $n processors ...\e[0m"
+	decomposePar 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/decomposePar.log > /dev/null & spinner $!
+else
+	echo ""
+fi
+
+#-------------------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
+
+    if [ "$parallel" == "y" ]; then
+
+	echo -e "\e[31mRunning $solver ...\e[0m"
+	mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null & spinner $!
+    else
+	echo -e "\e[31mRunning $solver in parallel ...\e[0m"
+
+	# Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
+	$solver  2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
+
+	# Store the process ID (PID) of the solver command
+	solver_pid=$!
+
+	# Print the first 500 lines from solver.log as they are produced
+	line_count=0
+	while IFS= read -r line; do
+	  echo "$line"
+	  ((line_count++))
+	  if [ $line_count -eq 500 ]; then
+	    break
+	  fi
+	done < <(tail -n 500 -f outPut/$solver.log)
+
+	# Call the spinner function in the background
+	spinner $solver_pid
+
+	# Wait for sprayFoam to terminate
+	wait $solver_pid
+
+    fi
+
+#-------------------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
+
+#########################
+end=$(date +%s.%N)
+runtime=$(echo "$end - $start" | bc)
+echo -e "\e[1;35mExecution time: $runtime seconds\e[0m"
+#########################
 
 cd outPut/
 
-echo "Here are the searched terms"
-grep -r 'new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*' 2>&1 | tee search.log
+echo -e "\e[31mCreating search.log file :\e[0m"
+grep 'new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*' $solver.log 2>&1 | tee search.log > /dev/null
 
-echo "These were Errors and Warnings"
-grep -n -B 3 -A 5 'Error*\|Warning*' blockMesh.log decomposePar.log $solver.log | tee -a errors.log | tee /dev/tty 
+echo -e "\e[31mThese were Errors and Warnings :\e[0m"
+grep -B 3 -A 5 'Error*\|Warning*' blockMesh.log decomposePar.log $solver.log | tee -a errors.log | tee /dev/tty 
 
-echo "Opening the Results"
-sleep 3
-gedit --new-window search.log errors.log blockMesh.log decomposePar.log $solver.log & disown
+echo -e "\e[31mOpening the Results in new window ...\e[0m"
+sleep 1
+
+######################################################
+# Ask the user for the phrases to search for
+read -p $'\e[1;35mEnter the phrases to search for (separated by comma - Press Enter to ignore search): \e[0m' phrases
+
+# Split the input phrases into an array
+IFS=, read -ra phrase_array <<< "$phrases"
+
+# Define the color codes
+Red=$(tput setaf 1)   # Red color for highlighting
+Def=$(tput sgr0)   # Reset color to default
+
+# Loop through files and search for each phrase
+for phrase in "${phrase_array[@]}"; do
+  echo -e "${Red}Searching for '$phrase'${Def}"
+  grep -r -n -A 2 -B 2 "$phrase" | while IFS= read -r line; do
+    # Highlight the found phrase in the line using sed
+    highlighted_line=$(echo "$line" | sed "s/$phrase/\'${Red}&${Def}\'/g")
+    echo -e "$highlighted_line"
+  done
+done
+#######################################################
+
+
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+  echo -e "\e[35mYou are a Remote user\e[0m"
+else
+  echo -e "\e[35mYou are a Local user ... opening gedit to see the files ...\e[0m"
+  gedit --new-window search.log errors.log blockMesh.log decomposePar.log $solver.log & disown
+fi
 
 cd ..
-
-
-
-
-
-
-
