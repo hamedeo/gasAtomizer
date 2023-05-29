@@ -40,21 +40,15 @@ fi
 
 #-------------------------------------------------------------------------------------------------#
 
-if [ "$parallel" == "y" ]; then
-
-	if [ -d outPut ]; then
-	    echo -e "\e[32moutPut directory exists\e[0m"
-	    if [ -n "$(ls -A outPut)" ]; then
-		echo -e "\e[32mCleaning outPut directory\e[0m"
-	        rm -r outPut/*
-	    fi
-	else
-	    mkdir outPut
-	fi
+if [ -d outPut ]; then
+    echo -e "\e[32moutPut directory exists\e[0m"
+    if [ -n "$(ls -A outPut)" ]; then
+	echo -e "\e[32mCleaning outPut directory\e[0m"
+        rm -r outPut/*
+    fi
 else
-	echo ""
+    mkdir outPut
 fi
-
 
 #-------------------------------------------------------------------------------------------------#
 #-------------------------------------------------------------------------------------------------#

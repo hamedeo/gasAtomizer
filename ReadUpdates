@@ -2,7 +2,7 @@
 # CURRENT STATE:
 
 	+ The level of distortion (y) is now being printed as "Level of distortion" by including myDistortedSphereDrag in lagrangian/intermediate
-	+ y Level of distortion is works fine with TAB model and basically the original models of openFOAM installation
+	+ y Level of distortion works fine now
 
 # CURRENT ISSUES:
 
@@ -12,10 +12,10 @@
 #/*---------------------------------------------------------------------------------------------*/
 #/*---------------------------------------------------------------------------------------------*/
 
-	1. Happens only for *KelvinHelmholtz* of our local files. The value of y is consistently equal to zero, as we expected.
+	1. SOLVED
 	2. Happens For all BreakUp models : myDistortedSphereDrag is calculated only for some processors (with 2 or 4 processors --> only for last introduced droplet) 
  
 #  CURRENT MEASUREMENTS
 
-	1. The problem arises by using our home Breakup Model KelvinHelmholtz so will compare them together to see what is missing.
+	1. SOLVED
 	2. Tracking the code to understand how OpenFOAM utilizes the Drag Force & Breakup Model to update y while running in parallel. First guess would be setup of our decomposeParDict file has some issues.

@@ -247,7 +247,7 @@ subModels
             massTotal       #eval {$rho0 * 4/3 * pi() * pow($outerDiameter/2, 3) * $duration * $parcelsPerSecond};                      // Total mass to inject [kg]. --> metal droplet material: // Benz: 2.119691206e-09    // Fe:
 
           }
-                       
+
     }
 
     dispersionModel none;
@@ -264,8 +264,8 @@ subModels
 
     atomizationModel none;
 
-    breakupModel     KelvinHelmholtz;   //KelvinHelmholtz;   //TAB;	//ReitzDiwakar; // ReitzKHRT;
-    
+    breakupModel     TAB;   //KelvinHelmholtz;   //TAB;	//ReitzDiwakar; // ReitzKHRT;
+
     stochasticCollisionModel none;
 
     radiation       off;
