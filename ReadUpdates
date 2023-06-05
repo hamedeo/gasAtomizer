@@ -1,8 +1,7 @@
 
 # CURRENT STATE:
 
-	+ The level of distortion (y) is now being printed as "Level of distortion" by including myDistortedSphereDrag in lagrangian/intermediate
-	+ y Level of distortion works fine now
+	+ Finally i could get the TAB models working by fixing our injection method to stabilize the injection oscillation amplitude of the droplet ampO=0. 
 
 # CURRENT ISSUES:
 
@@ -12,10 +11,9 @@
 #/*---------------------------------------------------------------------------------------------*/
 #/*---------------------------------------------------------------------------------------------*/
 
-	1. SOLVED
-	2. Happens For all BreakUp models : myDistortedSphereDrag is calculated only for some processors (with 2 or 4 processors --> only for last introduced droplet) 
- 
+	1. ones,  well, obviously ´y Level of distortion´ in KH model do not get computed.
+	
 #  CURRENT MEASUREMENTS
 
-	1. SOLVED
-	2. Tracking the code to understand how OpenFOAM utilizes the Drag Force & Breakup Model to update y while running in parallel. First guess would be setup of our decomposeParDict file has some issues.
+	1. So referring to Liu et al. paper, "y is the drop distortion computed from the TAB model". having said that we have to get y from TAB and use it for KH! Now i have 3 scenarios in my mind to achieve this: Incorporate whatever is Related to calculate y from TAB into KH/myDistortedSphereDrag of ours in local directory to update y. 
+	* NOTE: TAB Computations were made using Standard sphereDrag coefficient. _Liu et al. 
