@@ -39,11 +39,11 @@ Foam::scalar Foam::myDistortedSphereDragForce<CloudType>::CdRe
     // (AOB:Eq. 35; LMR:Eq. 9)
     if (Re > 1000.0)
     {
-        Info << "Test Re >1000 :" << Re << endl; // #test
+        Pout << "Test Re >1000 :		" << Re << endl; // #test
         return 0.424*Re;
     }
 
-    Info << "Test Re <1000 :" << Re << endl;   // #test
+    Pout << "Test Re <1000 :		" << Re << endl;   // #test
     return 24.0*(1.0 + (1.0/6.0)*pow(Re, 2.0/3.0));
 
 }
@@ -61,7 +61,7 @@ Foam::myDistortedSphereDragForce<CloudType>::myDistortedSphereDragForce
 :
     ParticleForce<CloudType>(owner, mesh, dict, typeName, false)
 {
-    Info << " Test 1" << endl;   // #test
+    Pout << " Test 1		" << endl;   // #test
 }
 
 
@@ -73,7 +73,7 @@ Foam::myDistortedSphereDragForce<CloudType>::myDistortedSphereDragForce
 :
     ParticleForce<CloudType>(df)
 {
-    Info << " Test 2" << endl;   // #test
+    Pout << " Test 2		" << endl;   // #test
 }
 
 
@@ -91,15 +91,23 @@ Foam::forceSuSp Foam::myDistortedSphereDragForce<CloudType>::calcCoupled
 ) const
 {
 
-    // Xtra
-	//p.y() = abs(p.y());
+    // Declare and assign p.y() to y_value
+    // scalar y_value = p.y();
 
     // Limit the drop distortion to y=0 (sphere) and y=1 (disk)
-    const scalar y = min(max(abs(p.y()), scalar(0)), scalar(1));
+    // const scalar y = min(max(y_value, scalar(0)), scalar(1));
+
+    // ##### This is how it looked like before : #####
+    const scalar y = min(max(p.y(), scalar(0)), scalar(1));
 
     // Print Level of distortion y into the console
-    Info<< "Level of distortion y: " << y << endl;
-    Info<< "p.y() is "	<< p.y() << endl;
+    Pout << "Level of distortion y:	" << y << endl;
+    Pout << "p.y():	 		" << p.y() << endl;
+
+    // Printout p.y() typeid
+    //Info << "Type of p.y(): " << typeid(p.y()).name() << endl;
+    //Info<< "Type of y_value:" << typeid(y_value).name() <<endl;
+    //Info<< "Type of scalar(0):" << typeid(scalar(0)).name() <<endl;
 
     // (LMR:Eq. 10)
     return

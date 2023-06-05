@@ -6,11 +6,11 @@
 
 #---------------------------################################################----------------------------------#
 #------------------##################------------------------------##################-------------------------#
-#---------------########--------------------  FOAM RUN  ------------------------########----------------------#
+#---------------########------------------  FOAM ALL RUN  ----------------------########----------------------#
 #------------------##################------------------------------##################-------------------------#
 #---------------------------################################################----------------------------------#
 #                                                                                                             |
-#     Medeo to run OpenFoam cases automatically. Hope this will help openScience              ⣀⣀              |
+#     Medeo to run multiple OpenFoam cases automatically. Hope this will help openScience     ⣀⣀              |
 #⠀⠀⠀ Copyright (C) <2023>  <meDeo>                                                          ⣴⠾⡍⣧⣹⡆            |
 #    ⠀⠀⠀⠀                                                                                ⠀⣠⡿⢁⡴⠟⠋⣷⣽⠀           |
 #    This program is free software: you can redistribute it and/or modify⠀⠀⠀⠀⠀           ⠀⣿⢵⠷⠄⠀⠀⣿⡸⠀  ⠀⠀⠀⠀⠀    |
@@ -36,229 +36,150 @@
 #---------------------------###############################################-----------------------------------#
 
 
+#######################################################################
+#########   Activate the screen blanking prevention
+#######################################################################
+
+#xset s off
+#xset -dpms
+#xset s noblank
+#######################################################################
+#######################################################################
+#######################################################################
+
+
+wait_time=1	# Define variables
 
 #######################################################################
-#########   it assignes values automatically or ask the user
+#########   Prompt the user to confirm shutdown
 #######################################################################
 
-# Check if this bash is being sourced by another script
-if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
-#-------------------------------------------------------------------------------------------------#
-#-------------------------------------------------------------------------------------------------#
+read -p "Do you want to shut down the system after execution? (y/n) " confirm
 
-	echo -e "\e[1;35mEnter a solver to execute:\e[0m"
-	read solver
-	read -p $'\e[1;35myou chose '$solver' as your solver ... is that correct? (y/n)   ' answer
-
-	#-----------------------------------------------------------------------------------------#
-
-	if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
-	    echo ""
-	else
-	    exit
-	fi
-
-	#-----------------------------------------------------------------------------------------#
-
-	echo -e "\e[35mDo you want to run parallel? (y/n)    \e[0m"
-	read parallel
-
-#-------------------------------------------------------------------------------------------------#
-#-------------------------------------------------------------------------------------------------#
-
-else
-  echo -e "\e[35mScript is being sourced by another script ... values are automatically set as bellow: \e[0m"
-  solver=${solver:-sprayFoam}; echo -e "\e[1;35msolver == sprayFoam\e[0m"
-  parallel=${parallel:-y}; echo -e "\e[1;35mmode == parallel\e[0m"
+if [[ $confirm == "y" ]]; then
+    # Prompt the user to enter the wait time
+    read -p "Enter the time to wait before shutting down (in minutes): " wait_time
+    echo "System will shut down in $wait_time minutes after execution."
 fi
-
-
 #######################################################################
-##############################*END*####################################
+#######################################################################
 #######################################################################
 
 
-#######################################################################
-#########   Make directory
-#######################################################################
 
-if [ -d outPut ]; then
-    echo -e "\e[32moutPut directory exists\e[0m"
-    if [ -n "$(ls -A outPut)" ]; then
-	echo -e "\e[32mCleaning outPut directory\e[0m"
-        rm -r outPut/*
+#######################################################################
+####### Case Execution
+#######################################################################
+start_time=$(date +%s.%N)
+
+# Original directory
+orDir=$(pwd)
+
+
+###### Directory List  ###########
+# List of directories to execute commands in
+directories=$(find ./ -maxdepth 1 \( -name "secondaryBreakupBenz-*" \))
+echo "$directories"
+sleep 10
+# Prompt the user to confirm shutdown
+read -p "Do you confirm the directory list? (y/n) " dirlistconfirm
+
+if [[ $dirlistconfirm != "y" ]]; then
+    echo "Please check the code again"
+    sleep 2
+    exit 1
+else
+    echo "Great"
+    sleep 1
+fi
+##################################
+
+
+# Loop through each directory and execute commands
+for dir in $directories
+do
+    cat << EoF
+        $(echo -e "\e[1;31m/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+        \/\/\/\/\/\/\/\/      Executing case in $dir
+        \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\e[0m")
+EoF
+
+    cd "$dir"
+
+    ##################################
+    # Run the Case in the Case Folder
+    source run
+    ##################################
+
+    echo "Foam $dir done"
+
+    if command -v beep >/dev/null 2>&1; then
+	 # Beep superMario as a case complition
+	beep -n -f 146 -l 20 -D 0 -n -f 369 -l 20 -D 0 -n -f 659 -l 20 -D 47 -n -f 146 -l 20 -D 0 -n -f 369 -l 20 -D 0 -n -f 659 -l 20 -D 189 -n -f 146 -l 20 -D 0 -n -f 369 -l 20 -D 0 -n -f 659 -l 20 -D 190 -n -f 146 -l 20 -D 0 -n -f 369 -l 20 -D 0 -n -f 523 -l 20 -D 47 -n -f 146 -l 20 -D 0 -n -f 369 -l 20 -D 0 -n -f 659 -l 20 -D 190 -n -f 391 -l 20 -D 0 -n -f 493 -l 20 -D 0 -n -f 783 -l 20 -D 475 -n -f 195 -l 20 -D 0 -n -f 391 -l 20 -n -f 195 -l 20 -D 0 -n -f 391 -l 20 -D 473
+    else
+	echo ""
     fi
-else
-    mkdir outPut
-fi
 
-#######################################################################
-##############################*END*####################################
-#######################################################################
+    # Back to original directory
+    cd $orDir
+done
 
+end_time=$(date +%s.%N)
+total_time=$(echo "$end_time - $start_time" | bc)
+echo "Whole execution time $total_time seconds"
 
-#######################################################################
-#########   spinner
-#######################################################################
+echo "All Foam done"
+    cat << EoF
+        $(echo -e "\e[1;37;41m  /\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\e[0m
+        \e[1;37;41m /\/\/\/\/\/\/\/      FINISHED      /\/\/\/\/\/\/\/\/\/\/\/\/\/\/ \e[0m
+        \e[1;37;41m/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/  \e[0m")
+EoF
 
-spinner() {
-    local pid=$1
-    local delay=0.1
-    local spinstr='|/-\'
-    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-        local temp=${spinstr#?}
-        printf " [%c] " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
-        sleep $delay
-        printf "\b\b\b\b\b\b"
-    done
-    printf "    \b\b\b\b"
-}
-
-#######################################################################
-##############################*END*####################################
-#######################################################################
-
-#########################
-start=$(date +%s.%N)
-#########################
-
-
-
-#######################################################################
-#########   Prepare and Run the Solver
-#######################################################################
-
-echo -e "\e[31mCleaning the case ...\e[0m"
-foamCleanTutorials > /dev/null
-
-#-------------------------------------------------------------------------------------------------#
-
-#n=$(grep -o -E '\w+\.[A-Za-z]{2,6}' system/decomposeParDict | wc -l)
-n=$(grep numberOfSubdomains system/decomposeParDict | cut -d';' -f1 | awk '{print $NF}')
-echo -e "\e[31mNumber of domains: $n\e[0m"
-
-#-------------------------------------------------------------------------------------------------#
-
-echo -e "\e[31mBuilding Mesh ...\e[0m"
-blockMesh 2> >(tee outPut/errors.log 2>&1) | tee outPut/blockMesh.log > /dev/null & spinner $!
-
-#-------------------------------------------------------------------------------------------------#
-
-if [ "$parallel" == "y" ]; then
-	echo -e "\e[31mDecomposing model into $n processors ...\e[0m"
-	decomposePar 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/decomposePar.log > /dev/null & spinner $!
+if command -v beep >/dev/null 2>&1; then
+	# Play Victory as BEEP
+	beep -l 375 -f 392 -n -l 750 -f 523 -n -l 463 -f 392 -n -l 187 -f 440 -n -l 750 -f 494 -n -l 375 -f 330 -n -l 375 -f 330 -n -l 750 -f 440 -n -l 463 -f 392 -n -l 187 -f 349 -n -l 750 -f 392 -n -l 463 -f 262 -n -l 187 -f 262 -n -l 750 -f 294 -n -l 463 -f 294 -n -l 187 -f 330 -n -l 750 -f 349 -n -l 463 -f 349 -n -l 187 -f 392 -n -l 750 -f 440 -n -l 375 -f 494 -n -l 375 -f 523 -n -l 1125 -f 587
 else
 	echo ""
 fi
+sleep 3
+#######################################################################
+#######################################################################
+#######################################################################
 
-#-------------------------------------------------------------------------------------------------#
-#----------- Solver
-#-------------------------------------------------------------------------------------------------#
 
-    if [ "$parallel" == "y" ]; then
+#######################################################################
+####### Deactivate the screen blanking prevention
+#######################################################################
+#xset s on
+#xset +dpms
+#xset s blank
+#######################################################################
 
-	echo -e "\e[31mRunning $solver ...\e[0m"
-	mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null & spinner $!
+
+#######################################################################
+######## Shutdown the system
+#######################################################################
+# Shutdown the system with sudo privileges and delay
+if [[ "$confirm" != "y" ]]; then
+    # Wait for user input for $wait_time minutes
+    read -t $(($wait_time * 60)) -n 2 -s -r -p "Press any key to cancel shutdown or wait $wait_time minute to shutdown..." response
+
+    # Check if user confirmed shutdown or no input was given within $wait_time minutes
+    if [[ $response != "" ]]; then
+        echo "Shutdown cancelled."
     else
-	echo -e "\e[31mRunning $solver in parallel ...\e[0m"
-
-	# Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
-	$solver  2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
-
-	# Store the process ID (PID) of the solver command
-	solver_pid=$!
-
-	# Print the first 500 lines from solver.log as they are produced
-	line_count=0
-	while IFS= read -r line; do
-	  echo "$line"
-	  ((line_count++))
-	  if [ $line_count -eq 500 ]; then
-	    break
-	  fi
-	done < <(tail -n 500 -f outPut/$solver.log)
-
-	# Call the spinner function in the background
-	spinner $solver_pid
-
-	# Wait for sprayFoam to terminate
-	wait $solver_pid
-
+        echo "Shutting down the system in 30 seconds..."
+        sleep 30
+        sudo shutdown now
     fi
 
-#-------------------------------------------------------------------------------------------------#
-
-    echo -e "\e[31mTranslate foam to VTK format ...\e[0m"
-    if [ "$parallel" == "y" ]; then
-	mpirun -np $n foamToVTK -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/foamToVTK.log > /dev/null & spinner $!
-    else
-	foamToVTK 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/foamToVTK.log > /dev/null & spinner $!
-    fi
-
-#######################################################################
-##############################*END*####################################
-#######################################################################
-
-
-#########################
-end=$(date +%s.%N)
-runtime=$(echo "$end - $start" | bc)
-echo -e "\e[1;35mExecution time: $runtime seconds\e[0m"
-#########################
-
-
-#######################################################################
-#########   Search & Create & Print
-#######################################################################
-
-cd outPut/
-
-echo -e "\e[31mCreating search.log file :\e[0m"
-grep 'new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*' $solver.log 2>&1 | tee search.log > /dev/null
-
-echo -e "\e[31mThese were Errors and Warnings :\e[0m"
-grep -B 3 -A 5 'Error*\|Warning*' blockMesh.log decomposePar.log $solver.log | tee -a errors.log | tee /dev/tty 
-
-echo -e "\e[31mOpening the Results in new window ...\e[0m"
-sleep 1
-
-###################################################
-# Ask the user for the phrases to search for      #
-###################################################
-    if [ "$parallel" == "y" ]; then
-	echo ""
-    else
-	read -p $'\e[1;35mEnter the phrases to search for (separated by comma - Press Enter to ignore search): \e[0m' phrases
-
-	# Split the input phrases into an array
-	IFS=, read -ra phrase_array <<< "$phrases"
-
-	# Define the color codes
-	Red=$(tput setaf 1)   # Red color for highlighting
-	Def=$(tput sgr0)   # Reset color to default
-
-	# Loop through files and search for each phrase
-	for phrase in "${phrase_array[@]}"; do
-	  echo -e "${Red}Searching for '$phrase'${Def}"
-	  grep -r -n -A 2 -B 2 "$phrase" | while IFS= read -r line; do
-	    # Highlight the found phrase in the line using sed
-	    highlighted_line=$(echo "$line" | sed "s/$phrase/\'${Red}&${Def}\'/g")
-	    echo -e "$highlighted_line"
-	  done
-	done
-    fi
-#######################################################
-
-
-if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-  echo -e "\e[35mYou are a Remote user\e[0m"
 else
-  echo -e "\e[35mYou are a Local user ... opening gedit to see the files ...\e[0m"
-  gedit --new-window search.log errors.log blockMesh.log decomposePar.log $solver.log foamToVTK.log & disown
+    echo "Enjoy results"
 fi
+#######################################################################
+#######################################################################
+#######################################################################
 
-cd ..
 
 #######################################################################
 ##############################*END*####################################
@@ -307,4 +228,3 @@ echo -e "\e[31m    fifi Howls from happiness\e[0m"
 ##############################*END*####################################
 ##############################*END*####################################
 ##############################*DEO*####################################
-

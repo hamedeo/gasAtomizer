@@ -196,7 +196,7 @@ subModels
                     {
                         value   0.00017;
                     }
-                ///
+                ////*
                 type        uniform;                // all the droplets injected will have the same diameter
                                                     // the initial particle size is only controlled by breakup and evaporation process.
                     uniformDistribution             // defines how the uniform distribution range is 
@@ -208,7 +208,7 @@ subModels
                         //d               0.00017;      // Rosin-Rammler Mean Diameter
                         //n               1;            // Rosin-Rammler Spread Parameter: n controls the shape of the distribution curve and higher values of n result in a narrower and more sharply peaked distribution
                     }
-                ///
+                ///*/
             }
         
 
@@ -236,8 +236,7 @@ subModels
             //Cd              0.9;                    // determing the intial velocity magnitude if we chose the flowType as flowRateAndDischarge. 
 
             //// Pressure driven velocity - The pressure difference between injector and ambient pressure
-            //flowType        pressureDrivenVelocity;
-            //Pinj            10e5;
+            //flowType        pressureDrivenVelocity;            //Pinj            10e5;
 
         //massTotal 
             //rho0    $constantProperties.rho0;
@@ -286,9 +285,9 @@ subModels
         (
             liquid
             {
-                Fe          0;
-                H2O	 	    0;
-                Benz		1; // Mass Fraction of the phase
+                Fe      	   	0;
+                H2O	 	    	0;
+                Benz			1; // Mass Fraction of the phase
             }
         );
     }
@@ -335,13 +334,23 @@ subModels
     TABCoeffs
     {
     
-        solveOscillationEq no;        
+        solveOscillationEq yes;   // why ?
         y0              0;
-        yDot0           0;           
-        Cmu             5;//10;  
-        Comega          8;         
+        yDot0           0;
+        Cmu             5;//10;
+        Comega          8;
         WeCrit          6;
         SMDCalculationMethod 	method1;
+    }
+
+	ETABCoeffs
+    {
+	    Cmu             10.0;
+	    Comega          8.0;
+	    WeCrit          12;
+	    k1              0.2;
+	    k2              0.2;
+	    WeTransition    100.0;
     }
 }
 

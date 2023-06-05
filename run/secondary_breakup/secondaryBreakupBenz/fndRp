@@ -1,0 +1,13 @@
+#!/bin/bash
+
+destination_directories=$(find ./ -maxdepth 1 \( -name "secondaryBreakupBenz-*" \))
+read -p "Which file do you want to replace: (input the directory path from here)   " dir_file
+dir_dest_ext=$(echo "$dir_file" | cut -d'/' -f2-)
+filename=$(basename "$dir_file")
+
+# Iterate over each destination directory
+for dest_dir in $destination_directories; do
+    # Replace the file in the destination directory
+    cp -f "${dir_file}" "${dest_dir}/${dir_dest_ext}"
+    echo "Replaced ${filename} in ${dest_dir}/${dir_dest_ext}"
+done
