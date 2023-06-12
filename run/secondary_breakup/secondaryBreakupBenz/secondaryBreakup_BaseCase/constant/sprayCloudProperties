@@ -1,5 +1,5 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
+0| =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  v2106                                 |
 |   \\  /    A nd           | Website:  www.openfoam.com                      |
@@ -80,91 +80,6 @@ subModels
 
     injectionModels                                 // Modelling Injection of the FUEL into chamber from the Nozzle 
     {
-/*
-        model1
-        {
-            type            injectedParticleDistributionInjection;
-            SOI             0;
-            parcelBasisType mass;
-            cloud           eulerianParticleCloud;
-            positionOffset  (0 -0.0047625 0.055);
-            binWidth        0.1e-3;
-            parcelsPerInjector 1;
-            // resampleSize    100;                    // optional
-            applyDistributionMassTotal no;// yes;
-
-            // Placeholder only when using applyDistributionMassTotal
-            massTotal       0;
-        }
-*/
- /*   
-	  model1
-        {
-            type            injectedParticleInjection;
-            SOI             0;
-            // massTotal       6.0e-6;
-            parcelBasisType fixed;
-            nParticle       1;
-            massTotal       0; //#eval {$rho0 * 4/3 * pi() * pow(0.00017/2, 3) * $nParticle};
-            cloud           eulerianParticleCloud;
-            positionOffset  (0 -0.0047625 0.055);
-        }
-*/
-/*
-        model1
-        {
-        
-            type            coneNozzleInjection;   
-            
-        // Times    
-            SOI             0;//5e-6; //3e-3;               // injectionStartTime: specifies the time at which the injection process starts.
-            duration        5e-5; //2e-4;                   // injectionDuration: specifies the duration of the injection process.
-
-        // Quantities   
-            //massTotal will be calculated based on the defined dependenty variables later 
-            parcelBasisType mass;		    // Lagrangian particle tracking model that tracks the movement of individual fuel droplets or particles based on their mass.
-                                                    //  Parcels based on Opt: -fixed -number -mass
-            parcelsPerSecond 5e4;//5e3;             // number of parcels injected into the simulation domain every second
-            flowRateProfile constant 1;             // Profile of droplets which There is no physical meaning for the value, it will be normalized
-
-            
-            //nParticle        1;                     // number of particls injected into the simulation domain per timestep
-
-        // Size distribution of the injected parcels (Parcel diameters)	
-            sizeDistribution                        // size distribution of the particles injected into the flow  
-            {
-                type        fixedValue;
-                    fixedValueDistribution
-                    {
-                        value   0.00017;
-                    }
-
-            }
-        
-
-        // Geometry
-            // Inner and outer half-cone angles    // angle between the axis of the particle and the inner and outer walls of the injection device
-            direction       (0 1 0);                // nozzleAxis: main axis for fuel injection
-            position        (0 -0.0047625 0.055);   // nozzlePosition: specifies the position of the nozzle in the simulation domain
-            thetaInner      constant 0.0;
-            thetaOuter      constant 0.0;
-
-            //inject over a disc:
-            injectionMethod point;                   // simulates the injection of a fuel spray from a disc-shaped orifice Opt: -point -disc
-            // innerDiameter   0;                      // inner diameter of FUEL Nozzle injector
-            // outerDiameter   170e-6;                 // outer diameter of FUEL Nozzle injector
-        
-        //Parcel Velocity - Calculate the partical initial velocity profile
-            // - Inject with constant velocity
-            flowType        constantVelocity; 		// the type of velocity profile for the injected particles
-            UMag            16; 				    // the magnitude of the initial velocity of the fuel droplets at the nozzle exit. // Liu et al. 1993
-
-        //massTotal 
-            massTotal       #eval {$rho0 * 4/3 * pi() * pow(0.00017/$outerDiameter//2, 3) * $duration * $parcelsPerSecond};
-
-          }
-*/
-          
         model1
         {
         
@@ -196,19 +111,7 @@ subModels
                     {
                         value   0.00017;
                     }
-                ////*
-                type        uniform;                // all the droplets injected will have the same diameter
-                                                    // the initial particle size is only controlled by breakup and evaporation process.
-                    uniformDistribution             // defines how the uniform distribution range is 
-                    {
-                        minValue        0.00017;        //  Max. Diameter 
-                        maxValue        0.00017;        //  Min. Diameter 
-                        // !IGNORED by OpenFOAM / Wrong Usage / Not Defined in the UniformDistribution
-                        //The Rosin-Rammler distribution assumes that the particles are spherical and monodisperse, i.e., all particles have the same density.
-                        //d               0.00017;      // Rosin-Rammler Mean Diameter
-                        //n               1;            // Rosin-Rammler Spread Parameter: n controls the shape of the distribution curve and higher values of n result in a narrower and more sharply peaked distribution
-                    }
-                ///*/
+
             }
         
 
@@ -220,7 +123,7 @@ subModels
             thetaOuter      constant 0.0;
 
             //inject over a disc:
-            injectionMethod disc;                   // simulates the injection of a fuel spray from a disc-shaped orifice Opt: -point -disc
+            injectionMethod point;                   // simulates the injection of a fuel spray from a disc-shaped orifice Opt: -point -disc
             innerDiameter   0;                      // inner diameter of FUEL Nozzle injector
             outerDiameter   170e-6;                 // outer diameter of FUEL Nozzle injector
         
@@ -263,7 +166,7 @@ subModels
 
     atomizationModel none;
 
-    breakupModel     TAB;   //KelvinHelmholtz;   //TAB;	//ReitzDiwakar; // ReitzKHRT;
+    breakupModel     KelvinHelmholtz;   //KelvinHelmholtz;   //TAB;	//ReitzDiwakar; // ReitzKHRT;
 
     stochasticCollisionModel none;
 
@@ -318,6 +221,11 @@ subModels
         CRT             0.1;
         msLimit         0.03;
         WeberLimit      6;              //6;
+	//i have added these 3  :
+        Cmu             5;//10;
+        Comega          8;
+        WeCrit          6;
+
     }
 
     ReitzKHRTCoeffs
@@ -334,7 +242,7 @@ subModels
     TABCoeffs
     {
     
-        solveOscillationEq yes;   // why ?
+        // solveOscillationEq yes;   // why ?
         y0              0;
         yDot0           0;
         Cmu             5;//10;

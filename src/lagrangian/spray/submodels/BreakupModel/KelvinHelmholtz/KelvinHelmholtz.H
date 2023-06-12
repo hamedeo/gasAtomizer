@@ -36,10 +36,11 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "BreakupModel.H"
+
 #ifndef KelvinHelmholtz_H
 #define KelvinHelmholtz_H
 
-#include "BreakupModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

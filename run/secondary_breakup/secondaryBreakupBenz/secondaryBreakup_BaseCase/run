@@ -38,64 +38,20 @@
 
 
 #######################################################################
-#########   it assignes values automatically or ask the user
+#########   Help Function
 #######################################################################
 
-# Check if this bash is being sourced by another script
-if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
-#-------------------------------------------------------------------------------------------------#
-#-------------------------------------------------------------------------------------------------#
-
-	echo -e "\e[1;35mEnter a solver to execute:\e[0m"
-	read solver
-	read -p $'\e[1;35myou chose '$solver' as your solver ... is that correct? (y/n)   ' answer
-
-	#-----------------------------------------------------------------------------------------#
-
-	if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
-	    echo ""
-	else
-	    exit
-	fi
-
-	#-----------------------------------------------------------------------------------------#
-
-	echo -e "\e[35mDo you want to run parallel? (y/n)    \e[0m"
-	read parallel
-
-#-------------------------------------------------------------------------------------------------#
-#-------------------------------------------------------------------------------------------------#
-
-else
-  echo -e "\e[35mScript is being sourced by another script ... values are automatically set as bellow: \e[0m"
-  solver=${solver:-sprayFoam}; echo -e "\e[1;35msolver == sprayFoam\e[0m"
-  parallel=${parallel:-y}; echo -e "\e[1;35mmode == parallel\e[0m"
-fi
-
-
-#######################################################################
-##############################*END*####################################
-#######################################################################
-
-
-#######################################################################
-#########   Make directory
-#######################################################################
-
-if [ -d outPut ]; then
-    echo -e "\e[32moutPut directory exists\e[0m"
-    if [ -n "$(ls -A outPut)" ]; then
-	echo -e "\e[32mCleaning outPut directory\e[0m"
-        rm -r outPut/*
-    fi
-else
-    mkdir outPut
-fi
-
-#######################################################################
-##############################*END*####################################
-#######################################################################
-
+# Function to display the script usage/help message
+display_help() {
+    echo -e "\e[1;35mUsage: $(basename "$0") [options]\e[0m"
+    echo -e "\e[1;35mOptions:\e[0m"
+    echo -e "\e[1;35m  -h, --help           Display this help message\e[0m"
+    echo -e "\e[1;35m  -s, --solver         Specify the Solver                                                     \e[0m"
+    echo -e "\e[1;35m  -p, --parallel       Run in parallel                                                        \e[0m"
+    echo -e "\e[1;35m  -n                   Number of solver lines to be printed out into console                  \e[0m"
+    echo -e "\e[1;35m  --search             Saerch phrases in the Solver's cosole output                           /
+                       use comma to seperate the inputs inside a quotation. E.g: -search "phrase1,phrase2,phrase3" \e[0m"
+}
 
 #######################################################################
 #########   spinner
@@ -116,8 +72,157 @@ spinner() {
 }
 
 #######################################################################
+#########   Solver Input User
+#######################################################################
+
+Solving_Intake() {
+  echo -e "\e[1;35mEnter a solver to execute:\e[0m"
+  read solver
+
+  echo -e "\e[1;35mYou chose '$solver' as your solver ... is that correct? (y/n)    \e[0m"
+  read answer
+  
+  if ! [[ "$answer" == "y" || "$answer" == "Y" ]]; then
+      exit 1
+  fi
+}
+#######################################################################
 ##############################*END*####################################
 #######################################################################
+
+#######################################################################
+#########   Options Definition for bashScript
+#######################################################################
+
+# Default values
+origCaseDir=$(pwd)
+solver_inserted=false
+parallel_inserted=false
+nout_inserted=false
+search_inserted=false
+
+# Process command-line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      display_help
+      exit 0
+      ;;
+    -s|--solver)
+      solver=$2
+      solver_inserted=true       # Update flag to indicate solver is inserted
+      shift 2
+      ;;
+    -p|--parallel)
+      parallel=true
+      parallel_inserted=true     # Update flag to indicate parallel mode is enabled
+      shift 1
+      ;;  
+    -n)
+      nout=$2
+      nout_inserted=true         # Update flag to indicate number of solver lines to be printed out
+      shift 2
+      ;;
+    --search)
+      IFS=',' read -ra phrases <<< "$2"  # Split input phrases by comma into an array
+      search_inserted=true      # Update flag to indicate number of solver lines to be printed out
+      shift 2
+      ;;
+    *)
+      echo "Invalid option: -$1"
+      echo "Use -h or --help to display the help message."
+      exit 1
+      ;;
+  esac
+done
+
+#######################################################################
+#########   it assignes values automatically or ask the user
+#######################################################################
+
+# Check if solver is inserted
+if ! $solver_inserted; then
+  echo -e "\e[1;35mSolver is not specified.\e[0m"
+    # Retrieve the list of available solvers
+    cd $WM_PROJECT_DIR/applications/solvers/ && allSolvers=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
+
+    # Extract the solver name from the controlDict file
+    solver=$(sed -n 's/.*application\s*\(\w\+\);.*/\1/p' system/controlDict)
+
+    # Check if the solver exists in the available solvers
+    if echo "$allSolvers" | grep -q "\<$solver\>"; then
+      echo -e "\e[1;35mThe solver \e[1;31;47m'$solver'\e[0m\e[1;35m has been chosen as Case application method\e[0m"
+    else
+        # Check if this bash is NOT being sourced by another script
+        if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
+          Solving_Intake
+        else
+          echo -e "\e[35mScript is being sourced by another script ... \e[0m"
+          echo -e "\e[1;35mSolver '$solver' not found in available solvers. Please change the controlDict\nto set available application or use options (-s solver_name) to clarify the solver method\e[0m"
+          exit 1
+        fi
+    fi
+else
+  # Retrieve the list of available solvers
+  cd $WM_PROJECT_DIR/applications/solvers/ && allSolvers=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
+  
+  # Retrieve the list of available solvers in local directory
+  cd $WM_PROJECT_USER_DIR/applications/solvers/ && allSolvers+=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
+  
+  # Check if the solver exists in the available solvers
+  if echo "$allSolvers" | grep -q "\<$solver\>"; then
+    echo -e "\e[1;35mThe solver '$solver' has been chosen as Case applicatioon method\e[0m"
+  else
+    echo -e "\e[1;35mSolver '$solver' not found in the available Original and Local directory solvers. Please correct your entry or change the controlDict\nto set available application or use options (-s solver_name) to clarify the solver method\e[0m"
+    Solving_Intake
+  fi
+fi
+
+#-------------------------------------------------------------------------------------------------#
+if ! $parallel_inserted; then
+  echo -e "\e[1;35mSolving mode is not specified.\e[0m"
+    # Check if this bash is NOT being sourced by another script
+    if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
+      echo -e "\e[1;31mIf you wish to run in parallel please specify it (-p) in the run options [use -h for help]    \e[0m"
+      parallel=false
+    else
+      parallel=true
+      echo -e "\e[1;35mMode == parallel\e[0m"
+    fi
+fi
+#-------------------------------------------------------------------------------------------------#
+if ! $nout_inserted; then
+  echo -e "\e[1;35mNumber of lines to print is not specified.\e[0m"
+  nout=500
+  echo -e "\e[1;35mFirst 500 lines will be printed into the console\e[0m"
+fi
+
+
+
+#######################################################################
+##############################*END*####################################
+#######################################################################
+
+sleep 3
+
+#######################################################################
+#########   Make directory
+#######################################################################
+
+if [ -d outPut ]; then
+    echo -e "\e[1;32moutPut directory exists\e[0m"
+    if [ -n "$(ls -A outPut)" ]; then
+	echo -e "\e[1;32mCleaning outPut directory\e[0m"
+        rm -r outPut/*
+    fi
+else
+    mkdir outPut
+fi
+
+#######################################################################
+##############################*END*####################################
+#######################################################################
+
 
 #########################
 start=$(date +%s.%N)
@@ -129,24 +234,24 @@ start=$(date +%s.%N)
 #########   Prepare and Run the Solver
 #######################################################################
 
-echo -e "\e[31mCleaning the case ...\e[0m"
+echo -e "\e[1;31mCleaning the case ...\e[0m"
 foamCleanTutorials > /dev/null
 
 #-------------------------------------------------------------------------------------------------#
 
 #n=$(grep -o -E '\w+\.[A-Za-z]{2,6}' system/decomposeParDict | wc -l)
 n=$(grep numberOfSubdomains system/decomposeParDict | cut -d';' -f1 | awk '{print $NF}')
-echo -e "\e[31mNumber of domains: $n\e[0m"
+echo -e "\e[1;31mNumber of domains: $n\e[0m"
 
 #-------------------------------------------------------------------------------------------------#
 
-echo -e "\e[31mBuilding Mesh ...\e[0m"
+echo -e "\e[1;31mBuilding Mesh ...\e[0m"
 blockMesh 2> >(tee outPut/errors.log 2>&1) | tee outPut/blockMesh.log > /dev/null & spinner $!
 
 #-------------------------------------------------------------------------------------------------#
 
-if [ "$parallel" == "y" ]; then
-	echo -e "\e[31mDecomposing model into $n processors ...\e[0m"
+if [ "$parallel" == true ]; then
+	echo -e "\e[1;31mDecomposing model into $n processors ...\e[0m"
 	decomposePar 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/decomposePar.log > /dev/null & spinner $!
 else
 	echo ""
@@ -156,45 +261,69 @@ fi
 #----------- Solver
 #-------------------------------------------------------------------------------------------------#
 
-    if [ "$parallel" == "y" ]; then
+if [ "$parallel" == true ]; then
+  echo -e "\e[1;31mRunning $solver ...\e[0m"
+  echo -e "\e[1;32mPrinting the first $nout lines...\e[0m"
 
-	echo -e "\e[31mRunning $solver ...\e[0m"
-	mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null & spinner $!
-    else
-	echo -e "\e[31mRunning $solver in parallel ...\e[0m"
+  # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
+  mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null & 
 
-	# Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
-	$solver  2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
+  # Store the process ID (PID) of the solver command
+  solver_pid=$!
 
-	# Store the process ID (PID) of the solver command
-	solver_pid=$!
-
-	# Print the first 500 lines from solver.log as they are produced
-	line_count=0
-	while IFS= read -r line; do
-	  echo "$line"
-	  ((line_count++))
-	  if [ $line_count -eq 500 ]; then
-	    break
-	  fi
-	done < <(tail -n 500 -f outPut/$solver.log)
-
-	# Call the spinner function in the background
-	spinner $solver_pid
-
-	# Wait for sprayFoam to terminate
-	wait $solver_pid
-
+  # Print the first 500 lines from solver.log as they are produced
+  line_count=0
+  while IFS= read -r line; do
+    echo "$line"
+    ((line_count++))
+    if [ $line_count -eq $nout ]; then
+      break
     fi
+  done < <(sleep 1; tail -n $nout -f outPut/$solver.log)
+
+  # Call the spinner function in the background
+  spinner $solver_pid
+
+  # Wait for sprayFoam to terminate
+  wait $solver_pid
+else
+  echo -e "\e[1;31mRunning $solver in parallel ...\e[0m"
+  echo -e "\e[1;32mPrinting the first $nout lines...\e[0m"
+
+  # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
+  $solver  2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
+
+  # Store the process ID (PID) of the solver command
+  solver_pid=$!
+
+  # Print the first 500 lines from solver.log as they are produced
+  line_count=0
+  while IFS= read -r line; do
+    echo "$line"
+    ((line_count++))
+    if [ $line_count -eq $nout ]; then
+      break
+    fi
+  done < <(tail -n $nout -f outPut/$solver.log)
+
+  # Call the spinner function in the background
+  spinner $solver_pid
+
+  # Wait for sprayFoam to terminate
+  wait $solver_pid
+fi
 
 #-------------------------------------------------------------------------------------------------#
 
-    echo -e "\e[31mTranslate foam to VTK format ...\e[0m"
-    if [ "$parallel" == "y" ]; then
-	mpirun -np $n foamToVTK -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/foamToVTK.log > /dev/null & spinner $!
-    else
-	foamToVTK 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/foamToVTK.log > /dev/null & spinner $!
-    fi
+# Create VTK file
+
+echo -e "\e[1;31mTranslate foam to VTK format ...\e[0m"
+
+if [ "$parallel" == true ]; then
+  mpirun -np $n foamToVTK -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/foamToVTK.log > /dev/null & spinner $!
+else
+  foamToVTK 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/foamToVTK.log > /dev/null & spinner $!
+fi
 
 #######################################################################
 ##############################*END*####################################
@@ -214,47 +343,40 @@ echo -e "\e[1;35mExecution time: $runtime seconds\e[0m"
 
 cd outPut/
 
-echo -e "\e[31mCreating search.log file :\e[0m"
-grep 'new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*' $solver.log 2>&1 | tee search.log > /dev/null
+echo -e "\e[1;31mSearching for predefind search results :\e[0m"
+grep --color=auto 'new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*' $solver.log 2>&1 | tee search.log > /dev/null
 
-echo -e "\e[31mThese were Errors and Warnings :\e[0m"
-grep -B 3 -A 5 'Error*\|Warning*' blockMesh.log decomposePar.log $solver.log | tee -a errors.log | tee /dev/tty 
+if [ "$parallel" == false ]; then
+  touch decomposePar.log
+  echo -e "${Red}The case ran with normal single core.  ${Def}" >> decomposePar.log
+fi
+ 
+echo -e "\e[1;31mThese were Errors and Warnings :\e[0m"
+grep --color=auto -B 3 -A 5 'Error*\|Warning*' blockMesh.log decomposePar.log $solver.log | tee -a errors.log | tee /dev/tty 
 
-echo -e "\e[31mOpening the Results in new window ...\e[0m"
 sleep 1
 
 ###################################################
-# Ask the user for the phrases to search for      #
+# Phrases to search for inserted in options       #
 ###################################################
-    if [ "$parallel" == "y" ]; then
-	echo ""
-    else
-	read -p $'\e[1;35mEnter the phrases to search for (separated by comma - Press Enter to ignore search): \e[0m' phrases
-
-	# Split the input phrases into an array
-	IFS=, read -ra phrase_array <<< "$phrases"
-
+if $search_inserted; then
 	# Define the color codes
 	Red=$(tput setaf 1)   # Red color for highlighting
 	Def=$(tput sgr0)   # Reset color to default
 
 	# Loop through files and search for each phrase
-	for phrase in "${phrase_array[@]}"; do
-	  echo -e "${Red}Searching for '$phrase'${Def}"
-	  grep -r -n -A 2 -B 2 "$phrase" | while IFS= read -r line; do
-	    # Highlight the found phrase in the line using sed
-	    highlighted_line=$(echo "$line" | sed "s/$phrase/\'${Red}&${Def}\'/g")
-	    echo -e "$highlighted_line"
-	  done
+	for phrase in "${phrases[@]}"; do
+	  echo -e "${Red}Searching for '$phrase':${Def}" >> search.log
+	  grep --color=auto -r -n -A 2 -B 2 "$phrase" --exclude=search.log >> search.log
 	done
-    fi
-#######################################################
+fi
+####################################################
 
 
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
   echo -e "\e[35mYou are a Remote user\e[0m"
 else
-  echo -e "\e[35mYou are a Local user ... opening gedit to see the files ...\e[0m"
+  echo -e "\e[35mYou are a Local user ... Opening the Results in new window ...\e[0m"
   gedit --new-window search.log errors.log blockMesh.log decomposePar.log $solver.log foamToVTK.log & disown
 fi
 
@@ -288,7 +410,7 @@ $(echo -e "\033[1;37m
    ....********...........***...
    .......*.... .......***...... \033[0m")
 echo
-echo -e "\e[31m    fifi Howls from happiness\e[0m"
+echo -e "\e[1;31m    fifi Howls from happiness\e[0m"
 
 ################################*######################################
 ###############################*H*#####################################

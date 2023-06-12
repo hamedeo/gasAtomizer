@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     secondaryBreakupFoam;
+application     sprayFoam;
 
 startFrom       startTime;
 

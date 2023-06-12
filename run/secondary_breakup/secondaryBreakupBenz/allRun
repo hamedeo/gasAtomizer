@@ -108,7 +108,7 @@ EoF
 
     ##################################
     # Run the Case in the Case Folder
-    source run
+    source run -p 
     ##################################
 
     echo "Foam $dir done"

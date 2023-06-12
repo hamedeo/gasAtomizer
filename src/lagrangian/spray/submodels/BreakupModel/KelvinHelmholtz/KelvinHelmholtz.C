@@ -27,6 +27,7 @@ License
 
 #include "KelvinHelmholtz.H"
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class CloudType>
@@ -36,7 +37,7 @@ Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz
     CloudType& owner
 )
 :
-    BreakupModel<CloudType>(dict, owner, typeName),
+    BreakupModel<CloudType>(dict, owner, typeName, true),
     b0_(0.61),
     b1_(40.0),
     cTau_(1.0),
@@ -44,6 +45,7 @@ Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz
     msLimit_(0.03),
     weberLimit_(6.0)
 {
+	Pout<< " Test KH Constructor 1 is used " << endl;
     if (!this->defaultCoeffs(true))
     {
         this->coeffDict().readEntry("B0", b0_);
@@ -66,7 +68,8 @@ Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz(const KelvinHelmholtz<CloudTyp
     cRT_(bum.cRT_),
     msLimit_(bum.msLimit_),
     weberLimit_(bum.weberLimit_)
-{}
+{        Pout<< " Test KH Constructor 2 is used " << endl;
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -203,7 +206,7 @@ bool Foam::KelvinHelmholtz<CloudType>::update
             }
         }
    }
-     
+
     else if (KHindex < 0.5)
     {
         // Case of larger drops after breakup (Reitz, Atomization & Spray
