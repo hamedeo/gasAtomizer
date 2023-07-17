@@ -1,0 +1,561 @@
+#!/bin/bash
+
+#---------------------------################################################----------------------------------#
+#---------------------------################################################----------------------------------#
+
+
+#---------------------------################################################----------------------------------#
+#------------------##################------------------------------##################-------------------------#
+#---------------########--------------------  FOAM RUN  ------------------------########----------------------#
+#------------------##################------------------------------##################-------------------------#
+#---------------------------################################################----------------------------------#
+#                                                                                                             |
+#     Medeo to run OpenFoam cases automatically. Hope this will help openScience              ⣀⣀              |
+#⠀⠀⠀ Copyright (C) <2023>  <meDeo>                                                          ⣴⠾⡍⣧⣹⡆            |
+#    ⠀⠀⠀⠀                                                                                ⠀⣠⡿⢁⡴⠟⠋⣷⣽⠀           |
+#    This program is free software: you can redistribute it and/or modify⠀⠀⠀⠀⠀           ⠀⣿⢵⠷⠄⠀⠀⣿⡸⠀  ⠀⠀⠀⠀⠀    |
+#    it under the terms of the GNU General Public License as published by  ⠀⠀⠀⠀          ⠀⢿⠘⣎⠀⢀⡼⢯⠃       ⠀⠀⠀⠀⠀|
+#    the Free Software Foundation, either version 3 of the License, or  ⠀⠀⠀⠀⠀⠀⠀    ⠀ ⠀   ⠘⣧⣽⠧⣊⡾⠋⠀⠀⠀           |
+#⠀⠀ ⠀(at your option) any later version.                                      ⠀⠀          ⢸⡿⠋⠉ ⠀⠀⠀⠀⠀          |
+#    ⠀⠀                                                               ⠀⠀⠀⠀⠀⠀⠀   ⣀⣠⣤⣤ ⣀⣀⣀⣀⡠⠾⢅⣀⡀     ⠀⠀⠀⠀⠀⠀⠀    |
+#    This program is distributed in the hope that it will be useful,⠀⠀⠀⠀⠀      ⢸⠋⠀⠀ ⠀⠈⠉⠉⠁⠀⡩⠬⢼⡍⠉⠛⢒⠶⠶⠦⠄         |
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of           ⢸⠀⠠⠀⠀⢀⠀⠀⢀⠔⢁⡔⠁  ⢈⡧⢽⠀⢠⡄ ⡈   ⠀⠀ ⠀  |
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            ⢸⠀⢸⣸⠀⠀⣰⣖⠋⣠⠋⠀ ⠀⠀⣸⡇⠈⠃⢀⣳⠀⡅         |
+#                                                                             ⢻⢀⠀⠹⢀⣴⠃⠀⠀⠀⠀⣰⠿⠀⠀⢀⣤⢸⡇⡇            |
+#    GNU General Public License for more details.                              ⡇⠀⠘⣿⣠⢴⠞⠁⠀⠀⠀⠀⡼⠁⠆⡤⠀⠀⢈⣶⢁⠃         |
+#    You should have received a copy of the GNU General Public License         ⢱⡀⡄⠘⢿⠃⠀ ⢀⡞⠁⠀⡆⢀⣠⢺⡿⣗⣸            |
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>   ⠀⢸⣿⢧⠀⠘ ⠀⠀⣰⠏⠀⠀⠈⠩⠿⠵⠊⢀⡠⡜⠀           |
+#                                                                              ⠈⠧⠬⠷⠤⠤⠤⠼⠾⠥⠤⠤⠤⠤⠤⠤⠤⠴⠥⠶⠇⠀         |
+#---------------------------###############################################-----------------------------------#
+#---------------------------################╭━━━╮##########################-----------------------------------#
+#---------------------------################┃╭━╮┃##########################-----------------------------------#
+#---------------------------################┃┃╱┃┣━━┳━━╮####################-----------------------------------#
+#---------------------------################┃┃╱┃┃━━┫╭╮┃####################-----------------------------------#
+#---------------------------################┃╰━╯┃━━┫╰╯┃####################-----------------------------------#
+#---------------------------################╰━━━┻━━┻━━╯####################-----------------------------------#
+#---------------------------###############################################-----------------------------------#
+
+#################################################################################
+#################################################################################
+### ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██ ███████ ###
+### ██      ██    ██ ████   ██ ██         ██    ██ ██    ██ ████   ██ ██      ###
+### █████   ██    ██ ██ ██  ██ ██         ██    ██ ██    ██ ██ ██  ██ ███████ ###
+### ██      ██    ██ ██  ██ ██ ██         ██    ██ ██    ██ ██  ██ ██      ██ ###
+### ██       ██████  ██   ████  ██████    ██    ██  ██████  ██   ████ ███████ ###
+#################################################################################
+#################################################################################
+
+#######################################################################
+#########   Help Function
+#######################################################################
+
+# Function to display the script usage/help message
+display_help() {
+    echo -e "\e[1;35mUsage: $(basename "$0") [options]\e[0m"
+    echo -e "\e[1;35mOptions:\e[0m"
+    echo -e "\e[1;35m  -h, --help           Display this help message\e[0m"
+    echo -e "\e[1;35m  -s, --solver         Specify the Solver                                                     \e[0m"
+    echo -e "\e[1;35m  -p, --parallel       Run in parallel                                                        \e[0m"
+    echo -e "\e[1;35m  -n                   Number of solver lines to be printed out into console                  \e[0m"
+    echo -e "\e[1;35m  -tp, --targetphrase  Print output into the console containing target phrase 			  	   \e[0m"
+    echo -e "\e[1;35m  -lt, --latestTime    Run the Solver from the result of  the simulation                      \e[0m"
+    echo -e "\e[1;35m  --search             Search phrases in the Solver's cosole output                           \e[0m"
+    echo -e "\e[1;35m  -debug               debug mode:ON - modify run file to appropriate debug switch design     /
+                       use comma to seperate the inputs inside a quotation. E.g: -search "phrase1,phrase2,phrase3" \e[0m"
+}
+
+#######################################################################
+#########   spinner
+#######################################################################
+
+spinner() {
+    local pid=$1
+    local delay=0.1
+    local spinstr='|/-\'
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf " [%c] " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
+}
+
+#######################################################################
+#########   ctrl_c
+#######################################################################
+
+ctrl_c() {
+	echo " Ctrl+C detected. Stopping process..."
+	exit 0
+}
+
+#######################################################################
+#########   Solver Input User
+#######################################################################
+
+Solving_Intake() {
+  echo -e "\e[1;35mEnter a solver to execute:\e[0m"
+  read solver
+
+  echo -e "\e[1;35mYou chose '$solver' as your solver ... is that correct? (y/n)    \e[0m"
+  read answer
+  
+  if ! [[ "$answer" == "y" || "$answer" == "Y" ]]; then
+      exit 1
+  fi
+}
+
+#######################################################################
+#########   Clean/Make the outPut directory Function
+#######################################################################
+
+cleanOutPutDir() {
+	# Make and Clean outPut directory
+	if [ -d outPut ]; then
+		echo -e "\e[1;32mOutPut directory exists\e[0m"
+		if [ -n "$(ls -A outPut)" ]; then
+		echo -e "\e[1;32mCleaning outPut directory\e[0m"
+		  if $latest_time; then
+		  	[ -f "outPut/$solver.log" ] && mv outPut/$solver.log outPut/old$solver.log
+		  	[ -f "outPut/foamToVTK.log" ] && rm outPut/foamToVTK.log
+		  	[ -f "outPut/search.log" ] && rm outPut/search.log
+		  	[ -f "outPut/errors.log" ] && rm outPut/errors.log
+		  else
+		    rm -r outPut/*
+		  fi
+		fi
+	else
+		mkdir outPut
+	fi
+}
+
+#######################################################################
+#########   cleanCase Function
+#######################################################################
+cleanCaseFunction(){
+	! $latest_time && { echo -e "\e[1;31mCleaning the case ...\e[0m"; foamCleanTutorials > /dev/null; }
+	$latest_time && { echo -e "\e[1;31mCleaning the time steps after 0.003 ...\e[0m"; sleep 3; rm -rf VTK; find . -maxdepth 2 \( -name "[0-9]*.[0-9]*" -o -name "[0-9]*e*" \) -not -name "0.003" -exec rm -rf {} +; }
+	#find . -maxdepth 2 \( -name "0.00[0-9]*" -o -name "[1-9]*.[0-9]*[^/]" -o -name "[0-9]*e-[0-2]*" -o -name "[3-9]*e-3*" \) -not \( -name "0.003" -o -path "./constant/*" \) -exec rm -rf {} +
+}
+
+#######################################################################
+#########   blockMesh Function
+#######################################################################
+buildMesh(){
+	echo -e "\e[1;31mBuilding Mesh ...\e[0m"
+	blockMesh 2> >(tee outPut/errors.log 2>&1) | tee outPut/blockMesh.log > /dev/null & spinner $!
+}
+
+#######################################################################
+#########   decompossePar Function
+#######################################################################
+decomposeFunction(){
+	echo -e "\e[1;31mDecomposing model into $n processors ...\e[0m"
+	decomposePar 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/decomposePar.log > /dev/null & spinner $!
+}
+
+#######################################################################
+#########   decomposePar Function
+#######################################################################
+search4nDomainFunction(){
+	n=$(grep numberOfSubdomains system/decomposeParDict | cut -d';' -f1 | awk '{print $NF}')
+	echo -e "\e[1;31mNumber of domains: $n\e[0m"
+}
+
+#######################################################################
+#########   solverCheck Function
+#######################################################################
+solverCheckFunction(){
+
+	# Check if solver is inserted
+	if ! $solver_inserted; then
+	  echo -e "\e[1;35mSolver is not specified.\e[0m"
+		# Retrieve the list of available solvers
+		cd $WM_PROJECT_DIR/applications/solvers/ && allSolvers=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
+
+        	# Retrieve the list of available solvers in local directory
+	        cd $WM_PROJECT_USER_DIR/applications/solvers/ && allSolvers+=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
+
+		# Extract the solver name from the controlDict file
+		solver=$(sed -n 's/.*application\s*\(\w\+\);.*/\1/p' system/controlDict)
+
+		# Check if the solver exists in the available solvers
+		if echo "$allSolvers" | grep -q "\<$solver\>"; then
+		  echo -e "\e[1;35mThe solver \e[1;31;47m'$solver'\e[0m\e[1;35m has been chosen as Case application method\e[0m"
+
+		else
+
+		    # Check if this bash is NOT being sourced by another script
+		    if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
+		      Solving_Intake
+		    else
+		      echo -e "\e[35mScript is being sourced by another script ... \e[0m"
+		      echo -e "\e[1;35mSolver '$solver' not found in available solvers. Please change the controlDict\nto set available application or use options (-s solver_name) to clarify the solver method\e[0m"
+		      exit 1
+		    fi
+		fi
+	else
+	  # Retrieve the list of available solvers
+	  cd $WM_PROJECT_DIR/applications/solvers/ && allSolvers=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
+
+	  # Retrieve the list of available solvers in local directory
+	  cd $WM_PROJECT_USER_DIR/applications/solvers/ && allSolvers+=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
+
+	  # Check if the solver exists in the available solvers
+	  if echo "$allSolvers" | grep -q "\<$solver\>"; then
+		echo -e "\e[1;35mThe solver '$solver' has been chosen as Case applicatioon method\e[0m"
+	  else
+		echo -e "\e[1;35mSolver '$solver' not found in the available Original and Local directory solvers. Please correct your entry or change the controlDict\nto set available application or use options (-s solver_name) to clarify the solver method\e[0m"
+		Solving_Intake
+	  fi
+	fi
+
+}
+
+#######################################################################
+#########   Search & print subFunctions for solve Functions
+#######################################################################
+targetPhraseFunction(){
+	# Continue searching for the desired phrase after line count condition is met
+	local line_count_final=0
+	local line_count=0
+	while IFS= read -r line; do
+	((line_count++))
+	# Search for the desired phrase in each line
+	if [[ $line == *"$target_phrase"* ]]; then
+	  echo -e "target phrase detected 			: \n\n\n\n"
+	  sleep 1; 
+	  # Print the context lines after finding the desired phrase
+      tail -n +$((line_count - 6)) outPut/$solver.log | head -n 60 | tee outPut/debug.log
+      open_files+=" debug.log"
+      echo -e "\n\n\n\n\n"
+	  return
+	fi
+	done < <(tail -n 1 -f outPut/$solver.log) &
+}
+
+printInitialLinesFunction(){
+	# Print the first 200 lines from solver.log as they are produced
+	echo -e "\e[1;32mPrinting the first $nout lines...\e[0m"
+	local line_count=0
+	while IFS= read -r line; do
+	echo "$line"
+	((line_count++))
+	if [ $line_count -eq $nout ]; then
+	  break
+	fi
+	done < <(sleep 0.1; tail -n $nout -f outPut/$solver.log) &
+}
+
+#######################################################################
+#########   solveParallel Function
+#######################################################################
+solveParallelFunction(){
+  echo -e "\e[1;31mRunning $solver ...\e[0m"
+
+  # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
+  mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null & 
+
+  # Store the process ID (PID) of the solver command
+  solver_pid=$!
+
+  $print_phrase && targetPhraseFunction || printInitialLinesFunction
+
+  # Call the spinner function in the background
+  spinner $solver_pid
+
+  # Wait for sprayFoam to terminate
+  wait $solver_pid
+  
+}
+
+#######################################################################
+#########   solveSerial Function
+#######################################################################
+solveSerialFunction(){
+  echo -e "\e[1;31mRunning $solver in parallel ...\e[0m"
+
+  # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
+  $solver  2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
+
+  # Store the process ID (PID) of the solver command
+  solver_pid=$!
+
+  $print_phrase && targetPhraseFunction || printInitialLinesFunction
+
+  # Call the spinner function in the background
+  spinner $solver_pid
+
+  # Wait for sprayFoam to terminate
+  wait $solver_pid
+}
+
+
+#######################################################################
+#########   foamToVTK Function
+#######################################################################
+foamToVTKFunction(){
+
+	VTKParallelFunction(){
+	  mpirun -np $n foamToVTK -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/foamToVTK.log > /dev/null & spinner $!
+	}
+	
+	VTKSerialFunction(){
+	  foamToVTK 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/foamToVTK.log > /dev/null & spinner $!
+	}	
+	
+	# Create VTK file
+	$parallel && VTKParallelFunction || VTKSerialFunction
+	echo -e "\e[1;31mTranslate foam to VTK format ...\e[0m"
+}
+
+#######################################################################
+##############################*END*####################################
+#######################################################################
+
+################################################################
+################################################################
+###   ██████  ██████  ████████ ██  ██████  ███    ██ ███████ ###
+###  ██    ██ ██   ██    ██    ██ ██    ██ ████   ██ ██      ###
+###  ██    ██ ██████     ██    ██ ██    ██ ██ ██  ██ ███████ ###
+###  ██    ██ ██         ██    ██ ██    ██ ██  ██ ██      ██ ###
+###   ██████  ██         ██    ██  ██████  ██   ████ ███████ ###
+################################################################
+################################################################
+
+# General options
+exit_code=false
+
+# Default values
+origCaseDir=$(pwd)
+solver_inserted=false
+parallel_inserted=false
+nout_inserted=false
+search_flag=false
+debug_search=false
+print_phrase=false
+latest_time=false
+debug_switch=false
+
+# Process command-line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      display_help
+      exit 0
+      ;;
+    -s|--solver)
+      solver=$2
+      solver_inserted=true       # Update flag to indicate solver is inserted
+      shift 2
+      ;;
+    -p|--parallel)
+      parallel=true
+      parallel_inserted=true     # Update flag to indicate parallel mode is enabled
+      shift 1
+      ;;  
+    -n)
+      nout=$2
+      nout_inserted=true         # Update flag
+      shift 2
+      ;;
+    -tp|--targetphrase)
+      print_phrase=true			# Update flag
+      shift 1
+      ;;
+    -lt|--latestTime)
+      latest_time=true			# Update flag
+      shift 1
+      ;;
+    --search)
+      search_flag=true			# Update flag
+      #       IFS=',' read -ra phrases <<< "$2"  # Split input phrases by comma into an array
+      shift 1
+      ;;
+    -debug)
+      debug_switch=true
+      debug_search=false
+      parallel=true
+      parallel_inserted=true
+      latest_time=true
+      print_phrase=true
+      shift 1
+      ;;
+    *)
+      echo "Invalid option: -$1"
+      echo "Use -h or --help to display the help message."
+      exit 1
+      ;;
+  esac
+done
+
+#######################################################################
+#########   Assignes option flags
+#######################################################################
+
+# Exit the program
+$exit_code && exit 1
+
+# Check if the solver exists
+solverCheckFunction
+
+# Parallel Vs. Serial run
+if ! $parallel_inserted; then
+  echo -e "\e[1;35mSolving mode is not specified.\e[0m"
+  [[ "$0" == "${BASH_SOURCE[0]}" ]] && { echo -e "\e[1;31mFor parallel run use -p [eg: ./run -p]\e[0m"; parallel=false; } || { parallel=true; echo -e "\e[1;35mMode == parallel\e[0m"; }
+fi
+
+
+# Decide number of lines to print
+if ! $nout_inserted; then
+  nout=200
+  echo -e "\e[1;35mFirst $nout lines will be printed into the console\e[0m"
+fi
+
+# Assign Target phrase to search 
+if $print_phrase; then
+    read -p $'\e[1;35mEnter the line to search for and print into console when happened    :\e[0m' target_phrase
+    # If the user pressed Enter without entering a value, assign an automatic value
+    [ -z "$target_phrase" ] && target_phrase="parcels       = 1"
+    echo "The chosen target phrase is	:$target_phrase"
+fi
+
+# Search flag 
+$search_flag && IFS=',' read -rp "Enter the search phrases (comma-separated): " -a phrases
+$debug_search && phrases='new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*'}
+
+
+sleep 3
+
+##############################################################################
+##############################################################################
+###  ███    ███  █████  ██ ███    ██     ██████   ██████  ██████  ██    ██ ###
+###  ████  ████ ██   ██ ██ ████   ██     ██   ██ ██    ██ ██   ██  ██  ██  ###
+###  ██ ████ ██ ███████ ██ ██ ██  ██     ██████  ██    ██ ██   ██   ████   ###
+###  ██  ██  ██ ██   ██ ██ ██  ██ ██     ██   ██ ██    ██ ██   ██    ██    ###
+###  ██      ██ ██   ██ ██ ██   ████     ██████   ██████  ██████     ██    ###
+##############################################################################
+##############################################################################
+
+trap ctrl_c SIGINT
+
+start=$(date +%s.%N)
+
+	cleanOutPutDir
+	search4nDomainFunction
+	cleanCaseFunction
+	! $latest_time && buildMesh && open_files+=" blockMesh.log" && $parallel && decomposeFunction && open_files+=" decomposePar.log"
+	$parallel && solveParallelFunction || solveSerialFunction
+	open_files+=" $solver.log"
+	! $debug_switch && foamToVTKFunction && open_files+=" foamToVTK.log"
+
+end=$(date +%s.%N)
+runtime=$(echo "$end - $start" | bc)
+echo -e "\e[1;35mExecution time: $runtime seconds\e[0m"
+
+#############################################################################################################################
+#############################################################################################################################
+###  ██████   ██████  ███████ ████████     ██████  ██████   ██████   ██████ ███████ ███████ ███████ ██ ███    ██  ██████  ###
+###  ██   ██ ██    ██ ██         ██        ██   ██ ██   ██ ██    ██ ██      ██      ██      ██      ██ ████   ██ ██       ###
+###  ██████  ██    ██ ███████    ██        ██████  ██████  ██    ██ ██      █████   ███████ ███████ ██ ██ ██  ██ ██   ███ ###
+###  ██      ██    ██      ██    ██        ██      ██   ██ ██    ██ ██      ██           ██      ██ ██ ██  ██ ██ ██    ██ ###
+###  ██       ██████  ███████    ██        ██      ██   ██  ██████   ██████ ███████ ███████ ███████ ██ ██   ████  ██████  ###
+#############################################################################################################################
+#############################################################################################################################
+
+#######################################################################
+#########   Search & Create & Print
+#######################################################################
+
+cd outPut/
+
+	# Print Errors and Warnings 
+	echo -e "\e[1;31mThese were Errors and Warnings :\e[0m"
+	grep --color=auto -B 3 -A 5 'Error*\|Warning*' blockMesh.log decomposePar.log $solver.log | tee -a errors.log | tee /dev/tty 
+	open_files="errors.log $open_files"
+	
+	sleep 1
+	
+	###################################################
+	# Phrases to search for inserted in options       #
+	###################################################
+	if $search_flag; then
+		# Define the color codes
+		Red=$(tput setaf 1)   # Red color for highlighting
+		Def=$(tput sgr0)   # Reset color to default
+		
+		# Loop through files and search for each phrase
+		for phrase in "${phrases[@]}"; do
+		  echo -e "${Red}Searching for '$phrase':${Def}" >> search.log
+		  grep --color=auto -r -n -A 2 -B 2 "$phrase" --exclude=search.log >> search.log
+		done
+		
+	elif $debug_search; then
+		grep --color=auto $predefined_phrases $solver.log 2>&1 | tee search.log > /dev/null
+	fi
+	
+	[ "$search_flag" = true ] || [ "$debug_search" = true ] && open_files+=" search.log"
+
+	####################################################
+
+	if ! [ [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] ]; then
+	  echo -e "\e[35mLocal user ... Opening the Results in a new window ...\e[0m"
+	  gedit --new-window $open_files & disown
+	fi
+
+cd ..
+
+###############################################################
+###  ████████ ██   ██ ███████     ███████ ███    ██ ██████  ###
+###     ██    ██   ██ ██          ██      ████   ██ ██   ██ ###
+###     ██    ███████ █████       █████   ██ ██  ██ ██   ██ ###
+###     ██    ██   ██ ██          ██      ██  ██ ██ ██   ██ ###
+###     ██    ██   ██ ███████     ███████ ██   ████ ██████  ###
+###############################################################
+
+cat << echo
+$(echo -e "\033[1;37m
+                    ..**.*.
+                  .*o*.....
+                 .**...   ..
+                .*.       .
+                 **      ..
+                 .*.   ...
+                  ....**.
+                   ...
+                  ..
+   .......       ...
+ .**o**.*......................
+ .*****..**........****...*******
+ .**********......*..***..***....
+ .***.****......***..*..*****....
+ .***.**o***...***.***..***o**...
+  **o*.*0o*...***.**....***......
+  .***..*...**..*.*......oo**....
+  .****....*.....*. ..*****.....
+   ..***.*..****............**..
+   ....********...........***...
+   .......*.... .......***...... \033[0m")
+echo
+echo -e "\e[1;31m    fifi Howls from happiness\e[0m"
+
+################################*######################################
+###############################*H*#####################################
+##############################*END*####################################
+#############################**END**###################################
+############################***END***##################################
+###########################****END****#################################
+############################***END***##################################
+#############################**END**###################################
+##############################*END*####################################
+##############################*END*####################################
+##############################*END*####################################
+##############################*END*####################################
+##############################*END*#################☭##################
+##############################*END*####################################
+##############################*END*####################################
+##############################*END*####################################
+##############################*DEO*####################################
+

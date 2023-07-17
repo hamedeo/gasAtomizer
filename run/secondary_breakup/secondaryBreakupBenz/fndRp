@@ -1,6 +1,6 @@
 #!/bin/bash
 
-destination_directories=$(find ./ -maxdepth 1 \( -name "secondaryBreakupBenz-*" \))
+destination_directories=$(find ./ -maxdepth 1 \( -name "subCase-*" \))
 read -p "Which file do you want to replace: (input the directory path from here)   " dir_file
 dir_dest_ext=$(echo "$dir_file" | cut -d'/' -f2-)
 filename=$(basename "$dir_file")

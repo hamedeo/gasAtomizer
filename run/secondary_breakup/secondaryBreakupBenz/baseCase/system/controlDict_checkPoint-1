@@ -1,0 +1,83 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2106                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     sprayFoam;
+
+startFrom       startTime;
+
+startTime       3e-03;
+
+stopAt          endTime;
+
+endTime         5e-3;
+
+deltaT          2.5e-06;
+
+writeControl    adjustable;
+
+writeInterval   5e-05; //1e-05
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+adjustTimeStep  yes;
+
+maxCo           0.1;
+
+runTimeModifiable yes;
+
+logLevel	4;
+
+libs ("libmyThermophysicalProperties.so" "libmylagrangianSpray.so" "libmylagrangianIntermediate.so");
+
+functions
+{
+/*
+    getSOI
+    {
+        type            executeProgram;
+        name            getSOI;
+        executable      "python3 extract_soi.py"; // Replace with the actual command to run your script
+        log             yes;
+    }
+*/
+	timeControl
+	{
+        type              timeActivatedFileUpdate;
+        libs              ("libutilityFunctionObjects.so");
+        writeControl      timeStep;
+        writeInterval     1;
+        fileToUpdate      "<system>/controlDict";
+
+        timeVsFile
+        (
+            (-1 		"<system>/controlDict_start")
+            (3e-03		"<system>/controlDict_checkPoint-1")
+        );
+	}
+
+}
+
+// ************************************************************************* //

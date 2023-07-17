@@ -36,7 +36,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "BreakupModel.H"
+#include "myBreakupModel.H"
 
 #ifndef KelvinHelmholtz_H
 #define KelvinHelmholtz_H
@@ -53,7 +53,7 @@ namespace Foam
 template<class CloudType>
 class KelvinHelmholtz
 :
-    public BreakupModel<CloudType>
+    public myBreakupModel<CloudType>
 {
 private:
 
@@ -83,9 +83,9 @@ public:
         KelvinHelmholtz(const KelvinHelmholtz<CloudType>& bum);
 
         //- Construct and return a clone
-        virtual autoPtr<BreakupModel<CloudType>> clone() const
+        virtual autoPtr<myBreakupModel<CloudType>> clone() const
         {
-            return autoPtr<BreakupModel<CloudType>>
+            return autoPtr<myBreakupModel<CloudType>>
             (
                 new KelvinHelmholtz<CloudType>(*this)
             );

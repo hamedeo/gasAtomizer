@@ -37,15 +37,15 @@ Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz
     CloudType& owner
 )
 :
-    BreakupModel<CloudType>(dict, owner, typeName, true),
+    myBreakupModel<CloudType>(dict, owner, typeName, true),
     b0_(0.61),
-    b1_(40.0),
+    b1_(1.73), //40.0
     cTau_(1.0),
     cRT_(0.1),
     msLimit_(0.03),
     weberLimit_(6.0)
 {
-	Pout<< " Test KH Constructor 1 is used " << endl;
+	Pout<< " KH Normal Constructor is used " << endl;
     if (!this->defaultCoeffs(true))
     {
         this->coeffDict().readEntry("B0", b0_);
@@ -54,6 +54,7 @@ Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz
         this->coeffDict().readEntry("CRT", cRT_);
         this->coeffDict().readEntry("msLimit", msLimit_);
         this->coeffDict().readEntry("WeberLimit", weberLimit_);
+	Pout<< " KH Change Coeffs in Normal Constructor " << endl;
     }
 }
 
@@ -61,14 +62,14 @@ Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz
 template<class CloudType>
 Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz(const KelvinHelmholtz<CloudType>& bum)
 :
-    BreakupModel<CloudType>(bum),
+    myBreakupModel<CloudType>(bum),
     b0_(bum.b0_),
     b1_(bum.b1_),
     cTau_(bum.cTau_),
     cRT_(bum.cRT_),
     msLimit_(bum.msLimit_),
     weberLimit_(bum.weberLimit_)
-{        Pout<< " Test KH Constructor 2 is used " << endl;
+{        Pout<< " KH Constructor bum is used " << endl;
 }
 
 
@@ -107,7 +108,7 @@ bool Foam::KelvinHelmholtz<CloudType>::update
     scalar& massChild
 )
 {
-    bool addParcel = false;
+    bool addParcel = false;//true; //false;
 
     const scalar averageParcelMass = this->owner().averageParcelMass();
 
@@ -148,7 +149,7 @@ bool Foam::KelvinHelmholtz<CloudType>::update
 
     // stable KH diameter
     scalar dc = 2.0*b0_*lambdaKH;
-    
+
     if (dc < d)
     {
         // no breakup below Weber = 12
@@ -207,6 +208,7 @@ bool Foam::KelvinHelmholtz<CloudType>::update
         }
    }
 
+/*
     else if (KHindex < 0.5)
     {
         // Case of larger drops after breakup (Reitz, Atomization & Spray
@@ -219,7 +221,7 @@ bool Foam::KelvinHelmholtz<CloudType>::update
         ms = 0.0;
         KHindex = 1.0;
     }
-
+*/
     // correct the number of parcels in parent
     scalar massDrop = pow3(d)*rhopi6;
     nParticle = mass/massDrop;

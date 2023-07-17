@@ -78,7 +78,7 @@ orDir=$(pwd)
 
 ###### Directory List  ###########
 # List of directories to execute commands in
-directories=$(find ./ -maxdepth 1 \( -name "secondaryBreakupBenz-*" \))
+directories=$(find ./ -maxdepth 1 \( -name "subCase-*" \))
 echo "$directories"
 sleep 10
 # Prompt the user to confirm shutdown
