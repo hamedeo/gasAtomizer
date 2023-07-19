@@ -1,6 +1,0 @@
-SOURCE = \
-clouds/baseClasses/sprayCloud/mysprayCloud.C \
-$(SPRAYPARCEL)/myDefineBasicSprayParcel.C \
-$(SPRAYPARCEL)/myMakeBasicSprayParcelSubmodels.C \
-
-# sources
