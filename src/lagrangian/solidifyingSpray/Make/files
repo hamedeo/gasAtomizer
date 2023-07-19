@@ -1,0 +1,7 @@
+clouds/baseClasses/solidifyingSprayCloud/solidifyingSprayCloud.C
+
+SOLSPRAYPARCEL=parcels/derived/basicSolidifyingSprayParcel
+$(SOLSPRAYPARCEL)/defineBasicSolidifyingSprayParcel.C
+$(SOLSPRAYPARCEL)/makeBasicSolidifyingSprayParcelSubmodels.C
+
+LIB = $(FOAM_USER_LIBBIN)/liblagrangianSolidifyingSpray
