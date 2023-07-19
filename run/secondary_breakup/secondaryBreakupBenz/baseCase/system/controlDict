@@ -18,7 +18,7 @@ application     solidifyingSprayFoam;
 
 startFrom       startTime;
 
-startTime       0;
+startTime       3e-03;
 
 stopAt          endTime;
 
@@ -50,7 +50,8 @@ runTimeModifiable yes;
 
 logLevel	4;
 
-libs ("libmyThermophysicalProperties.so" "libmylagrangianSpray.so" "libmylagrangianIntermediate.so");
+// libs ("libmyThermophysicalProperties.so" "libmylagrangianSpray.so" "solidifyingSprayFoam" "liblagrangianSolidifyingSpray.so"  "libmylagrangianIntermediate.so");
+libs ("libmyThermophysicalProperties.so" "liblagrangianSolidifyingSpray.so");
 
 functions
 {

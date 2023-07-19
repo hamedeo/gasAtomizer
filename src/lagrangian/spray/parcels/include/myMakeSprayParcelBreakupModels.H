@@ -30,15 +30,18 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "KelvinHelmholtz.H"
+#include "xKelvinHelmholtz.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #define myMakeSprayParcelBreakupModels(CloudType)                             \
                                                                                \
-    myMakeBreakupModel(CloudType)                                                \
+    makeBreakupModel(CloudType)                                                \
+    makeBreakupModelType(xKelvinHelmholtz, CloudType);                          \
+/*    myMakeBreakupModel(CloudType)                                                \
     myMakeBreakupModelType(KelvinHelmholtz, CloudType);                          \
+*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

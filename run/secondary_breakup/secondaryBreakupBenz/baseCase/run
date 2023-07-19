@@ -88,6 +88,8 @@ spinner() {
 
 ctrl_c() {
 	echo " Ctrl+C detected. Stopping process..."
+	# Kill the solver process and all its child processes
+    	kill -TERM $solver_pid
 	exit 0
 }
 
@@ -176,17 +178,18 @@ solverCheckFunction(){
 		cd $WM_PROJECT_DIR/applications/solvers/ && allSolvers=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
 
         	# Retrieve the list of available solvers in local directory
-	        cd $WM_PROJECT_USER_DIR/applications/solvers/ && allSolvers+=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
+	        cd $WM_PROJECT_USER_DIR/applications/solvers/ && allSolvers+=$'\n'$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
 
 		# Extract the solver name from the controlDict file
 		solver=$(sed -n 's/.*application\s*\(\w\+\);.*/\1/p' system/controlDict)
 
+		echo "$allSolvers" | grep -q "\<$solver\>"
 		# Check if the solver exists in the available solvers
 		if echo "$allSolvers" | grep -q "\<$solver\>"; then
 		  echo -e "\e[1;35mThe solver \e[1;31;47m'$solver'\e[0m\e[1;35m has been chosen as Case application method\e[0m"
 
 		else
-
+		    echo "i am here in else"
 		    # Check if this bash is NOT being sourced by another script
 		    if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
 		      Solving_Intake
@@ -201,7 +204,7 @@ solverCheckFunction(){
 	  cd $WM_PROJECT_DIR/applications/solvers/ && allSolvers=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
 
 	  # Retrieve the list of available solvers in local directory
-	  cd $WM_PROJECT_USER_DIR/applications/solvers/ && allSolvers+=$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
+          cd $WM_PROJECT_USER_DIR/applications/solvers/ && allSolvers+=$'\n'$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
 
 	  # Check if the solver exists in the available solvers
 	  if echo "$allSolvers" | grep -q "\<$solver\>"; then
@@ -268,7 +271,7 @@ solveParallelFunction(){
 
   # Wait for sprayFoam to terminate
   wait $solver_pid
-  
+
 }
 
 #######################################################################
@@ -301,11 +304,11 @@ foamToVTKFunction(){
 	VTKParallelFunction(){
 	  mpirun -np $n foamToVTK -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/foamToVTK.log > /dev/null & spinner $!
 	}
-	
+
 	VTKSerialFunction(){
 	  foamToVTK 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/foamToVTK.log > /dev/null & spinner $!
-	}	
-	
+	}
+
 	# Create VTK file
 	$parallel && VTKParallelFunction || VTKSerialFunction
 	echo -e "\e[1;31mTranslate foam to VTK format ...\e[0m"
@@ -500,7 +503,7 @@ cd outPut/
 
 	####################################################
 
-	if ! [ [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] ]; then
+	if ! [ -n "$SSH_CLIENT" ] && ! [ -n "$SSH_TTY" ]; then
 	  echo -e "\e[35mLocal user ... Opening the Results in a new window ...\e[0m"
 	  gedit --new-window $open_files & disown
 	fi

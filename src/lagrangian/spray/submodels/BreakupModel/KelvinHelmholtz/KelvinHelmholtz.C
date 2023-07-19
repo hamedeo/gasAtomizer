@@ -108,7 +108,7 @@ bool Foam::KelvinHelmholtz<CloudType>::update
     scalar& massChild
 )
 {
-    bool addParcel = false;//true; //false;
+    bool addParcel = true; //false;
 
     const scalar averageParcelMass = this->owner().averageParcelMass();
 

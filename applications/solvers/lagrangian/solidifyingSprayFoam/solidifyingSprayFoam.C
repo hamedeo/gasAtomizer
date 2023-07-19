@@ -24,7 +24,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    solidifyingSprayFoam
+    secondaryBreakupFoam
 
 Group
     grpLagrangianSolvers
@@ -37,9 +37,8 @@ Description
 
 #include "fvCFD.H"
 #include "turbulentFluidThermoModel.H"
-#include "myBasicSprayCloud.H"
+#include "basicSolidifyingSprayCloud.H"
 #include "psiReactionThermo.H"
-#include "CombustionModel.H"
 #include "radiationModel.H"
 #include "SLGThermo.H"
 #include "pimpleControl.H"
@@ -112,10 +111,7 @@ int main(int argc, char *argv[])
 
             rho = thermo.rho();
 
-            if (runTime.write())
-            {
-                combustion->Qdot()().write();
-            }
+            runTime.write();
         }
         else
         {

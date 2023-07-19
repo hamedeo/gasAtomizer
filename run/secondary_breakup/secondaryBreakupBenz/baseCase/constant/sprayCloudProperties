@@ -123,7 +123,7 @@ subModels
         // - Inject with constant velocity
         flowType        constantVelocity;  // type of velocity profile
         UMag            16;  // fuel droplet initial velocity Liu et al. 1993
-        
+
     //massTotal
         massTotal       #eval {$rho0 * 4/3 * pi() * pow($outerDiameter/2, 3) * $duration * $parcelsPerSecond * 1}; //Total mass to inject per each parcel (Blob)
   }
@@ -144,7 +144,7 @@ subModels
     atomizationModel none;
 
     breakupModel	KelvinHelmholtz;   //KelvinHelmholtz;   //TAB;	//ReitzDiwakar; // ReitzKHRT;
-    
+
     stochasticCollisionModel none;
 
     radiation       off;
@@ -200,9 +200,9 @@ subModels
         WeberLimit      6;              //6;
 	// TABcoeffs
         y0              0;
-        yDot0           0;           
-        Cmu             5;//10;  
-        Comega          8;         
+        yDot0           0;
+        Cmu             5;//10;
+        Comega          8;
         WeCrit          6;
         SMDCalculationMethod    method1;
 
@@ -221,12 +221,11 @@ subModels
 
     TABCoeffs
     {
-    
-        solveOscillationEq no;        
+        // solveOscillationEq no;
         y0              0;
-        yDot0           0;           
-        Cmu             5;	// 10;  
-        Comega          8;         
+        yDot0           0;
+        Cmu             5;	// 10;
+        Comega          8;
         WeCrit          6;
         SMDCalculationMethod 	method1;
     }

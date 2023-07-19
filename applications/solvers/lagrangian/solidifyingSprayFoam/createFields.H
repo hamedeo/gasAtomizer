@@ -67,12 +67,6 @@ autoPtr<compressible::turbulenceModel> turbulence
     )
 );
 
-Info<< "Creating combustion model\n" << endl;
-autoPtr<CombustionModel<psiReactionThermo>> combustion
-(
-    CombustionModel<psiReactionThermo>::New(thermo, turbulence())
-);
-
 multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
 
 forAll(Y, i)
@@ -80,20 +74,6 @@ forAll(Y, i)
     fields.add(Y[i]);
 }
 fields.add(thermo.he());
-
-volScalarField Qdot
-(
-    IOobject
-    (
-        "Qdot",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh,
-    dimensionedScalar(dimEnergy/dimVolume/dimTime, Zero)
-);
 
 #include "createDpdt.H"
 

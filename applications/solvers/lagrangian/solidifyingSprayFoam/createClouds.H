@@ -1,7 +1,7 @@
 Info<< "\nConstructing reacting cloud" << endl;
-myBasicSprayCloud parcels
+basicSolidifyingSprayCloud parcels
 (
-    "mysprayCloud",
+    "solidifyingSprayCloud",
     rho,
     U,
     g,

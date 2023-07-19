@@ -88,6 +88,7 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/UList.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/one.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/oneI.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/contiguous.H \
+$(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Swap.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/ListPolicy.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/UListI.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/UList.C \
@@ -147,8 +148,6 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/tokenList.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/wordList.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/SubList.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/SubListI.H \
-$(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOobjectOption.H \
-$(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/dictionaryI.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/dictionaryTemplates.C \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/primitiveEntry.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/primitiveEntryTemplates.C \

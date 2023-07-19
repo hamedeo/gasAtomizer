@@ -25,9 +25,10 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
-#include "myBasicSprayCloud.H"
+//#include "myBasicSprayCloud.H"
+#include "basicSprayCloud.H"
 
-#include "makeReactingParcelCloudFunctionObjects.H"
+/*#include "makeReactingParcelCloudFunctionObjects.H"
 
 // Kinematic
 
@@ -51,13 +52,15 @@ License
 
 
 // Spray
+*/
 //#include "myDistortedSphereDragForce.H"
-#include "DistortedSphereDragForce.H"
+/*#include "DistortedSphereDragForce.H"
 //#include "makeSprayParcelAtomizationModels.H"
 //#include "makeSprayParcelBreakupModels.H"
+*/
 #include "myMakeSprayParcelBreakupModels.H"
 //#include "myMakeSprayParcelDragModels.H"
-
+/*
 // MPPIC sub-models
 
 #include "makeMPPICParcelDampingModels.H"
@@ -89,10 +92,14 @@ makeReactingParcelCompositionModels(myBasicSprayCloud);
 makeReactingParcelPhaseChangeModels(myBasicSprayCloud);
 makeReactingParcelSurfaceFilmModels(myBasicSprayCloud);
 
-
+*/
 // Spray sub-models
-myMakeSprayParcelBreakupModels(myBasicSprayCloud);
-makeParticleForceModelType(DistortedSphereDragForce, myBasicSprayCloud);
+//myMakeSprayParcelBreakupModels(myBasicSprayCloud);
+//makeParticleForceModelType(DistortedSphereDragForce, myBasicSprayCloud);
+myMakeSprayParcelBreakupModels(basicSprayCloud);
+//makeParticleForceModelType(myDistortedSphereDragForce, basicSprayCloud);
+
+
 //makeSprayParcelAtomizationModels(basicSprayCloud);
 //makeSprayParcelBreakupModels(myBasicSprayCloud);
 
@@ -101,10 +108,10 @@ makeParticleForceModelType(DistortedSphereDragForce, myBasicSprayCloud);
 
 
 // MPPIC sub-models
-
+/*
 makeMPPICParcelDampingModels(myBasicSprayCloud);
 makeMPPICParcelIsotropyModels(myBasicSprayCloud);
 makeMPPICParcelPackingModels(myBasicSprayCloud);
-
+*/
 
 // ************************************************************************* //
