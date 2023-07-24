@@ -1,36 +1,37 @@
-/*
-find . -type f -exec awk '
-FNR == 1 {
-    if (printed_dir) {
-        printf "\n";  # Print a new line before starting a new file
-    }
-    printed_dir = 1;
-    in_range = 0;
-    print "\033[1;33m" "File: " FILENAME "\033[0m";
-}
-/added <</ {
-    in_range = 1;
-    gsub(/ \/\/ added <</, "\033[1;31m&\033[0m");  # Set only the "added" phrases to green color
-    print "\033[1;32m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
-    next;
-}
-/added >>/ {
-    in_range = 0;
-    gsub(/ \/\/ added >>/, "\033[1;31m&\033[0m");  # Set only the "added" phrases to green color
-    print "\033[1;32m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
-    next;
-}
-in_range {
-    print "\033[1m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
-    next;
-}
-/added/ {
-    gsub(/ \/\/ added/, "\033[1;31m&\033[0m");  # Set only the "added" phrases to green color
-    print "\033[1;32m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
-    next;
-}
-' {} +
-*/
+#/*
+#find . -type f -exec awk '
+#FNR == 1 {
+#    if (printed_dir) {
+#        printf "\n";  # Print a new line before starting a new file
+#    }
+#    printed_dir = 1;
+#    in_range = 0;
+#    print "\033[1;33m" "File: " FILENAME "\033[0m";
+#}
+#/added <</ {
+#    in_range = 1;
+#    gsub(/ \/\/ added <</, "\033[1;31m&\033[0m");  # Set only the "added" phrases to green color
+#    print "\033[1;32m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
+#    next;
+#}
+#/added >>/ {
+#    in_range = 0;
+#    gsub(/ \/\/ added >>/, "\033[1;31m&\033[0m");  # Set only the "added" phrases to green color
+#    print "\033[1;32m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
+#    next;
+#}
+#in_range {
+#    print "\033[1m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
+#    next;
+#}
+#/added/ {
+#    gsub(/ \/\/ added/, "\033[1;31m&\033[0m");  # Set only the "added" phrases to green color
+#    print "\033[1;32m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
+#    next;
+#}
+#' {} +
+#*/
+cat << ENDOF
 [1;33mFile: ./parcels/Templates/SolidifyingSprayParcel/SolidifyingSprayParcelIO.C[0m
 [1;32m43: [0m    // 0   [1;31m // added[0m (should this line be added?)
 [1;32m72: [0m    YGas_(0),[1;31m // added[0m
@@ -805,3 +806,4 @@ in_range {
 [1;32m301: [0m/*template<class CloudType>  [1;31m // added[0m
 [1;32m328: [0mtemplate<class CloudType>  [1;31m // added[0m
 
+ENDOF
