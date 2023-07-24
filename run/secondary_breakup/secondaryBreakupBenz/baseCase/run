@@ -86,10 +86,16 @@ spinner() {
 #########   ctrl_c
 #######################################################################
 
+# Array to store PIDs of the running processes
+pids=()
+
 ctrl_c() {
 	echo " Ctrl+C detected. Stopping process..."
 	# Kill the solver process and all its child processes
     	kill -TERM $solver_pid
+	for pid in "${pids[@]}"; do
+    	    kill "$pid" >/dev/null 2>&1
+  	done
 	exit 0
 }
 
@@ -229,7 +235,7 @@ targetPhraseFunction(){
 	# Search for the desired phrase in each line
 	if [[ $line == *"$target_phrase"* ]]; then
 	  echo -e "target phrase detected 			: \n\n\n\n"
-	  sleep 1; 
+	  sleep 1;
 	  # Print the context lines after finding the desired phrase
       tail -n +$((line_count - 6)) outPut/$solver.log | head -n 60 | tee outPut/debug.log
       open_files+=" debug.log"
@@ -237,6 +243,9 @@ targetPhraseFunction(){
 	  return
 	fi
 	done < <(tail -n 1 -f outPut/$solver.log) &
+
+        # Store the process ID (PID) of the function
+        pids+=($!)
 }
 
 printInitialLinesFunction(){

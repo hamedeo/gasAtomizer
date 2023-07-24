@@ -129,7 +129,10 @@ inline Foam::SolidifyingSprayParcel<ParcelType>::SolidifyingSprayParcel
     ms_(0.0),
     injector_(1.0),
     tMom_(GREAT),
-    user_(0.0)
+    user_(0.0),
+    YGas_(0), // added
+    YLiquid_(0), // added
+    YSolid_(0) // added
 {}
 
 
@@ -154,7 +157,10 @@ inline Foam::SolidifyingSprayParcel<ParcelType>::SolidifyingSprayParcel
     ms_(0.0),
     injector_(1.0),
     tMom_(GREAT),
-    user_(0.0)
+    user_(0.0),
+    YGas_(0), // added
+    YLiquid_(0), // added
+    YSolid_(0) // added
 {}
 
 
@@ -184,6 +190,10 @@ inline Foam::SolidifyingSprayParcel<ParcelType>::SolidifyingSprayParcel
     const scalar injector,
     const scalar tMom,
     const scalar user,
+    const scalarField& YGas0,
+    const scalarField& YLiquid0,    // added
+    const scalarField& YSolid0,    // added
+    // const constantProperties& constProps    // added
     const typename ParcelType::constantProperties& constProps
 )
 :
@@ -217,7 +227,10 @@ inline Foam::SolidifyingSprayParcel<ParcelType>::SolidifyingSprayParcel
     ms_(ms),
     injector_(injector),
     tMom_(tMom),
-    user_(user)
+    user_(user),
+    YGas_(YGas0),   // added
+    YLiquid_(YLiquid0),   // added
+    YSolid_(YSolid0)   // added
 {}
 
 
@@ -240,6 +253,51 @@ Foam::SolidifyingSprayParcel<ParcelType>::constantProperties::mu0() const
 
 
 // * * * * * * * * * * SolidifyingSprayParcel Member Functions * * * * * * * * * * * * //
+
+template<class ParcelType>  // added
+inline const Foam::scalarField& Foam::SolidifyingSprayParcel<ParcelType>::
+YGas() const
+{
+    return YGas_;
+}
+
+
+template<class ParcelType>  // added
+inline const Foam::scalarField& Foam::SolidifyingSprayParcel<ParcelType>::
+YLiquid() const
+{
+    return YLiquid_;
+}
+
+
+template<class ParcelType>  // added
+inline const Foam::scalarField& Foam::SolidifyingSprayParcel<ParcelType>::
+YSolid() const
+{
+    return YSolid_;
+}
+
+
+template<class ParcelType>  // added
+inline Foam::scalarField& Foam::SolidifyingSprayParcel<ParcelType>::YGas()
+{
+    return YGas_;
+}
+
+
+template<class ParcelType>  // added
+inline Foam::scalarField& Foam::SolidifyingSprayParcel<ParcelType>::YLiquid()
+{
+    return YLiquid_;
+}
+
+
+template<class ParcelType>  // added
+inline Foam::scalarField& Foam::SolidifyingSprayParcel<ParcelType>::YSolid()
+{
+    return YSolid_;
+}
+
 
 template<class ParcelType>
 inline Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::d0() const

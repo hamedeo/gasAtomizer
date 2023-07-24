@@ -1,0 +1,807 @@
+/*
+find . -type f -exec awk '
+FNR == 1 {
+    if (printed_dir) {
+        printf "\n";  # Print a new line before starting a new file
+    }
+    printed_dir = 1;
+    in_range = 0;
+    print "\033[1;33m" "File: " FILENAME "\033[0m";
+}
+/added <</ {
+    in_range = 1;
+    gsub(/ \/\/ added <</, "\033[1;31m&\033[0m");  # Set only the "added" phrases to green color
+    print "\033[1;32m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
+    next;
+}
+/added >>/ {
+    in_range = 0;
+    gsub(/ \/\/ added >>/, "\033[1;31m&\033[0m");  # Set only the "added" phrases to green color
+    print "\033[1;32m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
+    next;
+}
+in_range {
+    print "\033[1m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
+    next;
+}
+/added/ {
+    gsub(/ \/\/ added/, "\033[1;31m&\033[0m");  # Set only the "added" phrases to green color
+    print "\033[1;32m" FNR ": " "\033[0m" $0;  # Set the FNR line number to green color
+    next;
+}
+' {} +
+*/
+[1;33mFile: ./parcels/Templates/SolidifyingSprayParcel/SolidifyingSprayParcelIO.C[0m
+[1;32m43: [0m    // 0   [1;31m // added[0m (should this line be added?)
+[1;32m72: [0m    YGas_(0),[1;31m // added[0m
+[1;32m73: [0m    YLiquid_(0),[1;31m // added[0m
+[1;32m74: [0m    YSolid_(0)[1;31m // added[0m
+[1;32m120: [0m        DynamicList<scalar> Yg;  [1;31m // added[0m
+[1;32m121: [0m        DynamicList<scalar> Yl;  [1;31m // added[0m
+[1;32m122: [0m        DynamicList<scalar> Ys;  [1;31m // added[0m
+[1;32m124: [0m        is >> Yg >> Yl >> Ys;  [1;31m // added[0m
+[1;32m126: [0m        YGas_.transfer(Yg);  [1;31m // added[0m
+[1;32m127: [0m        YLiquid_.transfer(Yl);  [1;31m // added[0m
+[1;32m128: [0m        YSolid_.transfer(Ys);  [1;31m // added[0m
+[1;32m254: [0m   [1;31m // added <<[0m
+[1m255: [0m    // Get names and sizes for each Y...
+[1m256: [0m    const label idGas = compModel.idGas();
+[1m257: [0m    const wordList& gasNames = compModel.componentNames(idGas);
+[1m258: [0m    const label idLiquid = compModel.idLiquid();
+[1m259: [0m    const wordList& liquidNames = compModel.componentNames(idLiquid);
+[1m260: [0m    const label idSolid = compModel.idSolid();
+[1m261: [0m    const wordList& solidNames = compModel.componentNames(idSolid);
+[1m262: [0m    const wordList& stateLabels = compModel.stateLabels();
+[1m263: [0m
+[1m264: [0m    // Set storage for each Y... for each parcel
+[1m265: [0m    for (SolidifyingSprayParcel<ParcelType>& p : c)
+[1m266: [0m    {
+[1m267: [0m        p.YGas_.setSize(gasNames.size(), 0.0);
+[1m268: [0m        p.YLiquid_.setSize(liquidNames.size(), 0.0);
+[1m269: [0m        p.YSolid_.setSize(solidNames.size(), 0.0);
+[1m270: [0m    }
+[1m271: [0m
+[1m272: [0m    // Populate YGas for each parcel
+[1m273: [0m    forAll(gasNames, j)
+[1m274: [0m    {
+[1m275: [0m        IOField<scalar> YGas
+[1m276: [0m        (
+[1m277: [0m            c.fieldIOobject
+[1m278: [0m            (
+[1m279: [0m                "Y" + gasNames[j] + stateLabels[idGas],
+[1m280: [0m                IOobject::MUST_READ
+[1m281: [0m            ),
+[1m282: [0m            valid
+[1m283: [0m        );
+[1m284: [0m
+[1m285: [0m        label i = 0;
+[1m286: [0m        for (SolidifyingSprayParcel<ParcelType>& p : c)
+[1m287: [0m        {
+[1m288: [0m            p.YGas_[j] = YGas[i]/(max(p.Y()[GAS], SMALL));
+[1m289: [0m            ++i;
+[1m290: [0m        }
+[1m291: [0m    }
+[1m292: [0m    // Populate YLiquid for each parcel
+[1m293: [0m    forAll(liquidNames, j)
+[1m294: [0m    {
+[1m295: [0m        IOField<scalar> YLiquid
+[1m296: [0m        (
+[1m297: [0m            c.fieldIOobject
+[1m298: [0m            (
+[1m299: [0m                "Y" + liquidNames[j] + stateLabels[idLiquid],
+[1m300: [0m                 IOobject::MUST_READ
+[1m301: [0m            ),
+[1m302: [0m            valid
+[1m303: [0m        );
+[1m304: [0m
+[1m305: [0m        label i = 0;
+[1m306: [0m        for (SolidifyingSprayParcel<ParcelType>& p : c)
+[1m307: [0m        {
+[1m308: [0m            p.YLiquid_[j] = YLiquid[i]/(max(p.Y()[LIQ], SMALL));
+[1m309: [0m            ++i;
+[1m310: [0m        }
+[1m311: [0m    }
+[1m312: [0m    // Populate YSolid for each parcel
+[1m313: [0m    forAll(solidNames, j)
+[1m314: [0m    {
+[1m315: [0m        IOField<scalar> YSolid
+[1m316: [0m        (
+[1m317: [0m            c.fieldIOobject
+[1m318: [0m            (
+[1m319: [0m                "Y" + solidNames[j] + stateLabels[idSolid],
+[1m320: [0m                IOobject::MUST_READ
+[1m321: [0m            ),
+[1m322: [0m            valid
+[1m323: [0m        );
+[1m324: [0m
+[1m325: [0m        label i = 0;
+[1m326: [0m        for (SolidifyingSprayParcel<ParcelType>& p : c)
+[1m327: [0m        {
+[1m328: [0m            p.YSolid_[j] = YSolid[i]/(max(p.Y()[SLD], SMALL));
+[1m329: [0m            ++i;
+[1m330: [0m        }
+[1m331: [0m    }
+[1;32m332: [0m   [1;31m // added >>[0m
+[1;32m417: [0m   [1;31m // added <<[0m
+[1m418: [0m    // Write the composition fractions
+[1m419: [0m    {
+[1m420: [0m        const wordList& stateLabels = compModel.stateLabels();
+[1m421: [0m
+[1m422: [0m        const label idGas = compModel.idGas();
+[1m423: [0m        const wordList& gasNames = compModel.componentNames(idGas);
+[1m424: [0m        forAll(gasNames, j)
+[1m425: [0m        {
+[1m426: [0m            IOField<scalar> YGas
+[1m427: [0m            (
+[1m428: [0m                c.fieldIOobject
+[1m429: [0m                (
+[1m430: [0m                    "Y" + gasNames[j] + stateLabels[idGas],
+[1m431: [0m                    IOobject::NO_READ
+[1m432: [0m                ),
+[1m433: [0m                np
+[1m434: [0m            );
+[1m435: [0m
+[1m436: [0m            label i = 0;
+[1m437: [0m            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+[1m438: [0m            {
+[1m439: [0m                YGas[i] = p0.YGas()[j]*max(p0.Y()[GAS], SMALL);
+[1m440: [0m                ++i;
+[1m441: [0m            }
+[1m442: [0m
+[1m443: [0m            YGas.write(np > 0);
+[1m444: [0m        }
+[1m445: [0m
+[1m446: [0m        const label idLiquid = compModel.idLiquid();
+[1m447: [0m        const wordList& liquidNames = compModel.componentNames(idLiquid);
+[1m448: [0m        forAll(liquidNames, j)
+[1m449: [0m        {
+[1m450: [0m            IOField<scalar> YLiquid
+[1m451: [0m            (
+[1m452: [0m                c.fieldIOobject
+[1m453: [0m                (
+[1m454: [0m                    "Y" + liquidNames[j] + stateLabels[idLiquid],
+[1m455: [0m                    IOobject::NO_READ
+[1m456: [0m                ),
+[1m457: [0m                np
+[1m458: [0m            );
+[1m459: [0m
+[1m460: [0m            label i = 0;
+[1m461: [0m            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+[1m462: [0m            {
+[1m463: [0m                YLiquid[i] = p0.YLiquid()[j]*max(p0.Y()[LIQ], SMALL);
+[1m464: [0m                ++i;
+[1m465: [0m            }
+[1m466: [0m
+[1m467: [0m            YLiquid.write(np > 0);
+[1m468: [0m        }
+[1m469: [0m
+[1m470: [0m        const label idSolid = compModel.idSolid();
+[1m471: [0m        const wordList& solidNames = compModel.componentNames(idSolid);
+[1m472: [0m        forAll(solidNames, j)
+[1m473: [0m        {
+[1m474: [0m            IOField<scalar> YSolid
+[1m475: [0m            (
+[1m476: [0m                c.fieldIOobject
+[1m477: [0m                (
+[1m478: [0m                    "Y" + solidNames[j] + stateLabels[idSolid],
+[1m479: [0m                    IOobject::NO_READ
+[1m480: [0m                ),
+[1m481: [0m                np
+[1m482: [0m            );
+[1m483: [0m
+[1m484: [0m            label i = 0;
+[1m485: [0m            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+[1m486: [0m            {
+[1m487: [0m                YSolid[i] = p0.YSolid()[j]*max(p0.Y()[SLD], SMALL);
+[1m488: [0m                ++i;
+[1m489: [0m            }
+[1m490: [0m
+[1m491: [0m            YSolid.write(np > 0);
+[1m492: [0m        }
+[1m493: [0m    }
+[1;32m494: [0m   [1;31m // added >>[0m
+[1;32m526: [0m    writeProp("YGas", YGas_);  [1;31m // added[0m
+[1;32m527: [0m    writeProp("YLiquid", YLiquid_);  [1;31m // added[0m
+[1;32m528: [0m    writeProp("YSolid", YSolid_);  [1;31m // added[0m
+[1;32m605: [0m   [1;31m // added <<[0m
+[1m606: [0m    ParcelType::readObjects(c, obr);
+[1m607: [0m
+[1m608: [0m    const label np = c.size();
+[1m609: [0m
+[1m610: [0m    // The composition fractions
+[1m611: [0m    if (np > 0)
+[1m612: [0m    {
+[1m613: [0m        const wordList& stateLabels = compModel.stateLabels();
+[1m614: [0m
+[1m615: [0m        const label idGas = compModel.idGas();
+[1m616: [0m        const wordList& gasNames = compModel.componentNames(idGas);
+[1m617: [0m        forAll(gasNames, j)
+[1m618: [0m        {
+[1m619: [0m            const word fieldName = "Y" + gasNames[j] + stateLabels[idGas];
+[1m620: [0m            const auto& YGas = cloud::lookupIOField<scalar>(fieldName, obr);
+[1m621: [0m
+[1m622: [0m            label i = 0;
+[1m623: [0m            for (SolidifyingSprayParcel<ParcelType>& p0 : c)
+[1m624: [0m            {
+[1m625: [0m                p0.YGas()[j]*max(p0.Y()[GAS], SMALL) = YGas[i];
+[1m626: [0m                ++i;
+[1m627: [0m            }
+[1m628: [0m        }
+[1m629: [0m
+[1m630: [0m        const label idLiquid = compModel.idLiquid();
+[1m631: [0m        const wordList& liquidNames = compModel.componentNames(idLiquid);
+[1m632: [0m        forAll(liquidNames, j)
+[1m633: [0m        {
+[1m634: [0m            const word fieldName = "Y" + liquidNames[j] + stateLabels[idLiquid];
+[1m635: [0m            const auto& YLiquid = cloud::lookupIOField<scalar>(fieldName, obr);
+[1m636: [0m
+[1m637: [0m            label i = 0;
+[1m638: [0m            for (SolidifyingSprayParcel<ParcelType>& p0 : c)
+[1m639: [0m            {
+[1m640: [0m                p0.YLiquid()[j]*max(p0.Y()[LIQ], SMALL) = YLiquid[i];
+[1m641: [0m                ++i;
+[1m642: [0m            }
+[1m643: [0m        }
+[1m644: [0m
+[1m645: [0m        const label idSolid = compModel.idSolid();
+[1m646: [0m        const wordList& solidNames = compModel.componentNames(idSolid);
+[1m647: [0m        forAll(solidNames, j)
+[1m648: [0m        {
+[1m649: [0m            const word fieldName = "Y" + solidNames[j] + stateLabels[idSolid];
+[1m650: [0m            const auto& YSolid = cloud::lookupIOField<scalar>(fieldName, obr);
+[1m651: [0m
+[1m652: [0m            label i = 0;
+[1m653: [0m            for (SolidifyingSprayParcel<ParcelType>& p0 : c)
+[1m654: [0m            {
+[1m655: [0m                p0.YSolid()[j]*max(p0.Y()[SLD], SMALL) = YSolid[i];
+[1m656: [0m                ++i;
+[1m657: [0m            }
+[1m658: [0m        }
+[1m659: [0m    }
+[1;32m660: [0m   [1;31m // added >>[0m
+[1;32m711: [0m   [1;31m // added <<[0m
+[1m712: [0m    ParcelType::writeObjects(c, obr);
+[1m713: [0m
+[1m714: [0m    // const label np = c.size();   // Redeclaration
+[1m715: [0m
+[1m716: [0m    // Write the composition fractions
+[1m717: [0m    if (np > 0)
+[1m718: [0m    {
+[1m719: [0m        const wordList& stateLabels = compModel.stateLabels();
+[1m720: [0m
+[1m721: [0m        const label idGas = compModel.idGas();
+[1m722: [0m        const wordList& gasNames = compModel.componentNames(idGas);
+[1m723: [0m        forAll(gasNames, j)
+[1m724: [0m        {
+[1m725: [0m            const word fieldName = "Y" + gasNames[j] + stateLabels[idGas];
+[1m726: [0m            auto& YGas = cloud::createIOField<scalar>(fieldName, np, obr);
+[1m727: [0m
+[1m728: [0m            label i = 0;
+[1m729: [0m            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+[1m730: [0m            {
+[1m731: [0m                YGas[i] = p0.YGas()[j]*max(p0.Y()[GAS], SMALL);
+[1m732: [0m                ++i;
+[1m733: [0m            }
+[1m734: [0m        }
+[1m735: [0m
+[1m736: [0m        const label idLiquid = compModel.idLiquid();
+[1m737: [0m        const wordList& liquidNames = compModel.componentNames(idLiquid);
+[1m738: [0m        forAll(liquidNames, j)
+[1m739: [0m        {
+[1m740: [0m            const word fieldName = "Y" + liquidNames[j] + stateLabels[idLiquid];
+[1m741: [0m            auto& YLiquid = cloud::createIOField<scalar>(fieldName, np, obr);
+[1m742: [0m
+[1m743: [0m            label i = 0;
+[1m744: [0m            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+[1m745: [0m            {
+[1m746: [0m                YLiquid[i] = p0.YLiquid()[j]*max(p0.Y()[LIQ], SMALL);
+[1m747: [0m                ++i;
+[1m748: [0m            }
+[1m749: [0m        }
+[1m750: [0m
+[1m751: [0m        const label idSolid = compModel.idSolid();
+[1m752: [0m        const wordList& solidNames = compModel.componentNames(idSolid);
+[1m753: [0m        forAll(solidNames, j)
+[1m754: [0m        {
+[1m755: [0m            const word fieldName = "Y" + solidNames[j] + stateLabels[idSolid];
+[1m756: [0m            auto& YSolid = cloud::createIOField<scalar>(fieldName, np, obr);
+[1m757: [0m
+[1m758: [0m            label i = 0;
+[1m759: [0m            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+[1m760: [0m            {
+[1m761: [0m                YSolid[i] = p0.YSolid()[j]*max(p0.Y()[SLD], SMALL);
+[1m762: [0m                ++i;
+[1m763: [0m            }
+[1m764: [0m        }
+[1m765: [0m    }
+[1;32m766: [0m   [1;31m // added >>[0m
+[1;32m779: [0m    scalarField YGasLoc(p.YGas()); [1;31m // added[0m
+[1;32m780: [0m    scalarField YLiquidLoc(p.YLiquid()); [1;31m // added[0m
+[1;32m781: [0m    scalarField YSolidLoc(p.YSolid()); [1;31m // added[0m
+[1;32m799: [0m            << token::SPACE << YGasLoc [1;31m // added[0m
+[1;32m800: [0m            << token::SPACE << YLiquidLoc  [1;31m // added[0m
+[1;32m801: [0m            << token::SPACE << YSolidLoc;  [1;31m // added[0m
+[1;32m807: [0m        os  << YGasLoc << YLiquidLoc << YSolidLoc; [1;31m // added[0m 
+
+[1;33mFile: ./parcels/Templates/SolidifyingSprayParcel/SolidifyingSprayParcelI.H[0m
+[1;32m133: [0m    YGas_(0),[1;31m // added[0m
+[1;32m134: [0m    YLiquid_(0),[1;31m // added[0m
+[1;32m135: [0m    YSolid_(0)[1;31m // added[0m
+[1;32m161: [0m    YGas_(0),[1;31m // added[0m
+[1;32m162: [0m    YLiquid_(0),[1;31m // added[0m
+[1;32m163: [0m    YSolid_(0)[1;31m // added[0m
+[1;32m194: [0m    const scalarField& YLiquid0,   [1;31m // added[0m
+[1;32m195: [0m    const scalarField& YSolid0,   [1;31m // added[0m
+[1;32m196: [0m    // const constantProperties& constProps   [1;31m // added[0m
+[1;32m231: [0m    YGas_(YGas0),  [1;31m // added[0m
+[1;32m232: [0m    YLiquid_(YLiquid0),  [1;31m // added[0m
+[1;32m233: [0m    YSolid_(YSolid0)  [1;31m // added[0m
+[1;32m257: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m265: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m273: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m281: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m288: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m295: [0mtemplate<class ParcelType> [1;31m // added[0m
+
+[1;33mFile: ./parcels/Templates/SolidifyingSprayParcel/SolidifyingSprayParcel.C[0m
+[1;32m32: [0m#include "mathematicalConstants.H" [1;31m // added[0m
+[1;32m34: [0musing namespace Foam::constant::mathematical; [1;31m // added[0m
+[1;32m37: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m40: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m43: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m48: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m68: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m88: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m108: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m142: [0mtemplate<class ParcelType> [1;31m // added[0m
+[1;32m222: [0m   [1;31m // added <<[0m
+[1m223: [0m    /* typedef typename TrackCloudType::solidifyingCloudType solidifyingCloudType;
+[1m224: [0m    const CompositionModel<solidifyingCloudType>& composition =
+[1m225: [0m        cloud.composition(); */
+[1m226: [0m
+[1m227: [0m    // Define local properties at beginning of timestep
+[1m228: [0m    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1m229: [0m
+[1m230: [0m    const scalar np0 = this->nParticle_;
+[1m231: [0m    const scalar d0 = this->d_;
+[1m232: [0m    const vector& U0 = this->U_;
+[1m233: [0m    const scalar T0 = this->T_;
+[1m234: [0m    const scalar mass0 = this->mass();
+[1m235: [0m    const scalar rho0 = this->rho_;
+[1m236: [0m
+[1m237: [0m
+[1m238: [0m    const scalar pc = td.pc();
+[1m239: [0m
+[1m240: [0m    const scalarField& YMix = this->Y_;
+[1m241: [0m    const label idG = composition.idGas();
+[1m242: [0m    const label idL = composition.idLiquid();
+[1m243: [0m    const label idS = composition.idSolid();
+[1;32m244: [0m   [1;31m // added >>[0m
+[1;32m320: [0m   [1;31m // added <<[0m
+[1m321: [0m    // Calc surface values
+[1m322: [0m    scalar Ts, rhos, mus, Prs, kappas;
+[1m323: [0m    this->calcSurfaceValues(cloud, td, T0, Ts, rhos, mus, Prs, kappas);
+[1m324: [0m    scalar Res = this->Re(rhos, U0, td.Uc(), d0, mus); 
+[1m325: [0m
+[1m326: [0m    // Sources
+[1m327: [0m    //~~~~~~~~
+[1m328: [0m
+[1m329: [0m    // Explicit momentum source for particle
+[1m330: [0m    vector Su = Zero;
+[1m331: [0m
+[1m332: [0m    // Linearised momentum source coefficient
+[1m333: [0m    scalar Spu = 0.0;
+[1m334: [0m
+[1m335: [0m    // Momentum transfer from the particle to the carrier phase
+[1m336: [0m    vector dUTrans = Zero;
+[1m337: [0m
+[1m338: [0m    // Explicit enthalpy source for particle
+[1m339: [0m    scalar Sh = 0.0;
+[1m340: [0m
+[1m341: [0m    // Linearised enthalpy source coefficient
+[1m342: [0m    scalar Sph = 0.0;
+[1m343: [0m
+[1m344: [0m    // Sensible enthalpy transfer from the particle to the carrier phase
+[1m345: [0m    scalar dhsTrans = 0.0;
+[1m346: [0m
+[1m347: [0m
+[1m348: [0m    // 1. Compute models that contribute to mass transfer - U, T held constant
+[1m349: [0m    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1m350: [0m
+[1m351: [0m    // Phase change in liquid phase
+[1m352: [0m    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1m353: [0m
+[1m354: [0m    // Mass transfer due to phase change
+[1m355: [0m    scalarField dMassPC(YLiquid_.size(), Zero);
+[1m356: [0m
+[1m357: [0m    // Molar flux of species emitted from the particle (kmol/m^2/s)
+[1m358: [0m    scalar Ne = 0.0;
+[1m359: [0m
+[1m360: [0m    // Sum Ni*Cpi*Wi of emission species
+[1m361: [0m    scalar NCpW = 0.0;
+[1m362: [0m
+[1m363: [0m    // Surface concentrations of emitted species
+[1m364: [0m    scalarField Cs(composition.carrier().species().size(), Zero);
+[1m365: [0m
+[1m366: [0m    // Calc mass and enthalpy transfer due to phase change
+[1m367: [0m    this->calcPhaseChange
+[1m368: [0m    (
+[1m369: [0m        cloud,
+[1m370: [0m        td,
+[1m371: [0m        dt,
+[1m372: [0m        Res,
+[1m373: [0m        Prs,
+[1m374: [0m        Ts,
+[1m375: [0m        mus/rhos,
+[1m376: [0m        d0,
+[1m377: [0m        T0,
+[1m378: [0m        mass0,
+[1m379: [0m        rho0,
+[1m380: [0m        idL,
+[1m381: [0m        YMix[LIQ],
+[1m382: [0m        YLiquid_,
+[1m383: [0m        YMix[SLD]*YSolid_,
+[1m384: [0m        dMassPC,
+[1m385: [0m        Sh,
+[1m386: [0m        Ne,
+[1m387: [0m        NCpW,
+[1m388: [0m        Cs
+[1m389: [0m    );
+[1m390: [0m
+[1m391: [0m    // 2. Update the parcel properties due to change in mass
+[1m392: [0m    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1m393: [0m
+[1m394: [0m    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
+[1m395: [0m    // Added these to solve the "NOT Declaration" error for when theare called
+[1m396: [0m    // they are in fact related to devolitilization and surface reaction models
+[1m397: [0m    // but for now i decided to keep them like that. probably we can relate them
+[1m398: [0m    // to our models ot just simply replace it with one universal mass for each phase
+[1m399: [0m    scalarField dMassDV(YGas_.size(), Zero);
+[1m400: [0m    scalarField dMassSRGas(YGas_.size(), Zero);
+[1m401: [0m    scalarField dMassSRLiquid(YLiquid_.size(), Zero);
+[1m402: [0m    scalarField dMassSRSolid(YSolid_.size(), Zero);
+[1m403: [0m    scalarField dMassSRCarrier(composition.carrier().species().size(), Zero);
+[1m404: [0m    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1m405: [0m
+[1m406: [0m    scalarField dMassGas(dMassDV + dMassSRGas);    // NOT declaration
+[1m407: [0m    scalarField dMassLiquid(dMassPC + dMassSRLiquid);
+[1m408: [0m    scalarField dMassSolid(dMassSRSolid);
+[1m409: [0m
+[1m410: [0m    scalar mass1 = mass0 - sum(dMassGas) - sum(dMassLiquid) - sum(dMassSolid);
+[1m411: [0m
+[1m412: [0m    // Remove the particle when mass falls below minimum threshold
+[1m413: [0m    if (np0*mass1 < cloud.constProps().minParcelMass())
+[1m414: [0m    {
+[1m415: [0m        td.keepParticle = false;
+[1m416: [0m
+[1m417: [0m        if (cloud.solution().coupled())
+[1m418: [0m        {
+[1m419: [0m            scalar dm = np0*mass0;
+[1m420: [0m
+[1m421: [0m            // Absorb parcel into carrier phase
+[1m422: [0m            forAll(YGas_, i)
+[1m423: [0m            {
+[1m424: [0m                label gid = composition.localToCarrierId(GAS, i);
+[1m425: [0m                cloud.rhoTrans(gid)[this->cell()] += dm*YMix[GAS]*YGas_[i];
+[1m426: [0m            }
+[1m427: [0m            forAll(YLiquid_, i)
+[1m428: [0m            {
+[1m429: [0m                label gid = composition.localToCarrierId(LIQ, i);
+[1m430: [0m                cloud.rhoTrans(gid)[this->cell()] += dm*YMix[LIQ]*YLiquid_[i];
+[1m431: [0m            }
+[1m432: [0m
+[1m433: [0m            // No mapping between solid components and carrier phase
+[1m434: [0m            /*
+[1m435: [0m            forAll(YSolid_, i)
+[1m436: [0m            {
+[1m437: [0m                label gid = composition.localToCarrierId(SLD, i);
+[1m438: [0m                cloud.rhoTrans(gid)[this->cell()] += dm*YMix[SLD]*YSolid_[i];
+[1m439: [0m            }
+[1m440: [0m            */
+[1m441: [0m
+[1m442: [0m            cloud.UTrans()[this->cell()] += dm*U0;
+[1m443: [0m
+[1m444: [0m            cloud.hsTrans()[this->cell()] +=
+[1m445: [0m                dm*HsEff(cloud, td, pc, T0, idG, idL, idS);
+[1m446: [0m
+[1m447: [0m            cloud.phaseChange().addToPhaseChangeMass(np0*mass1);
+[1m448: [0m        }
+[1m449: [0m
+[1m450: [0m        return;
+[1m451: [0m    }
+[1m452: [0m
+[1m453: [0m    (void)updateMassFractions(mass0, dMassGas, dMassLiquid, dMassSolid);
+[1m454: [0m
+[1m455: [0m    if
+[1m456: [0m    (
+[1m457: [0m        cloud.constProps().volUpdateType()
+[1m458: [0m     == constantProperties::volumeUpdateType::mUndefined
+[1m459: [0m    )
+[1m460: [0m    {
+[1m461: [0m        if (cloud.constProps().constantVolume())
+[1m462: [0m        {
+[1m463: [0m            this->rho_ = mass1/this->volume();
+[1m464: [0m        }
+[1m465: [0m        else
+[1m466: [0m        {
+[1m467: [0m            this->d_ = cbrt(mass1/this->rho_*6/pi);
+[1m468: [0m        }
+[1m469: [0m    }
+[1m470: [0m    else
+[1m471: [0m    {
+[1m472: [0m        switch (cloud.constProps().volUpdateType())
+[1m473: [0m        {
+[1m474: [0m            case constantProperties::volumeUpdateType::mConstRho :
+[1m475: [0m            {
+[1m476: [0m                this->d_ = cbrt(mass1/this->rho_*6/pi);
+[1m477: [0m                break;
+[1m478: [0m            }
+[1m479: [0m            case constantProperties::volumeUpdateType::mConstVol :
+[1m480: [0m            {
+[1m481: [0m                this->rho_ = mass1/this->volume();
+[1m482: [0m                break;
+[1m483: [0m            }
+[1m484: [0m            case constantProperties::volumeUpdateType::mUpdateRhoAndVol :
+[1m485: [0m            {
+[1m486: [0m                scalar deltaVol =
+[1m487: [0m                    updatedDeltaVolume
+[1m488: [0m                    (
+[1m489: [0m                        cloud,
+[1m490: [0m                        dMassGas,
+[1m491: [0m                        dMassLiquid,
+[1m492: [0m                        dMassSolid,
+[1m493: [0m                        idG,
+[1m494: [0m                        idL,
+[1m495: [0m                        idS,
+[1m496: [0m                        pc,
+[1m497: [0m                        T0
+[1m498: [0m                    );
+[1m499: [0m
+[1m500: [0m                this->rho_ = mass1/(this->volume() + deltaVol);
+[1m501: [0m                this->d_ = cbrt(mass1/this->rho_*6/pi);
+[1m502: [0m                break;
+[1m503: [0m            }
+[1m504: [0m        }
+[1m505: [0m    }
+[1m506: [0m    // Correct surface values due to emitted species
+[1m507: [0m    this->correctSurfaceValues(cloud, td, Ts, Cs, rhos, mus, Prs, kappas);
+[1m508: [0m    Res = this->Re(rhos, U0, td.Uc(), this->d_, mus);
+[1m509: [0m
+[1m510: [0m
+[1m511: [0m    // 3. Compute heat- and momentum transfers
+[1m512: [0m    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1m513: [0m
+[1m514: [0m    // Heat transfer
+[1m515: [0m    // ~~~~~~~~~~~~~
+[1m516: [0m
+[1m517: [0m    // Calculate new particle temperature
+[1m518: [0m    this->T_ =
+[1m519: [0m        this->calcHeatTransfer
+[1m520: [0m        (
+[1m521: [0m            cloud,
+[1m522: [0m            td,
+[1m523: [0m            dt,
+[1m524: [0m            Res,
+[1m525: [0m            Prs,
+[1m526: [0m            kappas,
+[1m527: [0m            NCpW,
+[1m528: [0m            Sh,
+[1m529: [0m            dhsTrans,
+[1m530: [0m            Sph
+[1m531: [0m        );
+[1m532: [0m
+[1m533: [0m
+[1m534: [0m    this->Cp_ = CpEff(cloud, td, pc, this->T_, idG, idL, idS);
+[1m535: [0m
+[1m536: [0m
+[1m537: [0m    // Motion
+[1m538: [0m    // ~~~~~~
+[1m539: [0m
+[1m540: [0m    // Calculate new particle velocity
+[1m541: [0m    this->U_ =
+[1m542: [0m        this->calcVelocity(cloud, td, dt, Res, mus, mass1, Su, dUTrans, Spu);
+[1m543: [0m
+[1m544: [0m
+[1m545: [0m    // 4. Accumulate carrier phase source terms
+[1m546: [0m    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1m547: [0m
+[1m548: [0m    if (cloud.solution().coupled())
+[1m549: [0m    {
+[1m550: [0m        // Transfer mass lost to carrier mass, momentum and enthalpy sources
+[1m551: [0m        forAll(YGas_, i)
+[1m552: [0m        {
+[1m553: [0m            scalar dm = np0*dMassGas[i];
+[1m554: [0m            label gid = composition.localToCarrierId(GAS, i);
+[1m555: [0m            scalar hs = composition.carrier().Hs(gid, pc, T0);
+[1m556: [0m            cloud.rhoTrans(gid)[this->cell()] += dm;
+[1m557: [0m            cloud.UTrans()[this->cell()] += dm*U0;
+[1m558: [0m            cloud.hsTrans()[this->cell()] += dm*hs;
+[1m559: [0m        }
+[1m560: [0m        forAll(YLiquid_, i)
+[1m561: [0m        {
+[1m562: [0m            scalar dm = np0*dMassLiquid[i];
+[1m563: [0m            label gid = composition.localToCarrierId(LIQ, i);
+[1m564: [0m            scalar hs = composition.carrier().Hs(gid, pc, T0);
+[1m565: [0m            cloud.rhoTrans(gid)[this->cell()] += dm;
+[1m566: [0m            cloud.UTrans()[this->cell()] += dm*U0;
+[1m567: [0m            cloud.hsTrans()[this->cell()] += dm*hs;
+[1m568: [0m        }
+[1m569: [0m
+[1m570: [0m        // No mapping between solid components and carrier phase
+[1m571: [0m        /*
+[1m572: [0m        forAll(YSolid_, i)
+[1m573: [0m        {
+[1m574: [0m            scalar dm = np0*dMassSolid[i];
+[1m575: [0m            label gid = composition.localToCarrierId(SLD, i);
+[1m576: [0m            scalar hs = composition.carrier().Hs(gid, pc, T0);
+[1m577: [0m            cloud.rhoTrans(gid)[this->cell()] += dm;
+[1m578: [0m            cloud.UTrans()[this->cell()] += dm*U0;
+[1m579: [0m            cloud.hsTrans()[this->cell()] += dm*hs;
+[1m580: [0m        }
+[1m581: [0m        */
+[1m582: [0m
+[1m583: [0m        forAll(dMassSRCarrier, i)
+[1m584: [0m        {
+[1m585: [0m            scalar dm = np0*dMassSRCarrier[i];
+[1m586: [0m            scalar hs = composition.carrier().Hs(i, pc, T0);
+[1m587: [0m            cloud.rhoTrans(i)[this->cell()] += dm;
+[1m588: [0m            cloud.UTrans()[this->cell()] += dm*U0;
+[1m589: [0m            cloud.hsTrans()[this->cell()] += dm*hs;
+[1m590: [0m        }
+[1m591: [0m
+[1m592: [0m        // Update momentum transfer
+[1m593: [0m        cloud.UTrans()[this->cell()] += np0*dUTrans;
+[1m594: [0m        cloud.UCoeff()[this->cell()] += np0*Spu;
+[1m595: [0m
+[1m596: [0m        // Update sensible enthalpy transfer
+[1m597: [0m        cloud.hsTrans()[this->cell()] += np0*dhsTrans;
+[1m598: [0m        cloud.hsCoeff()[this->cell()] += np0*Sph;
+[1m599: [0m
+[1m600: [0m        // Update radiation fields
+[1m601: [0m        if (cloud.radiation())
+[1m602: [0m        {
+[1m603: [0m            const scalar ap = this->areaP();
+[1m604: [0m            const scalar T4 = pow4(T0);
+[1m605: [0m            cloud.radAreaP()[this->cell()] += dt*np0*ap;
+[1m606: [0m            cloud.radT4()[this->cell()] += dt*np0*T4;
+[1m607: [0m            cloud.radAreaPT4()[this->cell()] += dt*np0*ap*T4;
+[1m608: [0m        }
+[1m609: [0m    }
+[1;32m610: [0m   [1;31m // added >>[0m
+[1;32m904: [0m    YGas_(p.YGas_), //added
+[1;32m905: [0m    YLiquid_(p.YLiquid_), //added
+[1;32m906: [0m    YSolid_(p.YSolid_) //added
+[1;32m931: [0m    YGas_(p.YGas_), //added
+[1;32m932: [0m    YLiquid_(p.YLiquid_), //added
+[1;32m933: [0m    YSolid_(p.YSolid_) //added
+
+[1;33mFile: ./parcels/Templates/SolidifyingSprayParcel/SolidifyingSprayParcel.H[0m
+[1;32m31: [0m    Reacting spray parcel, with added functionality for atomization and breakup
+[1;32m69: [0m    // static const std::size_t sizeofFields; [1;31m // added[0m
+[1;32m74: [0m        static const label GAS; [1;31m // added[0m
+[1;32m75: [0m        static const label LIQ; [1;31m // added[0m
+[1;32m76: [0m        static const label SLD; [1;31m // added[0m
+[1;32m143: [0m// added <<
+[1m144: [0mprivate:
+[1m145: [0m
+[1m146: [0m    // Private Member Functions
+[1m147: [0m
+[1m148: [0m        //- Return the mixture effective specific heat capacity
+[1m149: [0m        template<class TrackCloudType>
+[1m150: [0m        scalar CpEff
+[1m151: [0m        (
+[1m152: [0m            TrackCloudType& cloud,
+[1m153: [0m            trackingData& td,
+[1m154: [0m            const scalar p,
+[1m155: [0m            const scalar T,
+[1m156: [0m            const label idG,
+[1m157: [0m            const label idL,
+[1m158: [0m            const label idS
+[1m159: [0m        ) const;
+[1m160: [0m
+[1m161: [0m        //- Return the mixture effective sensible enthalpy
+[1m162: [0m        template<class TrackCloudType>
+[1m163: [0m        scalar HsEff
+[1m164: [0m        (
+[1m165: [0m            TrackCloudType& cloud,
+[1m166: [0m            trackingData& td,
+[1m167: [0m            const scalar p,
+[1m168: [0m            const scalar T,
+[1m169: [0m            const label idG,
+[1m170: [0m            const label idL,
+[1m171: [0m            const label idS
+[1m172: [0m        ) const;
+[1m173: [0m
+[1m174: [0m        //- Return the mixture effective latent heat
+[1m175: [0m        template<class TrackCloudType>
+[1m176: [0m        scalar LEff
+[1m177: [0m        (
+[1m178: [0m            TrackCloudType& cloud,
+[1m179: [0m            trackingData& td,
+[1m180: [0m            const scalar p,
+[1m181: [0m            const scalar T,
+[1m182: [0m            const label idG,
+[1m183: [0m            const label idL,
+[1m184: [0m            const label idS
+[1m185: [0m        ) const;
+[1m186: [0m
+[1m187: [0m        //- Update the mass fractions (Y, YGas, YLiquid, YSolid)
+[1m188: [0m        scalar updateMassFractions
+[1m189: [0m        (
+[1m190: [0m            const scalar mass0,
+[1m191: [0m            const scalarField& dMassGas,
+[1m192: [0m            const scalarField& dMassLiquid,
+[1m193: [0m            const scalarField& dMassSolid
+[1m194: [0m        );
+[1;32m195: [0m// added >>
+[1;32m244: [0m            scalarField YGas_; [1;31m // added[0m
+[1;32m247: [0m            scalarField YLiquid_; [1;31m // added[0m
+[1;32m250: [0m            scalarField YSolid_; [1;31m // added[0m
+[1;32m251: [0m   [1;31m // added <<[0m
+[1m252: [0m    // Protected Member Functions
+[1m253: [0m
+[1m254: [0m
+[1m255: [0m        //- Return change of volume due to mass exchange
+[1m256: [0m        template<class TrackCloudType>
+[1m257: [0m        scalar updatedDeltaVolume
+[1m258: [0m        (
+[1m259: [0m            TrackCloudType& cloud,
+[1m260: [0m            const scalarField& dMassGas,
+[1m261: [0m            const scalarField& dMassLiquid,
+[1m262: [0m            const scalarField& dMassSolid,
+[1m263: [0m            const label idG,
+[1m264: [0m            const label idL,
+[1m265: [0m            const label idS,
+[1m266: [0m            const scalar p,
+[1m267: [0m            const scalar T
+[1m268: [0m        );
+[1;32m269: [0m   [1;31m // added >>[0m
+[1;32m299: [0m          + " nGas(Y1..YN)"[1;31m // added[0m
+[1;32m300: [0m          + " nLiquid(Y1..YN)"[1;31m // added[0m
+[1;32m301: [0m          + " nSolid(Y1..YN)"[1;31m // added[0m
+[1;32m353: [0m            const scalarField& YGas0,  [1;31m // added[0m
+[1;32m354: [0m            const scalarField& YLiquid0,  [1;31m // added[0m
+[1;32m355: [0m            const scalarField& YSolid0,  [1;31m // added[0m
+[1;32m356: [0m            // const constantProperties& constProps  [1;31m // added[0m
+[1;32m461: [0m            inline const scalarField& YGas() const;[1;31m // added[0m
+[1;32m464: [0m            inline const scalarField& YLiquid() const;[1;31m // added[0m
+[1;32m467: [0m            inline const scalarField& YSolid() const;[1;31m // added[0m
+[1;32m470: [0m            inline label canCombust() const;[1;31m // added[0m
+[1;32m515: [0m            inline scalarField& YGas();[1;31m // added[0m
+[1;32m518: [0m            inline scalarField& YLiquid();[1;31m // added[0m
+[1;32m521: [0m            inline scalarField& YSolid();[1;31m // added[0m
+[1;32m524: [0m            inline label& canCombust();[1;31m // added[0m
+
+[1;33mFile: ./clouds/baseClasses/solidifyingSprayCloud/solidifyingSprayCloud.H[0m
+
+[1;33mFile: ./clouds/baseClasses/solidifyingSprayCloud/solidifyingSprayCloud.C[0m
+
+[1;33mFile: ./clouds/derived/basicSolidifyingSprayCloud/basicSolidifyingSprayCloud.H[0m
+
+[1;33mFile: ./clouds/Templates/SolidifyingSprayCloud/SolidifyingSprayCloudI.H[0m
+[1;32m39: [0mtemplate<class CloudType>  [1;31m // added[0m
+[1;32m47: [0mtemplate<class CloudType>  [1;31m // added[0m
+
+[1;33mFile: ./clouds/Templates/SolidifyingSprayCloud/SolidifyingSprayCloud.H[0m
+[1;32m103: [0m        typename parcelType::constantProperties constProps_;   [1;31m // added[0m
+[1;32m189: [0m                constProps() const;  //added
+[1;32m192: [0m            inline typename parcelType::constantProperties& constProps();  //added
+[1;32m245: [0m            void resetSourceTerms();   [1;31m // added[0m
+[1;32m263: [0m            virtual void writeFields() const;  [1;31m // added[0m
+
+[1;33mFile: ./clouds/Templates/SolidifyingSprayCloud/SolidifyingSprayCloud.C[0m
+[1;32m86: [0m    constProps_(this->particleProperties()),[1;31m // added[0m
+[1;32m123: [0m    constProps_(c.constProps_),[1;31m // added[0m
+[1;32m141: [0m    constProps_(), [1;31m // added[0m
+[1;32m169: [0m    label idGas = this->composition().idGas(); [1;31m // added[0m
+[1;32m170: [0m    label idLiquid = this->composition().idLiquid(); [1;31m // added[0m
+[1;32m171: [0m    label idSolid = this->composition().idSolid(); [1;31m // added[0m
+[1;32m184: [0m    parcel.YGas() = this->composition().Y0(idGas); [1;31m // added[0m
+[1;32m185: [0m    parcel.YLiquid() = this->composition().Y0(idLiquid); [1;31m // added[0m
+[1;32m186: [0m    parcel.YSolid() = this->composition().Y0(idSolid); [1;31m // added[0m
+[1;32m190: [0m    if (constProps_.rho0() == -1)  [1;31m // added[0m
+[1;32m224: [0m    if (fullyDescribed)[1;31m // added[0m
+[1;32m277: [0mtemplate<class CloudType>  [1;31m // added[0m
+[1;32m301: [0m/*template<class CloudType>  [1;31m // added[0m
+[1;32m328: [0mtemplate<class CloudType>  [1;31m // added[0m
+

@@ -99,6 +99,10 @@ protected:
 
     // Protected data
 
+        //- Parcel constant properties
+        typename parcelType::constantProperties constProps_;    // added
+
+
         // References to the cloud sub-models
 
             //- Atomization model
@@ -180,6 +184,13 @@ public:
             //- Return a reference to the cloud copy
             inline const SolidifyingSprayCloud& cloudCopy() const;
 
+            //- Return the constant properties
+            inline const typename parcelType::constantProperties&
+                constProps() const;  //added
+
+            //- Return access to the constant properties
+            inline typename parcelType::constantProperties& constProps();  //added
+
             //- Return const-access to the average parcel mass
             inline scalar averageParcelMass() const;
 
@@ -230,14 +241,26 @@ public:
             //- Reset the current cloud to the previously stored state
             void restoreState();
 
+            //- Reset the cloud source terms
+            void resetSourceTerms();    // added
+
             //- Evolve the spray (inject, move)
             void evolve();
+
+        /* // Mapping
+
+            //- Remap the cells of particles corresponding to the
+            //  mesh topology change with a default tracking data object
+            virtual void autoMap(const mapPolyMesh&); */
 
 
         // I-O
 
             //- Print cloud information
             void info();
+
+            //- Write the field data for the cloud
+            virtual void writeFields() const;   // added
 };
 
 

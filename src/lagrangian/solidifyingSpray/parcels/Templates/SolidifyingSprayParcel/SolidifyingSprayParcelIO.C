@@ -40,6 +40,7 @@ template<class ParcelType>
 const std::size_t Foam::SolidifyingSprayParcel<ParcelType>::sizeofFields
 (
     sizeof(SolidifyingSprayParcel<ParcelType>) - sizeof(ParcelType)
+    // 0    // added (should this line be added?)
 );
 
 
@@ -67,7 +68,10 @@ Foam::SolidifyingSprayParcel<ParcelType>::SolidifyingSprayParcel
     ms_(0.0),
     injector_(1.0),
     tMom_(GREAT),
-    user_(0.0)
+    user_(0.0),
+    YGas_(0), // added
+    YLiquid_(0), // added
+    YSolid_(0) // added
 {
     if (readFields)
     {
@@ -113,6 +117,15 @@ Foam::SolidifyingSprayParcel<ParcelType>::SolidifyingSprayParcel
         {
             is.read(reinterpret_cast<char*>(&d0_), sizeofFields);
         }
+        DynamicList<scalar> Yg;   // added
+        DynamicList<scalar> Yl;   // added
+        DynamicList<scalar> Ys;   // added
+
+        is >> Yg >> Yl >> Ys;   // added
+
+        YGas_.transfer(Yg);   // added
+        YLiquid_.transfer(Yl);   // added
+        YSolid_.transfer(Ys);   // added
     }
 
     is.check(FUNCTION_NAME);
@@ -237,6 +250,86 @@ void Foam::SolidifyingSprayParcel<ParcelType>::readFields
 
         ++i;
     }
+
+    // added <<
+    // Get names and sizes for each Y...
+    const label idGas = compModel.idGas();
+    const wordList& gasNames = compModel.componentNames(idGas);
+    const label idLiquid = compModel.idLiquid();
+    const wordList& liquidNames = compModel.componentNames(idLiquid);
+    const label idSolid = compModel.idSolid();
+    const wordList& solidNames = compModel.componentNames(idSolid);
+    const wordList& stateLabels = compModel.stateLabels();
+
+    // Set storage for each Y... for each parcel
+    for (SolidifyingSprayParcel<ParcelType>& p : c)
+    {
+        p.YGas_.setSize(gasNames.size(), 0.0);
+        p.YLiquid_.setSize(liquidNames.size(), 0.0);
+        p.YSolid_.setSize(solidNames.size(), 0.0);
+    }
+
+    // Populate YGas for each parcel
+    forAll(gasNames, j)
+    {
+        IOField<scalar> YGas
+        (
+            c.fieldIOobject
+            (
+                "Y" + gasNames[j] + stateLabels[idGas],
+                IOobject::MUST_READ
+            ),
+            valid
+        );
+
+        label i = 0;
+        for (SolidifyingSprayParcel<ParcelType>& p : c)
+        {
+            p.YGas_[j] = YGas[i]/(max(p.Y()[GAS], SMALL));
+            ++i;
+        }
+    }
+    // Populate YLiquid for each parcel
+    forAll(liquidNames, j)
+    {
+        IOField<scalar> YLiquid
+        (
+            c.fieldIOobject
+            (
+                "Y" + liquidNames[j] + stateLabels[idLiquid],
+                 IOobject::MUST_READ
+            ),
+            valid
+        );
+
+        label i = 0;
+        for (SolidifyingSprayParcel<ParcelType>& p : c)
+        {
+            p.YLiquid_[j] = YLiquid[i]/(max(p.Y()[LIQ], SMALL));
+            ++i;
+        }
+    }
+    // Populate YSolid for each parcel
+    forAll(solidNames, j)
+    {
+        IOField<scalar> YSolid
+        (
+            c.fieldIOobject
+            (
+                "Y" + solidNames[j] + stateLabels[idSolid],
+                IOobject::MUST_READ
+            ),
+            valid
+        );
+
+        label i = 0;
+        for (SolidifyingSprayParcel<ParcelType>& p : c)
+        {
+            p.YSolid_[j] = YSolid[i]/(max(p.Y()[SLD], SMALL));
+            ++i;
+        }
+    }
+    // added >>
 }
 
 
@@ -320,6 +413,85 @@ void Foam::SolidifyingSprayParcel<ParcelType>::writeFields
     injector.write(valid);
     tMom.write(valid);
     user.write(valid);
+
+    // added <<
+    // Write the composition fractions
+    {
+        const wordList& stateLabels = compModel.stateLabels();
+
+        const label idGas = compModel.idGas();
+        const wordList& gasNames = compModel.componentNames(idGas);
+        forAll(gasNames, j)
+        {
+            IOField<scalar> YGas
+            (
+                c.fieldIOobject
+                (
+                    "Y" + gasNames[j] + stateLabels[idGas],
+                    IOobject::NO_READ
+                ),
+                np
+            );
+
+            label i = 0;
+            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+            {
+                YGas[i] = p0.YGas()[j]*max(p0.Y()[GAS], SMALL);
+                ++i;
+            }
+
+            YGas.write(np > 0);
+        }
+
+        const label idLiquid = compModel.idLiquid();
+        const wordList& liquidNames = compModel.componentNames(idLiquid);
+        forAll(liquidNames, j)
+        {
+            IOField<scalar> YLiquid
+            (
+                c.fieldIOobject
+                (
+                    "Y" + liquidNames[j] + stateLabels[idLiquid],
+                    IOobject::NO_READ
+                ),
+                np
+            );
+
+            label i = 0;
+            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+            {
+                YLiquid[i] = p0.YLiquid()[j]*max(p0.Y()[LIQ], SMALL);
+                ++i;
+            }
+
+            YLiquid.write(np > 0);
+        }
+
+        const label idSolid = compModel.idSolid();
+        const wordList& solidNames = compModel.componentNames(idSolid);
+        forAll(solidNames, j)
+        {
+            IOField<scalar> YSolid
+            (
+                c.fieldIOobject
+                (
+                    "Y" + solidNames[j] + stateLabels[idSolid],
+                    IOobject::NO_READ
+                ),
+                np
+            );
+
+            label i = 0;
+            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+            {
+                YSolid[i] = p0.YSolid()[j]*max(p0.Y()[SLD], SMALL);
+                ++i;
+            }
+
+            YSolid.write(np > 0);
+        }
+    }
+    // added >>
 }
 
 
@@ -351,6 +523,9 @@ void Foam::SolidifyingSprayParcel<ParcelType>::writeProperties
     writeProp("injector", injector_);
     writeProp("tMom", tMom_);
     writeProp("user", user_);
+    writeProp("YGas", YGas_);   // added
+    writeProp("YLiquid", YLiquid_);   // added
+    writeProp("YSolid", YSolid_);   // added
 
     #undef writeProp
 }
@@ -426,6 +601,63 @@ void Foam::SolidifyingSprayParcel<ParcelType>::readObjects
 
         ++i;
     }
+
+    // added <<
+    ParcelType::readObjects(c, obr);
+
+    const label np = c.size();
+
+    // The composition fractions
+    if (np > 0)
+    {
+        const wordList& stateLabels = compModel.stateLabels();
+
+        const label idGas = compModel.idGas();
+        const wordList& gasNames = compModel.componentNames(idGas);
+        forAll(gasNames, j)
+        {
+            const word fieldName = "Y" + gasNames[j] + stateLabels[idGas];
+            const auto& YGas = cloud::lookupIOField<scalar>(fieldName, obr);
+
+            label i = 0;
+            for (SolidifyingSprayParcel<ParcelType>& p0 : c)
+            {
+                p0.YGas()[j]*max(p0.Y()[GAS], SMALL) = YGas[i];
+                ++i;
+            }
+        }
+
+        const label idLiquid = compModel.idLiquid();
+        const wordList& liquidNames = compModel.componentNames(idLiquid);
+        forAll(liquidNames, j)
+        {
+            const word fieldName = "Y" + liquidNames[j] + stateLabels[idLiquid];
+            const auto& YLiquid = cloud::lookupIOField<scalar>(fieldName, obr);
+
+            label i = 0;
+            for (SolidifyingSprayParcel<ParcelType>& p0 : c)
+            {
+                p0.YLiquid()[j]*max(p0.Y()[LIQ], SMALL) = YLiquid[i];
+                ++i;
+            }
+        }
+
+        const label idSolid = compModel.idSolid();
+        const wordList& solidNames = compModel.componentNames(idSolid);
+        forAll(solidNames, j)
+        {
+            const word fieldName = "Y" + solidNames[j] + stateLabels[idSolid];
+            const auto& YSolid = cloud::lookupIOField<scalar>(fieldName, obr);
+
+            label i = 0;
+            for (SolidifyingSprayParcel<ParcelType>& p0 : c)
+            {
+                p0.YSolid()[j]*max(p0.Y()[SLD], SMALL) = YSolid[i];
+                ++i;
+            }
+        }
+    }
+    // added >>
 }
 
 
@@ -475,6 +707,63 @@ void Foam::SolidifyingSprayParcel<ParcelType>::writeObjects
 
         ++i;
     }
+
+    // added <<
+    ParcelType::writeObjects(c, obr);
+
+    // const label np = c.size();   // Redeclaration
+
+    // Write the composition fractions
+    if (np > 0)
+    {
+        const wordList& stateLabels = compModel.stateLabels();
+
+        const label idGas = compModel.idGas();
+        const wordList& gasNames = compModel.componentNames(idGas);
+        forAll(gasNames, j)
+        {
+            const word fieldName = "Y" + gasNames[j] + stateLabels[idGas];
+            auto& YGas = cloud::createIOField<scalar>(fieldName, np, obr);
+
+            label i = 0;
+            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+            {
+                YGas[i] = p0.YGas()[j]*max(p0.Y()[GAS], SMALL);
+                ++i;
+            }
+        }
+
+        const label idLiquid = compModel.idLiquid();
+        const wordList& liquidNames = compModel.componentNames(idLiquid);
+        forAll(liquidNames, j)
+        {
+            const word fieldName = "Y" + liquidNames[j] + stateLabels[idLiquid];
+            auto& YLiquid = cloud::createIOField<scalar>(fieldName, np, obr);
+
+            label i = 0;
+            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+            {
+                YLiquid[i] = p0.YLiquid()[j]*max(p0.Y()[LIQ], SMALL);
+                ++i;
+            }
+        }
+
+        const label idSolid = compModel.idSolid();
+        const wordList& solidNames = compModel.componentNames(idSolid);
+        forAll(solidNames, j)
+        {
+            const word fieldName = "Y" + solidNames[j] + stateLabels[idSolid];
+            auto& YSolid = cloud::createIOField<scalar>(fieldName, np, obr);
+
+            label i = 0;
+            for (const SolidifyingSprayParcel<ParcelType>& p0 : c)
+            {
+                YSolid[i] = p0.YSolid()[j]*max(p0.Y()[SLD], SMALL);
+                ++i;
+            }
+        }
+    }
+    // added >>
 }
 
 
@@ -487,26 +776,35 @@ Foam::Ostream& Foam::operator<<
     const SolidifyingSprayParcel<ParcelType>& p
 )
 {
+    scalarField YGasLoc(p.YGas());  // added
+    scalarField YLiquidLoc(p.YLiquid());  // added
+    scalarField YSolidLoc(p.YSolid());  // added
+
     if (os.format() == IOstream::ASCII)
     {
         os  << static_cast<const ParcelType&>(p)
-        << token::SPACE << p.d0()
-        << token::SPACE << p.position0()
-        << token::SPACE << p.sigma()
-        << token::SPACE << p.mu()
-        << token::SPACE << p.liquidCore()
-        << token::SPACE << p.KHindex()
-        << token::SPACE << p.y()
-        << token::SPACE << p.yDot()
-        << token::SPACE << p.tc()
-        << token::SPACE << p.ms()
-        << token::SPACE << p.injector()
-        << token::SPACE << p.tMom()
-        << token::SPACE << p.user();
+            << token::SPACE << p.d0()
+            << token::SPACE << p.position0()
+            << token::SPACE << p.sigma()
+            << token::SPACE << p.mu()
+            << token::SPACE << p.liquidCore()
+            << token::SPACE << p.KHindex()
+            << token::SPACE << p.y()
+            << token::SPACE << p.yDot()
+            << token::SPACE << p.tc()
+            << token::SPACE << p.ms()
+            << token::SPACE << p.injector()
+            << token::SPACE << p.tMom()
+            << token::SPACE << p.user()
+            << token::SPACE << YGasLoc  // added
+            << token::SPACE << YLiquidLoc   // added
+            << token::SPACE << YSolidLoc;   // added
+
     }
     else
     {
         os  << static_cast<const ParcelType&>(p);
+        os  << YGasLoc << YLiquidLoc << YSolidLoc;  // added 
         os.write
         (
             reinterpret_cast<const char*>(&p.d0_),

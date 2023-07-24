@@ -36,6 +36,22 @@ Foam::SolidifyingSprayCloud<CloudType>::cloudCopy() const
 }
 
 
+template<class CloudType>   // added
+inline const typename CloudType::particleType::constantProperties&
+Foam::SolidifyingSprayCloud<CloudType>::constProps() const
+{
+    return constProps_;
+}
+
+
+template<class CloudType>   // added
+inline typename CloudType::particleType::constantProperties&
+Foam::SolidifyingSprayCloud<CloudType>::constProps()
+{
+    return constProps_;
+}
+
+
 template<class CloudType>
 inline const Foam::AtomizationModel<Foam::SolidifyingSprayCloud<CloudType>>&
 Foam::SolidifyingSprayCloud<CloudType>::atomization() const

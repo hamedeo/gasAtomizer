@@ -36,6 +36,7 @@ Description
 #define SolidifyingSprayParcel_H
 
 #include "particle.H"
+#include "SLGThermo.H"
 #include "demandDrivenEntry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -63,6 +64,17 @@ class SolidifyingSprayParcel
     public ParcelType
 {
 public:
+
+    //- Size in bytes of the fields
+    // static const std::size_t sizeofFields;  // added
+
+
+    // IDs of phases in ReactingParcel phase list (Y)
+
+        static const label GAS;  // added
+        static const label LIQ;  // added
+        static const label SLD;  // added
+
 
     //- Class to hold reacting particle constant properties
     class constantProperties
@@ -121,12 +133,66 @@ public:
 
             //- Return const access to the initial dynamic viscosity
             inline scalar mu0() const;
+
     };
 
 
     //- Use base tracking data
     typedef typename ParcelType::trackingData trackingData;
 
+// added <<
+private:
+
+    // Private Member Functions
+
+        //- Return the mixture effective specific heat capacity
+        template<class TrackCloudType>
+        scalar CpEff
+        (
+            TrackCloudType& cloud,
+            trackingData& td,
+            const scalar p,
+            const scalar T,
+            const label idG,
+            const label idL,
+            const label idS
+        ) const;
+
+        //- Return the mixture effective sensible enthalpy
+        template<class TrackCloudType>
+        scalar HsEff
+        (
+            TrackCloudType& cloud,
+            trackingData& td,
+            const scalar p,
+            const scalar T,
+            const label idG,
+            const label idL,
+            const label idS
+        ) const;
+
+        //- Return the mixture effective latent heat
+        template<class TrackCloudType>
+        scalar LEff
+        (
+            TrackCloudType& cloud,
+            trackingData& td,
+            const scalar p,
+            const scalar T,
+            const label idG,
+            const label idL,
+            const label idS
+        ) const;
+
+        //- Update the mass fractions (Y, YGas, YLiquid, YSolid)
+        scalar updateMassFractions
+        (
+            const scalar mass0,
+            const scalarField& dMassGas,
+            const scalarField& dMassLiquid,
+            const scalarField& dMassSolid
+        );
+// added >>
 
 protected:
 
@@ -174,6 +240,34 @@ protected:
             //- Passive scalar (extra variable to be defined by user)
             scalar user_;
 
+            //- Mass fractions of gases []
+            scalarField YGas_;  // added
+
+            //- Mass fractions of liquids []
+            scalarField YLiquid_;  // added
+
+            //- Mass fractions of solids []
+            scalarField YSolid_;  // added
+    // added <<
+    // Protected Member Functions
+
+
+        //- Return change of volume due to mass exchange
+        template<class TrackCloudType>
+        scalar updatedDeltaVolume
+        (
+            TrackCloudType& cloud,
+            const scalarField& dMassGas,
+            const scalarField& dMassLiquid,
+            const scalarField& dMassSolid,
+            const label idG,
+            const label idL,
+            const label idS,
+            const scalar p,
+            const scalar T
+        );
+    // added >>
+
 
 public:
 
@@ -202,6 +296,9 @@ public:
           + " injector"
           + " tMom"
           + " user"
+          + " nGas(Y1..YN)" // added
+          + " nLiquid(Y1..YN)" // added
+          + " nSolid(Y1..YN)" // added
         );
 
 
@@ -253,6 +350,10 @@ public:
             const scalar injector,
             const scalar tMom,
             const scalar user,
+            const scalarField& YGas0,   // added
+            const scalarField& YLiquid0,   // added
+            const scalarField& YSolid0,   // added
+            // const constantProperties& constProps   // added
             const typename ParcelType::constantProperties& constProps
         );
 
@@ -356,6 +457,18 @@ public:
             //- Return const access to passive user scalar
             inline scalar user() const;
 
+            //- Return const access to mass fractions of gases
+            inline const scalarField& YGas() const; // added
+
+            //- Return const access to mass fractions of liquids
+            inline const scalarField& YLiquid() const; // added
+
+            //- Return const access to mass fractions of solids
+            inline const scalarField& YSolid() const; // added
+
+            //- Return const access to the canCombust flag
+            inline label canCombust() const; // added
+
 
         // Edit
 
@@ -398,6 +511,17 @@ public:
             //- Return access to passive user scalar
             inline scalar& user();
 
+            //- Return access to mass fractions of gases
+            inline scalarField& YGas(); // added
+
+            //- Return access to mass fractions of liquids
+            inline scalarField& YLiquid(); // added
+
+            //- Return access to mass fractions of solids
+            inline scalarField& YSolid(); // added
+
+            //- Return access to the canCombust flag
+            inline label& canCombust(); // added
 
         // Main calculation loop
 

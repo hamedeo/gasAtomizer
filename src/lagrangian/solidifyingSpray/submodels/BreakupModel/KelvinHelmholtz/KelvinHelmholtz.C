@@ -119,6 +119,8 @@ bool Foam::KelvinHelmholtz<CloudType>::update
     scalar mass = nParticle*d3*rhopi6;
     scalar mass0 = nParticle*d03*rhopi6;
 
+	Pout << "KH.C before computing sigma in denaminator line 122" << endl;
+
     scalar weGas = rhoc*sqr(Urmag)*r/sigma;
     scalar weLiquid = rho*sqr(Urmag)*r/sigma;
 

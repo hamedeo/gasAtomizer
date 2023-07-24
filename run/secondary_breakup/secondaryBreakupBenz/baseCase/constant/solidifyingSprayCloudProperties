@@ -10,7 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      sprayCloudProperties;
+    object      solidifyingSprayCloudProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -28,7 +28,7 @@ solution
     {
         schemes
         {
-            rho             explicit 1;
+            rho             explicit 1;	// semiImplicit 1; in simplifiedSiwek (also for all other schemes)
             U               explicit 1;
             Yi              explicit 1;
             h               explicit 1;
@@ -45,6 +45,7 @@ solution
         Cp              cell;
         kappa           cell;
         p               cell;
+        // G               cell;	// added
     }
 
     integrationSchemes
@@ -64,6 +65,9 @@ constantProperties
     rho0            $rho0; // Benz: 824 // Fe: 7874
     Cp0             825; // Benz:825 // Fe: 451
 
+    // epsilon0        1;		// added
+    // f0              0.5;	// added
+
     constantVolume  true;
 }
 
@@ -78,13 +82,37 @@ subModels
 
   injectionModels
   {
+	/*
+        model1
+        {
+            type            manualInjection;
+            massTotal       #eval {$rho0 * 4/3 * pi() * pow(0.00017/2, 3)};
+            parcelBasisType mass;
+            SOI             3e-03;
+            positionsFile   "sprayCloud1Positions";
+            U0              (0 -16 0);
+            sizeDistribution
+            {
+                type        RosinRammler;
+                RosinRammlerDistribution
+                {
+                    minValue        0.00017;
+                    maxValue        0.00017;
+                    d               1;
+                    n               1;
+                }
+            }
+        }
+	*/
+
     model1
     {
         type            coneNozzleInjection;
 
     // Times
         SOI			3e-3;    // injection start time
-        duration	#eval { 10 * 2.5e-5}; // injection duration
+        // nP			2;
+	duration	#eval { 2 * 2.5e-5}; // injection duration
 
     // Quantities
         // massTotal will be calculated based on variables later
@@ -143,7 +171,7 @@ subModels
 
     atomizationModel none;
 
-    breakupModel	TAB; // KelvinHelmholtz;   //KelvinHelmholtz;   //TAB;	//ReitzDiwakar; // ReitzKHRT;
+    breakupModel	KelvinHelmholtz;   // (ETAB KelvinHelmholtz PilchErdman ReitzDiwakar ReitzKHRT SHF TAB none)
 
     stochasticCollisionModel none;
 
@@ -161,23 +189,79 @@ subModels
 
     singlePhaseMixtureCoeffs
     {
+	phases
+	(
+	    liquid
+	    {
+                Fe              0;
+                H2O             0;
+                Benz            1; // Mass Fraction of the phase
+	    }
+	);
+    }
+
+    singleMixtureFractionCoeffs	// added
+    {
         phases
         (
+            gas
+            {
+                H2O             1;
+            }
             liquid
             {
                 Fe		0;
                 H2O		0;
                 Benz		1; // Mass Fraction of the phase
             }
+            solid
+            {
+                //ash             0;
+                Fe              1;
+            }
+        YGasTot0        	0;
+        YLiquidTot0     	0;
+        YSolidTot0      	0;
         );
     }
 
-    /*liquidEvaporationBoilCoeffs
+    /*liquidEvaporationBoilCoeffs	// added
     {
         enthalpyTransfer enthalpyDifference;
 
         activeLiquids    ( H2O );
     }*/
+
+    /*
+    liquidEvaporationCoeffs
+    {
+        enthalpyTransfer enthalpyDifference;
+
+        activeLiquids
+        (
+            H2O
+        );
+    }
+
+    constantRateDevolatilisationCoeffs
+    {
+        volatileData
+        (
+            (CH4            12)
+            (H2             12)
+            (CO2            12)
+        );
+        residualCoeff   0.001;
+    }
+
+    COxidationKineticDiffusionLimitedRateCoeffs
+    {
+        Sb              1;
+        C1              5.0E-12;
+        C2              0.002;
+        E               7.9E+07;
+    }
+    */
 
     ReitzDiwakarCoeffs
     {
