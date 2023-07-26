@@ -25,21 +25,25 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef myMakeParcelForces_H
-#define myMakeParcelForces_H
+#ifndef makeMyReactingParcelCompositionModels_H
+#define makeMyReactingParcelCompositionModels_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//#include "basicSolidifyingSprayCloud.H"
-#include "myDistortedSphereDragForce.H"
+#include "NoComposition.H"
+#include "SinglePhaseMixture.H"
+#include "SingleMixtureFraction.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define myMakeParcelForces(CloudType)                                          \
+#define makeMyReactingParcelCompositionModels(CloudType)                       \
                                                                                \
-    makeParticleForceModel(CloudType);     				                       \
-    makeParticleForceModelType(myDistortedSphereDragForce, CloudType);         \
-                         
+    makeCompositionModel(CloudType);                                           \
+    makeCompositionModelType(NoComposition, CloudType);                        \
+    makeCompositionModelType(SinglePhaseMixture, CloudType);                   \
+    makeCompositionModelType(SingleMixtureFraction, CloudType);
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

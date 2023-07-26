@@ -555,7 +555,7 @@ public:
                 trackingData& td,
                 const scalar dt
             );
-
+            /*
             //- Correct surface values due to emitted species
             template<class TrackCloudType>
             void correctSurfaceValues
@@ -568,7 +568,7 @@ public:
                 scalar& mus,
                 scalar& Pr,
                 scalar& kappa
-            );
+            );*/
 
             //- Update parcel properties over the time interval
             template<class TrackCloudType>

@@ -73,6 +73,7 @@ Foam::SolidifyingSprayParcel<ParcelType>::SolidifyingSprayParcel
     YLiquid_(0), // added
     YSolid_(0) // added
 {
+    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     if (readFields)
     {
         if (is.format() == IOstream::ASCII)
@@ -254,13 +255,16 @@ void Foam::SolidifyingSprayParcel<ParcelType>::readFields
     // added <<
     // Get names and sizes for each Y...
     const label idGas = compModel.idGas();
+    Pout << __FILE__ << ": " << __LINE__ << " => idGas: " << idGas << endl;
     const wordList& gasNames = compModel.componentNames(idGas);
     const label idLiquid = compModel.idLiquid();
+    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     const wordList& liquidNames = compModel.componentNames(idLiquid);
     const label idSolid = compModel.idSolid();
     const wordList& solidNames = compModel.componentNames(idSolid);
     const wordList& stateLabels = compModel.stateLabels();
 
+    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     // Set storage for each Y... for each parcel
     for (SolidifyingSprayParcel<ParcelType>& p : c)
     {
@@ -269,9 +273,12 @@ void Foam::SolidifyingSprayParcel<ParcelType>::readFields
         p.YSolid_.setSize(solidNames.size(), 0.0);
     }
 
+    // Pout << __FILE__ << ": " << __LINE__ << " => idGas: " << idGas << endl;
+    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     // Populate YGas for each parcel
     forAll(gasNames, j)
     {
+        // Pout << __FILE__ << ": " << __LINE__ << $p.YGas_ << endl;
         IOField<scalar> YGas
         (
             c.fieldIOobject
@@ -290,6 +297,7 @@ void Foam::SolidifyingSprayParcel<ParcelType>::readFields
         }
     }
     // Populate YLiquid for each parcel
+    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     forAll(liquidNames, j)
     {
         IOField<scalar> YLiquid
@@ -309,6 +317,7 @@ void Foam::SolidifyingSprayParcel<ParcelType>::readFields
             ++i;
         }
     }
+    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     // Populate YSolid for each parcel
     forAll(solidNames, j)
     {
@@ -415,6 +424,7 @@ void Foam::SolidifyingSprayParcel<ParcelType>::writeFields
     user.write(valid);
 
     // added <<
+    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     // Write the composition fractions
     {
         const wordList& stateLabels = compModel.stateLabels();
@@ -603,6 +613,7 @@ void Foam::SolidifyingSprayParcel<ParcelType>::readObjects
     }
 
     // added <<
+    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     ParcelType::readObjects(c, obr);
 
     const label np = c.size();
@@ -709,6 +720,7 @@ void Foam::SolidifyingSprayParcel<ParcelType>::writeObjects
     }
 
     // added <<
+    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     ParcelType::writeObjects(c, obr);
 
     // const label np = c.size();   // Redeclaration
@@ -777,6 +789,7 @@ Foam::Ostream& Foam::operator<<
 )
 {
     scalarField YGasLoc(p.YGas());  // added
+    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     scalarField YLiquidLoc(p.YLiquid());  // added
     scalarField YSolidLoc(p.YSolid());  // added
 

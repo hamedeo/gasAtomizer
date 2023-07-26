@@ -84,7 +84,9 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
+        //Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         parcels.evolve();
+        //Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
 
         if (pimple.solveFlow())
         {

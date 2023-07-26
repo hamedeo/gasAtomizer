@@ -27,7 +27,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 //#include "basicKinematicCloud.H"
-#include "myBasicSprayCloud.H"
+#include "basicSolidifyingSprayCloud.H"
 // #include "makeParcelCloudFunctionObjects.H"
 
 // Kinematic
@@ -38,6 +38,6 @@ License
 // makeParcelCloudFunctionObjects(basicKinematicCloud);
 
 // Kinematic sub-models
-myMakeParcelForces(myBasicSprayCloud);
+myMakeParcelForces(basicSolidifyingSprayCloud);
 
 // ************************************************************************* //

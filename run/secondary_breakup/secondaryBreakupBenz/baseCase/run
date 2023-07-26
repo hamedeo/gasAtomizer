@@ -90,12 +90,17 @@ spinner() {
 pids=()
 
 ctrl_c() {
-	echo " Ctrl+C detected. Stopping process..."
+    	local exit_status=$?
+    	if [[ $exit_status -eq 130 ]]; then
+	    echo "Ctrl+C detected. Stopping process..."
+	fi
 	# Kill the solver process and all its child processes
-    	kill -TERM $solver_pid
+    	ps -p $solver_pid > /dev/null && kill -TERM $solver_pid
 	for pid in "${pids[@]}"; do
     	    kill "$pid" >/dev/null 2>&1
   	done
+	sleep 1
+	# kill $(ps aux | grep -E '\./run(\s|$)' | awk '{print $2}')
 	exit 0
 }
 
@@ -109,7 +114,7 @@ Solving_Intake() {
 
   echo -e "\e[1;35mYou chose '$solver' as your solver ... is that correct? (y/n)    \e[0m"
   read answer
-  
+
   if ! [[ "$answer" == "y" || "$answer" == "Y" ]]; then
       exit 1
   fi
@@ -126,6 +131,9 @@ cleanOutPutDir() {
 		if [ -n "$(ls -A outPut)" ]; then
 		echo -e "\e[1;32mCleaning outPut directory\e[0m"
 		  if $latest_time; then
+			[ -f "outPut/$veryoldsolver.log" ] && mv outPut/veryold$solver.log outPut/oldest$solver.log
+			[ -f "outPut/$oldersolver.log" ] && mv outPut/older$solver.log outPut/veryold$solver.log
+			[ -f "outPut/$oldsolver.log" ] && mv outPut/old$solver.log outPut/older$solver.log
 		  	[ -f "outPut/$solver.log" ] && mv outPut/$solver.log outPut/old$solver.log
 		  	[ -f "outPut/foamToVTK.log" ] && rm outPut/foamToVTK.log
 		  	[ -f "outPut/search.log" ] && rm outPut/search.log
@@ -231,17 +239,17 @@ targetPhraseFunction(){
 	local line_count_final=0
 	local line_count=0
 	while IFS= read -r line; do
-	((line_count++))
-	# Search for the desired phrase in each line
-	if [[ $line == *"$target_phrase"* ]]; then
-	  echo -e "target phrase detected 			: \n\n\n\n"
-	  sleep 1;
-	  # Print the context lines after finding the desired phrase
-      tail -n +$((line_count - 6)) outPut/$solver.log | head -n 60 | tee outPut/debug.log
-      open_files+=" debug.log"
-      echo -e "\n\n\n\n\n"
-	  return
-	fi
+	  ((line_count++))
+	  # Search for the desired phrase in each line
+	  if [[ $line == *"$target_phrase"* ]]; then
+	    echo -e "target phrase detected 			: \n\n\n\n"
+	    sleep 1;
+	    # Print the context lines after finding the desired phrase
+     	    tail -n +$((line_count - 6)) outPut/$solver.log | head -n 60 | tee outPut/debug.log
+     	    open_files+=" debug.log"
+     	    echo -e "\n\n\n\n\n"
+	    return
+	  fi
 	done < <(tail -n 1 -f outPut/$solver.log) &
 
         # Store the process ID (PID) of the function
@@ -253,12 +261,12 @@ printInitialLinesFunction(){
 	echo -e "\e[1;32mPrinting the first $nout lines...\e[0m"
 	local line_count=0
 	while IFS= read -r line; do
-	echo "$line"
-	((line_count++))
-	if [ $line_count -eq $nout ]; then
-	  break
-	fi
-	done < <(sleep 0.1; tail -n $nout -f outPut/$solver.log) &
+	  echo "$line"
+	  ((line_count++))
+	  if [ $line_count -eq $nout ]; then
+	    break
+	  fi
+	done < <(sleep 0.1; tail -n $nout -f outPut/$solver.log) #&
 }
 
 #######################################################################
@@ -268,7 +276,7 @@ solveParallelFunction(){
   echo -e "\e[1;31mRunning $solver ...\e[0m"
 
   # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
-  mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null & 
+  mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
 
   # Store the process ID (PID) of the solver command
   solver_pid=$!
@@ -367,7 +375,7 @@ while [[ $# -gt 0 ]]; do
       parallel=true
       parallel_inserted=true     # Update flag to indicate parallel mode is enabled
       shift 1
-      ;;  
+      ;;
     -n)
       nout=$2
       nout_inserted=true         # Update flag
@@ -388,9 +396,9 @@ while [[ $# -gt 0 ]]; do
       ;;
     -debug)
       debug_switch=true
-      debug_search=false
-      parallel=true
-      parallel_inserted=true
+      debug_search=true
+      #parallel=true
+      #parallel_inserted=true
       latest_time=true
       print_phrase=true
       shift 1
@@ -423,20 +431,20 @@ fi
 # Decide number of lines to print
 if ! $nout_inserted; then
   nout=200
-  echo -e "\e[1;35mFirst $nout lines will be printed into the console\e[0m"
+  $print_phrase && echo -e "\e[1;35mFirst $nout lines will be printed into the console\e[0m"
 fi
 
-# Assign Target phrase to search 
+# Assign Target phrase to search
 if $print_phrase; then
-    read -p $'\e[1;35mEnter the line to search for and print into console when happened    :\e[0m' target_phrase
+    read -p $'\e[1;36mEnter the line or phrase to search for and print snippet into the console in case of occurance    \e[5m:\e[0m' target_phrase
     # If the user pressed Enter without entering a value, assign an automatic value
     [ -z "$target_phrase" ] && target_phrase="parcels       = 1"
     echo "The chosen target phrase is	:$target_phrase"
 fi
 
-# Search flag 
+# Search flag
 $search_flag && IFS=',' read -rp "Enter the search phrases (comma-separated): " -a phrases
-$debug_search && phrases='new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*'}
+$debug_search && phrases='is reached\|new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*'
 
 
 sleep 3
@@ -451,7 +459,7 @@ sleep 3
 ##############################################################################
 ##############################################################################
 
-trap ctrl_c SIGINT
+trap ctrl_c EXIT ERR SIGINT
 
 start=$(date +%s.%N)
 
@@ -483,13 +491,13 @@ echo -e "\e[1;35mExecution time: $runtime seconds\e[0m"
 
 cd outPut/
 
-	# Print Errors and Warnings 
-	echo -e "\e[1;31mThese were Errors and Warnings :\e[0m"
-	grep --color=auto -B 3 -A 5 'Error*\|Warning*' blockMesh.log decomposePar.log $solver.log | tee -a errors.log | tee /dev/tty 
+	# Print Errors and Warnings
+	# echo -e "\e[1;31mThese were Errors and Warnings :\e[0m"
+	grep --color=auto -B 3 -A 5 'Error*\|Warning*' $open_files | tee -a errors.log | tee /dev/tty 
 	open_files="errors.log $open_files"
-	
+
 	sleep 1
-	
+
 	###################################################
 	# Phrases to search for inserted in options       #
 	###################################################
@@ -497,19 +505,22 @@ cd outPut/
 		# Define the color codes
 		Red=$(tput setaf 1)   # Red color for highlighting
 		Def=$(tput sgr0)   # Reset color to default
-		
+
 		# Loop through files and search for each phrase
 		for phrase in "${phrases[@]}"; do
 		  echo -e "${Red}Searching for '$phrase':${Def}" >> search.log
 		  grep --color=auto -r -n -A 2 -B 2 "$phrase" --exclude=search.log >> search.log
 		done
-		
-	elif $debug_search; then
-		grep --color=auto $predefined_phrases $solver.log 2>&1 | tee search.log > /dev/null
-	fi
-	
-	[ "$search_flag" = true ] || [ "$debug_search" = true ] && open_files+=" search.log"
 
+	elif $debug_search; then
+        	echo -e "\e[1;31mThese were predefined search results : (Can be changed inside the ./run file under phrases)\e[0m"
+		grep --color=always 'is reached' $solver.log | tail -n 10
+		# grep --color=always 'is reached' $solver.log | less -R +G -n
+		grep --color=auto "$phrases" $solver.log 2>&1 | tee search.log > /dev/null
+	fi
+
+	[ "$search_flag" = true ] || [ "$debug_search" = true ] && open_files+=" search.log"
+	echo "$open_files"
 	####################################################
 
 	if ! [ -n "$SSH_CLIENT" ] && ! [ -n "$SSH_TTY" ]; then
@@ -526,7 +537,7 @@ cd ..
 ###     ██    ██   ██ ██          ██      ██  ██ ██ ██   ██ ###
 ###     ██    ██   ██ ███████     ███████ ██   ████ ██████  ###
 ###############################################################
-
+: `
 cat << echo
 $(echo -e "\033[1;37m
                     ..**.*.
@@ -552,7 +563,7 @@ $(echo -e "\033[1;37m
    .......*.... .......***...... \033[0m")
 echo
 echo -e "\e[1;31m    fifi Howls from happiness\e[0m"
-
+`
 ################################*######################################
 ###############################*H*#####################################
 ##############################*END*####################################

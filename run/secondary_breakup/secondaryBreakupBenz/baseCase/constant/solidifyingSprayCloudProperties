@@ -62,11 +62,11 @@ constantProperties
 
     // place holders for rho0 and Cp0
     // - reset from liquid properties using T0
-    rho0            $rho0; // Benz: 824 // Fe: 7874
-    Cp0             825; // Benz:825 // Fe: 451
+    rho0            $rho0; 	// Benz: 824 // Fe: 7874
+    Cp0             825; 	// Benz:825  // Fe: 451
 
-    // epsilon0        1;		// added
-    // f0              0.5;	// added
+    // epsilon0        1;	// particle emissivity		// added
+    // f0              0.5;	// particle scattering factor	// added
 
     constantVolume  true;
 }
@@ -163,7 +163,7 @@ subModels
 
     heatTransferModel none; // RanzMarshall;
 
-    compositionModel singlePhaseMixture; // valid options: (none singlePhaseMixture)
+    compositionModel singlePhaseMixture; // valid options: (none singlePhaseMixture singleMixtureFraction)
 
     phaseChangeModel none; // valid options: (liquidEvapFuchsKnudsen liquidEvaporation liquidEvaporationBoil none)
 
@@ -206,7 +206,7 @@ subModels
         (
             gas
             {
-                H2O             1;
+                //H2O             1;
             }
             liquid
             {
@@ -217,7 +217,7 @@ subModels
             solid
             {
                 //ash             0;
-                Fe              1;
+                //Fe              1;
             }
         YGasTot0        	0;
         YLiquidTot0     	0;
@@ -225,15 +225,15 @@ subModels
         );
     }
 
-    /*liquidEvaporationBoilCoeffs	// added
+    liquidEvaporationBoilCoeffs
     {
         enthalpyTransfer enthalpyDifference;
 
         activeLiquids    ( H2O );
-    }*/
+    }
 
     /*
-    liquidEvaporationCoeffs
+    liquidEvaporationCoeffs	// added
     {
         enthalpyTransfer enthalpyDifference;
 

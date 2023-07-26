@@ -43,7 +43,7 @@ License
 #include "makeParcelHeatTransferModels.H"
 
 // Reacting
-#include "makeReactingParcelCompositionModels.H"
+#include "makeMyReactingParcelCompositionModels.H"
 #include "makeReactingParcelPhaseChangeModels.H"
 #include "makeReactingParcelSurfaceFilmModels.H"
 
@@ -74,7 +74,7 @@ makeSolidifyingSprayParcelStochasticCollisionModels(basicSolidifyingSprayCloud);
 makeParcelHeatTransferModels(basicSolidifyingSprayCloud);
 
 // Reacting sub-models
-makeReactingParcelCompositionModels(basicSolidifyingSprayCloud);
+makeMyReactingParcelCompositionModels(basicSolidifyingSprayCloud);
 makeReactingParcelPhaseChangeModels(basicSolidifyingSprayCloud);
 makeReactingParcelSurfaceFilmModels(basicSolidifyingSprayCloud);
 

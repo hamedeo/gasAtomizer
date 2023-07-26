@@ -46,7 +46,7 @@ License
 
 // Reacting
 
-#include "makeReactingParcelCompositionModels.H"
+#include "makeMyReactingParcelCompositionModels.H"
 #include "makeReactingParcelPhaseChangeModels.H"
 #include "makeReactingParcelSurfaceFilmModels.H"
 
@@ -88,7 +88,7 @@ makeParcelHeatTransferModels(myBasicSprayCloud);
 
 // Reacting sub-models
 
-makeReactingParcelCompositionModels(myBasicSprayCloud);
+makeMyReactingParcelCompositionModels(myBasicSprayCloud);
 makeReactingParcelPhaseChangeModels(myBasicSprayCloud);
 makeReactingParcelSurfaceFilmModels(myBasicSprayCloud);
 
