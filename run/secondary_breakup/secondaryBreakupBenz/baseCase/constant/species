@@ -1,10 +1,11 @@
 species
 (
-	N2
-	Fe
-	H2O
-	Benz
+    N2
+    Fe
+    H2O
+    Benz
 );
 
 reactions
 {}
+

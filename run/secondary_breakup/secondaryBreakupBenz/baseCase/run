@@ -88,6 +88,7 @@ spinner() {
 
 # Array to store PIDs of the running processes
 pids=()
+# nctrl_c=0
 
 ctrl_c() {
     	local exit_status=$?
@@ -99,7 +100,9 @@ ctrl_c() {
 	for pid in "${pids[@]}"; do
     	    kill "$pid" >/dev/null 2>&1
   	done
-	sleep 1
+	# ((nctrl_c++))
+	# [[ $nctrl_c == 1 ]] && (nano outPut/$solver.log &)
+	# sleep 1
 	# kill $(ps aux | grep -E '\./run(\s|$)' | awk '{print $2}')
 	exit 0
 }
@@ -176,7 +179,8 @@ decomposeFunction(){
 #########   decomposePar Function
 #######################################################################
 search4nDomainFunction(){
-	n=$(grep numberOfSubdomains system/decomposeParDict | cut -d';' -f1 | awk '{print $NF}')
+	n=$(foamDictionary -entry numberOfSubdomains -value system/decomposeParDict)
+	#n=$(grep numberOfSubdomains system/decomposeParDict | cut -d';' -f1 | awk '{print $NF}')
 	echo -e "\e[1;31mNumber of domains: $n\e[0m"
 }
 
@@ -195,7 +199,7 @@ solverCheckFunction(){
 	        cd $WM_PROJECT_USER_DIR/applications/solvers/ && allSolvers+=$'\n'$(tree -L 2 -d -i | grep "Foam") && cd $origCaseDir
 
 		# Extract the solver name from the controlDict file
-		solver=$(sed -n 's/.*application\s*\(\w\+\);.*/\1/p' system/controlDict)
+		solver=$(foamDictionary -entry application -value system/controlDict)
 
 		echo "$allSolvers" | grep -q "\<$solver\>"
 		# Check if the solver exists in the available solvers
@@ -245,7 +249,7 @@ targetPhraseFunction(){
 	    echo -e "target phrase detected 			: \n\n\n\n"
 	    sleep 1;
 	    # Print the context lines after finding the desired phrase
-     	    tail -n +$((line_count - 6)) outPut/$solver.log | head -n 60 | tee outPut/debug.log
+     	    tail -n +$((line_count - 6)) outPut/$solver.log | head -n 160 | tee outPut/debug.log
      	    open_files+=" debug.log"
      	    echo -e "\n\n\n\n\n"
 	    return
@@ -273,7 +277,7 @@ printInitialLinesFunction(){
 #########   solveParallel Function
 #######################################################################
 solveParallelFunction(){
-  echo -e "\e[1;31mRunning $solver ...\e[0m"
+  echo -e "\e[1;31mRunning $solver in parallel ...\e[0m"
 
   # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
   mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
@@ -295,7 +299,7 @@ solveParallelFunction(){
 #########   solveSerial Function
 #######################################################################
 solveSerialFunction(){
-  echo -e "\e[1;31mRunning $solver in parallel ...\e[0m"
+  echo -e "\e[1;31mRunning $solver in serial ...\e[0m"
 
   # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
   $solver  2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
