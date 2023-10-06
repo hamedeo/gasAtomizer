@@ -6,6 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2017 OpenFOAM Foundation
+    Copyright (C) 2018-2019 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -25,87 +26,61 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-inline Foam::scalar Foam::Fe::rho(scalar p, scalar T) const
+#include "specie.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+inline Foam::scalar Foam::solidProperties::rho() const
 {
-    return rho_.f(p, T);
+    return rho_;
 }
 
 
-inline Foam::scalar Foam::Fe::pv(scalar p, scalar T) const
+inline Foam::scalar Foam::solidProperties::Cp() const
 {
-    return pv_.f(p, T);
+    return Cp_;
 }
 
 
-inline Foam::scalar Foam::Fe::hl(scalar p, scalar T) const
+inline Foam::scalar Foam::solidProperties::kappa() const
 {
-    return hl_.f(p, T);
+    return kappa_;
 }
 
 
-inline Foam::scalar Foam::Fe::Cp(scalar p, scalar T) const
+inline Foam::scalar Foam::solidProperties::Hf() const
 {
-    return Cp_.f(p, T);
+    return Hf_;
 }
 
 
-inline Foam::scalar Foam::Fe::h(scalar p, scalar T) const
+inline Foam::scalar Foam::solidProperties::Hs(const scalar T) const
 {
-    return h_.f(p, T);
+    return Cp_*(T - Tstd);
 }
 
 
-inline Foam::scalar Foam::Fe::Cpg(scalar p, scalar T) const
+inline Foam::scalar Foam::solidProperties::emissivity() const
 {
-    return Cpg_.f(p, T);
+    return emissivity_;
 }
 
 
-inline Foam::scalar Foam::Fe::B(scalar p, scalar T) const
+inline Foam::scalar Foam::solidProperties::W() const
 {
-    return B_.f(p, T);
+    return W_;
 }
 
 
-inline Foam::scalar Foam::Fe::mu(scalar p, scalar T) const
+inline Foam::scalar Foam::solidProperties::nu() const
 {
-    return mu_.f(p, T);
+    return nu_;
 }
 
 
-inline Foam::scalar Foam::Fe::mug(scalar p, scalar T) const
+inline Foam::scalar Foam::solidProperties::E() const
 {
-    return mug_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::kappa(scalar p, scalar T) const
-{
-    return kappa_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::kappag(scalar p, scalar T) const
-{
-    return kappag_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::sigma(scalar p, scalar T) const
-{
-    return sigma_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::D(scalar p, scalar T) const
-{
-    return D_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::D(scalar p, scalar T, scalar Wb) const
-{
-    return D_.f(p, T, Wb);
+    return E_;
 }
 
 

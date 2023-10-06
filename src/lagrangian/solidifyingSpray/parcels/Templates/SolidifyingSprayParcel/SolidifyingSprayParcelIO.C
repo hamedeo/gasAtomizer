@@ -73,7 +73,7 @@ Foam::SolidifyingSprayParcel<ParcelType>::SolidifyingSprayParcel
     YLiquid_(0), // added
     YSolid_(0) // added
 {
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     if (readFields)
     {
         if (is.format() == IOstream::ASCII)
@@ -424,7 +424,7 @@ void Foam::SolidifyingSprayParcel<ParcelType>::writeFields
     user.write(valid);
 
     // added <<
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    Pout << __FILE__ << ": " << __LINE__ << " is reached : " << __FUNCTION__ << endl;
     // Write the composition fractions
     {
         const wordList& stateLabels = compModel.stateLabels();
@@ -789,7 +789,7 @@ Foam::Ostream& Foam::operator<<
 )
 {
     scalarField YGasLoc(p.YGas());  // added
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     scalarField YLiquidLoc(p.YLiquid());  // added
     scalarField YSolidLoc(p.YSolid());  // added
 

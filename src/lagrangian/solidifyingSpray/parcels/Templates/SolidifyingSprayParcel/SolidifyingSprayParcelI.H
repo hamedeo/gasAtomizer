@@ -277,7 +277,6 @@ YSolid() const
     return YSolid_;
 }
 
-
 template<class ParcelType>  // added
 inline Foam::scalarField& Foam::SolidifyingSprayParcel<ParcelType>::YGas()
 {
@@ -297,7 +296,6 @@ inline Foam::scalarField& Foam::SolidifyingSprayParcel<ParcelType>::YSolid()
 {
     return YSolid_;
 }
-
 
 template<class ParcelType>
 inline Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::d0() const

@@ -30,22 +30,28 @@ chemistryReader	foamChemistryReader;
 foamChemistryFile	"<constant>/species";
 foamChemistryThermoFile "<constant>/thermo.species";
 
-
-
-
 newFormat       yes;
 
 inertSpecie     N2;
 
+gas
+{
+    // Benz;
+}
+
 liquids
 {
+    //Benz;
+    //H2O;
     Fe;
-    H2O;
-    Benz;
 }
 
 solids
-{}
+{
+    // Benz;
+    // H2O;
+    SolidFe;
+}
 
 
 // ************************************************************************* //

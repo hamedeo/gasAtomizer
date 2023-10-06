@@ -51,7 +51,10 @@ Foam::Fe::Fe()
         1548.6,	//Tt -> triple point temperature		(Fe)
         0.16,		//Pt -> triple point pressure			(Fe)
         3135,		//Tb -> normal boiling point			(Fe)
-        1811		//Tm or Tref -> normal melting point			(Fe)
+        // 1811		//Tm or Tref -> normal melting point			(Fe)
+        6.1709e-30,
+        0.3449,
+        4.7813e+4
     ),
     rho_				//density	(Fe) Brillo 2005 "Surface tension of ...  iron and their binary alloys" NSRDS0
     (
@@ -73,6 +76,22 @@ Foam::Fe::Fe()
     hl_(6340765),			//heat of vapourisation	(Fe)
     Cp_(825),				//heat capacity		(Fe)
     h_(2220432),			//enthalpy			(Fe)
+    Cpg_
+    (
+        1851.73466555648,
+        1487.53816264224,
+        2609.3,
+        493.366638912018,
+        1167.6
+    ),
+    B_
+    (
+       -0.0012789342214821,
+        1.4909797391063,
+       -1563696.91923397,
+        1.85445462114904e+19,
+       -7.68082153760755e+21
+    ),
     mu_     				//dynamic viscosity		(Fe) Assael 2006 "Reference Data for the Density ... Iron" NSRDS3   
     (
         0,
@@ -80,7 +99,9 @@ Foam::Fe::Fe()
         -6205.35,
         1
     ),
+    mug_(2.6986e-06, 0.498, 1257.7, -19570),
     kappa_(38),	    		//thermal conductivity		(Fe)
+    kappag_(6.977e-05, 1.1243, 844.9, -148850),
     sigma_      		//surface tension		(Fe) Reference Data for the Density and Viscosity of Liquid Aluminum and Liquid Iron" NSRDS0
     (
         1.900586,         
@@ -89,7 +110,9 @@ Foam::Fe::Fe()
         0,
         0,
         0
-    )
+    ),
+    // sigma_(1.2)
+    D_(15.0, 15.0, 18.015, 28)
 {}
 
 
@@ -101,9 +124,15 @@ Foam::Fe::Fe
     const thermophysicalConstant& heatOfVapourisation,
     const thermophysicalConstant& heatCapacity,
     const thermophysicalConstant& enthalpy,
+    const NSRDSfunc7& idealGasHeatCapacity,
+    const NSRDSfunc4& secondVirialCoeff,
     const NSRDSfunc3& dynamicViscosity,
+    const NSRDSfunc2& vapourDynamicViscosity,
     const thermophysicalConstant& thermalConductivity,
-    const NSRDSfunc0& surfaceTension
+    const NSRDSfunc2& vapourThermalConductivity,
+    const NSRDSfunc0& surfaceTension,
+    // const thermophysicalConstant& surfaceTension
+    const APIdiffCoefFunc& vapourDiffussivity
 )
 :
     liquidProperties(l),
@@ -112,9 +141,14 @@ Foam::Fe::Fe
     hl_(heatOfVapourisation),
     Cp_(heatCapacity),
     h_(enthalpy),
+    Cpg_(idealGasHeatCapacity),
+    B_(secondVirialCoeff),
     mu_(dynamicViscosity),
+    mug_(vapourDynamicViscosity),
     kappa_(thermalConductivity),
-    sigma_(surfaceTension)
+    kappag_(vapourThermalConductivity),
+    sigma_(surfaceTension),
+    D_(vapourDiffussivity)
 {}
 
 

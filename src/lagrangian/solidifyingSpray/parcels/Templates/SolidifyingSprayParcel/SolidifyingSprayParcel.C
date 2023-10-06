@@ -30,6 +30,8 @@ License
 #include "CompositionModel.H"
 #include "AtomizationModel.H"
 #include "mathematicalConstants.H"  // added
+// #include "PhaseChangeModel.H"  // added
+
 
 using namespace Foam::constant::mathematical;  // added
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -44,10 +46,68 @@ template<class ParcelType>  // added
 const Foam::label Foam::SolidifyingSprayParcel<ParcelType>::SLD(2);
 
 // * * * * * * * * * * * *  Private Member Functions * * * * * * * * * * * * //
+/*
+template<class ParcelType>
+Foam::scalar Foam::ReactingParcel<ParcelType>::updateMassFraction
+(
+    const scalar mass0,
+    const scalarField& dMass,
+    scalarField& Y
+) const
+{
+    scalar mass1 = mass0 - sum(dMass);
+
+    // only update the mass fractions if the new particle mass is finite
+    if (mass1 > ROOTVSMALL)
+    {
+        forAll(Y, i)
+        {
+            Y[i] = (Y[i]*mass0 - dMass[i])/mass1;
+        }
+    }
+
+    return mass1;
+}
+*/
+
+template<class ParcelType>
+bool Foam::SolidifyingSprayParcel<ParcelType>::Solidification
+(
+    const scalar T,
+    const scalar Tm0, // Add Tm0 as a function parameter
+    scalarField& YLiquid_,
+    scalarField& YSolid_
+) 
+{
+    scalarField& YMix = this->Y();
+
+    // Introduce a flag to track whether the condition has been entered
+    static bool conditionEntered = false;
+
+    Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
+    if (T <= Tm0 && !conditionEntered) 
+    {
+        // Pout << __FILE__ << ": " << __LINE__ << ": " << "Switch is activated." << endl;
+        //forAll(YLIQ, i) {
+            YSolid_[0] = 1;
+            YLiquid_[0] = 0;
+            YMix[1] = 0;
+            YMix[2] = 1;
+        // Pout << __FILE__ << ": " << __LINE__ << ": " << "Switch is applied. YMix: " << YMix << endl;
+        // Pout << __FILE__ << ": " << __LINE__ << ": " << "YLiquid_ : " << YLiquid_ << endl;
+        // Pout << __FILE__ << ": " << __LINE__ << ": " << "YSolid_ : " << YSolid_ << endl;
+        // Pout << __FILE__ << " : " << __LINE__ << " => YMixture0_: " << YMixture0_ << endl;
+        conditionEntered = true;
+        //}
+        return true;
+    }
+    return false;
+}
+
 
 template<class ParcelType>  // added
 template<class TrackCloudType>
-Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::CpEff
+Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::CpEff    // also 4 HsEff LEff
 (
     TrackCloudType& cloud,
     trackingData& td,
@@ -65,7 +125,7 @@ Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::CpEff
 }
 
 
-template<class ParcelType>  // added
+template<class ParcelType>
 template<class TrackCloudType>
 Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::HsEff
 (
@@ -85,7 +145,7 @@ Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::HsEff
 }
 
 
-template<class ParcelType>  // added
+template<class ParcelType>
 template<class TrackCloudType>
 Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::LEff
 (
@@ -104,7 +164,7 @@ Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::LEff
       + this->Y_[SLD]*cloud.composition().L(idS, YSolid_, p, T);
 }
 
-
+/*
 template<class ParcelType>  // added
 Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::updateMassFractions
 (
@@ -138,48 +198,7 @@ Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::updateMassFractions
     return massNew;
 }
 
-
-template<class ParcelType>  // added
-template<class TrackCloudType>
-Foam::scalar Foam::SolidifyingSprayParcel<ParcelType>::updatedDeltaVolume
-(
-    TrackCloudType& cloud,
-    const scalarField& dMassGas,
-    const scalarField& dMassLiquid,
-    const scalarField& dMassSolid,
-    const label idG,
-    const label idL,
-    const label idS,
-    const scalar p,
-    const scalar T
-)
-{
-    const auto& props = cloud.composition().phaseProps()[idG];
-    const auto& thermo = cloud.composition().thermo();
-
-    scalarField dVolGas(dMassGas.size(), Zero);
-    forAll(dMassGas, i)
-    {
-        label cid = props.carrierIds()[i];
-        dVolGas[i] = -dMassGas[i]/thermo.carrier().rho(cid, p, T);
-    }
-
-    scalarField dVolLiquid(dMassLiquid.size(), Zero);
-    forAll(dMassLiquid, i)
-    {
-        dVolLiquid[i] =
-            -dMassLiquid[i]/thermo.liquids().properties()[i].rho(p, T);
-    }
-
-    scalarField dVolSolid(dMassSolid.size(), Zero);
-    forAll(dMassSolid, i)
-    {
-        dVolSolid[i] = -dMassSolid[i]/thermo.solids().properties()[i].rho();
-    }
-
-    return (sum(dVolGas) + sum(dVolLiquid) + sum(dMassSolid));
-}
-
+*/
 
 // * * * * * * * * * * *  Protected Member Functions * * * * * * * * * * * * //
 
@@ -217,29 +236,24 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
     const scalar dt
 )
 {
-    // Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
-    // const auto& composition = cloud.composition();
-    // Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    const auto& composition = cloud.composition();
     // const auto& liquids = composition.liquids();
     // added <<
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
-    typedef typename TrackCloudType::reactingCloudType reactingCloudType;
-    const CompositionModel<reactingCloudType>& composition =
-        cloud.composition();
-
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
-    const auto& liquids = composition.liquids();
+    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
+    //typedef typename TrackCloudType::reactingCloudType reactingCloudType;
+    //const CompositionModel<reactingCloudType>& composition =
+    //    cloud.composition();
 
 
     // Define local properties at beginning of timestep
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    const scalar np0 = this->nParticle_;
-    const scalar d0 = this->d_;
-    const vector& U0 = this->U_;
+    // const scalar np0 = this->nParticle_;
+    // const scalar d0 = this->d_;
+    // const vector& U0 = this->U_;
     const scalar T0 = this->T_;
-    const scalar mass0 = this->mass();
-    const scalar rho0 = this->rho_;
+    // const scalar mass0 = this->mass();
+    // const scalar rho0 = this->rho_;
 
 
     const scalar pc = td.pc();
@@ -248,7 +262,22 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
     const label idG = composition.idGas();
     const label idL = composition.idLiquid();
     const label idS = composition.idSolid();
+    // const label YMx() = composition.YMixture0();
+    // YMixture0() = this->composition.YMixture0();
+
+    YGas() = composition.Y0(idG);     // added
+    YLiquid() = composition.Y0(idL);  // added
+    YSolid() = composition.Y0(idS);   // added
+
+    const auto& liquids = composition.liquids();
+    // const auto& solids = composition.solids();
+    
     // added >>
+    // Pout << __FILE__ << " : " << __LINE__ << " => YLiquid_ " << YLiquid_ << endl;
+    // Pout << __FILE__ << " : " << __LINE__ << " => YLiquid_[0] " << YLiquid_[0] << endl;
+    // Pout << __FILE__ << " : " << __LINE__ << " => YSolid_ " << YSolid_ << endl;
+    // Pout << __FILE__ << " : " << __LINE__ << " => YSolid_[0] " << YSolid_[0] << endl;
+    Pout << __FILE__ << " : " << __LINE__ << " => YMixture0_: " << composition.YMixture0() << ", " << this->Y() << endl;
 
     // Check if parcel belongs to liquid core
     if (liquidCore() > 0.5)
@@ -256,16 +285,17 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
         // Liquid core parcels should not experience coupled forces
         cloud.forces().setCalcCoupled(false);
     }
-
     // Get old mixture composition
-    scalarField X0(liquids.X(this->Y()));
+    scalarField X0(liquids.X(this->YLiquid()));
+
+    const scalar Tm0 = 0; // liquids.Tm(X0); // 1811; // added
 
     // Check if we have critical or boiling conditions
     scalar TMax = liquids.Tc(X0);
     // const scalar T0 = this->T(); // Redeclaration
     const scalar pc0 = td.pc();
     if (liquids.pv(pc0, T0, X0) >= pc0*0.999)
-    {
+    {    
         // Set TMax to boiling temperature
         TMax = liquids.pvInvert(pc0, X0);
     }
@@ -274,65 +304,33 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
     cloud.constProps().setTMax(TMax);
 
     // Store the parcel properties
-    this->Cp() = liquids.Cp(pc0, T0, X0);
-    sigma_ = liquids.sigma(pc0, T0, X0);
-    // const scalar rho0 = liquids.rho(pc0, T0, X0);    // Redeclaration
+    // this->Cp() = liquids.Cp(pc0, T0, X0);
+    this->Cp_ = CpEff(cloud, td, pc, this->T_, idG, idL, idS);
+    // this->sigma_ = this->cloud.composition().sigma(idC, YGas_, p, T);
+    sigma_ = liquids.sigma(pc0, T0, X0);    //- Liquid surface tension
+    const scalar rho0 = liquids.rho(pc0, T0, X0);    // Redeclaration
     this->rho() = rho0;
-    // const scalar mass0 = this->mass();    // Redeclaration
-    mu_ = liquids.mu(pc0, T0, X0);
+    const scalar mass0 = this->mass();    // Redeclaration
+    mu_ = liquids.mu(pc0, T0, X0);  //- Liquid dynamic viscosity
 
-    ParcelType::calc(cloud, td, dt);
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // ParcelType::calc(cloud, td, dt); ///////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    if (td.keepParticle)
-    {
-        // Reduce the stripped parcel mass due to evaporation
-        // assuming the number of particles remains unchanged
-        this->ms() -= this->ms()*(mass0 - this->mass())/mass0;
+    // Define local properties at beginning of time step
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        // Update Cp, sigma, density and diameter due to change in temperature
-        // and/or composition
-        scalar T1 = this->T();
-        scalarField X1(liquids.X(this->Y()));
+    const scalar np0 = this->nParticle_;
+    const scalar d0 = this->d_;
+    const vector& U0 = this->U_;
 
-        this->Cp() = liquids.Cp(td.pc(), T1, X1);
-
-        sigma_ = liquids.sigma(td.pc(), T1, X1);
-
-        scalar rho1 = liquids.rho(td.pc(), T1, X1);
-        this->rho() = rho1;
-
-        mu_ = liquids.mu(td.pc(), T1, X1);
-
-        scalar d1 = this->d()*cbrt(rho0/rho1);
-        this->d() = d1;
-
-        if (liquidCore() > 0.5)
-        {
-            calcAtomization(cloud, td, dt);
-
-            // Preserve the total mass/volume by increasing the number of
-            // particles in parcels due to breakup
-            scalar d2 = this->d();
-            this->nParticle() *= pow3(d1/d2);
-        }
-        else
-        {
-            calcBreakup(cloud, td, dt);
-        }
-    }
-
-    // Restore coupled forces
-    cloud.forces().setCalcCoupled(true);
-
-    // added <<
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     // Calc surface values
     scalar Ts, rhos, mus, Prs, kappas;
     this->calcSurfaceValues(cloud, td, T0, Ts, rhos, mus, Prs, kappas);
-    scalar Res = this->Re(rhos, U0, td.Uc(), d0, mus); 
+    scalar Res = this->Re(rhos, U0, td.Uc(), d0, mus);
 
     // Sources
-    //~~~~~~~~
+    // ~~~~~~~
 
     // Explicit momentum source for particle
     vector Su = Zero;
@@ -355,9 +353,8 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
 
     // 1. Compute models that contribute to mass transfer - U, T held constant
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Phase change in liquid phase
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Phase change
+    // ~~~~~~~~~~~~
 
     // Mass transfer due to phase change
     scalarField dMassPC(YLiquid_.size(), Zero);
@@ -372,7 +369,7 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
     scalarField Cs(composition.carrier().species().size(), Zero);
 
     // Calc mass and enthalpy transfer due to phase change
-    this->calcPhaseChange
+    ParcelType::calcPhaseChange
     (
         cloud,
         td,
@@ -385,10 +382,10 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
         T0,
         mass0,
         rho0,
-        idL,
-        YMix[LIQ],
+        0,
+        1.0,
         YLiquid_,
-        YMix[SLD]*YSolid_,
+        scalarField(),
         dMassPC,
         Sh,
         Ne,
@@ -396,79 +393,22 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
         Cs
     );
 
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+
     // 2. Update the parcel properties due to change in mass
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    scalarField dMass(dMassPC);
+    scalar mass1 = ParcelType::updateMassFraction(mass0, dMass, YLiquid_);
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
-    // Added these to solve the "NOT Declaration" error for when theare called
-    // they are in fact related to devolitilization and surface reaction models
-    // but for now i decided to keep them like that. probably we can relate them
-    // to our models ot just simply replace it with one universal mass for each phase
-    scalarField dMassDV(YGas_.size(), Zero);
-    scalarField dMassSRGas(YGas_.size(), Zero);
-    scalarField dMassSRLiquid(YLiquid_.size(), Zero);
-    scalarField dMassSRSolid(YSolid_.size(), Zero);
-    scalarField dMassSRCarrier(composition.carrier().species().size(), Zero);
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
-    scalarField dMassGas(dMassDV + dMassSRGas);    // NOT declaration
-    scalarField dMassLiquid(dMassPC + dMassSRLiquid);
-    scalarField dMassSolid(dMassSRSolid);
-
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
-    scalar mass1 = mass0 - sum(dMassGas) - sum(dMassLiquid) - sum(dMassSolid);
-
-    // Remove the particle when mass falls below minimum threshold
-    if (np0*mass1 < cloud.constProps().minParcelMass())
-    {
-        td.keepParticle = false;
-
-        if (cloud.solution().coupled())
-        {
-            scalar dm = np0*mass0;
-
-            // Absorb parcel into carrier phase
-            forAll(YGas_, i)
-            {
-                label gid = composition.localToCarrierId(GAS, i);
-                cloud.rhoTrans(gid)[this->cell()] += dm*YMix[GAS]*YGas_[i];
-            }
-            forAll(YLiquid_, i)
-            {
-                label gid = composition.localToCarrierId(LIQ, i);
-                cloud.rhoTrans(gid)[this->cell()] += dm*YMix[LIQ]*YLiquid_[i];
-            }
-
-            // No mapping between solid components and carrier phase
-            /*
-            forAll(YSolid_, i)
-            {
-                label gid = composition.localToCarrierId(SLD, i);
-                cloud.rhoTrans(gid)[this->cell()] += dm*YMix[SLD]*YSolid_[i];
-            }
-            */
-
-            cloud.UTrans()[this->cell()] += dm*U0;
-
-            cloud.hsTrans()[this->cell()] +=
-                dm*HsEff(cloud, td, pc, T0, idG, idL, idS);
-
-            cloud.phaseChange().addToPhaseChangeMass(np0*mass1);
-        }
-
-        return;
-    }
-
-    (void)updateMassFractions(mass0, dMassGas, dMassLiquid, dMassSolid);
+    this->Cp_ = CpEff(cloud, td, pc, this->T_, idG, idL, idS);
+    // this->Cp() = liquids.Cp(pc0, T0, X0);
 
     if
     (
         cloud.constProps().volUpdateType()
-     == constantProperties::volumeUpdateType::mUndefined
+    == constantProperties::volumeUpdateType::mUndefined
     )
     {
+        // Update particle density or diameter
         if (cloud.constProps().constantVolume())
         {
             this->rho_ = mass1/this->volume();
@@ -495,34 +435,63 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
             case constantProperties::volumeUpdateType::mUpdateRhoAndVol :
             {
                 scalar deltaVol =
-                    updatedDeltaVolume
+                    ParcelType::updatedDeltaVolume
                     (
                         cloud,
-                        dMassGas,
-                        dMassLiquid,
-                        dMassSolid,
-                        idG,
-                        idL,
-                        idS,
-                        pc,
+                        dMass,
+                        td.pc(),
                         T0
                     );
-
-                this->rho_ = mass1/(this->volume() + deltaVol);
+                this->rho_ = mass1/(this->volume() - deltaVol);
                 this->d_ = cbrt(mass1/this->rho_*6/pi);
                 break;
             }
         }
     }
+
+    // Remove the particle when mass falls below minimum threshold
+    if (np0*mass1 < cloud.constProps().minParcelMass())
+    {
+        td.keepParticle = false;
+
+        if (cloud.solution().coupled())
+        {
+            scalar dm = np0*mass0;
+
+            // Absorb parcel into carrier phase
+            forAll(YLiquid_, i)
+            {
+                scalar dmi = dm*YLiquid_[i];
+                label gid = composition.localToCarrierId(LIQ, i);
+                // scalar hs = composition.carrier().Hs(gid, td.pc(), T0);
+
+                cloud.rhoTrans(gid)[this->cell()] += dmi;
+                // cloud.hsTrans()[this->cell()] += dmi*hs;
+            }
+            forAll(YSolid_, i)
+            {
+                label gid = composition.localToCarrierId(SLD, i);
+                cloud.rhoTrans(gid)[this->cell()] += dm*YMix[SLD]*YSolid_[i];
+            }
+
+            cloud.UTrans()[this->cell()] += dm*U0;
+
+            cloud.hsTrans()[this->cell()] +=
+                dm*HsEff(cloud, td, pc, T0, idG, idL, idS);
+
+            cloud.phaseChange().addToPhaseChangeMass(np0*mass1);
+        }
+
+        return;
+    }
+
     // Correct surface values due to emitted species
-    // this->correctSurfaceValues(cloud, td, Ts, Cs, rhos, mus, Prs, kappas);
-    Res = this->Re(rhos, U0, td.Uc(), this->d_, mus);
+    ParcelType::correctSurfaceValues(cloud, td, Ts, Cs, rhos, mus, Prs, kappas);
+    Res = this->Re(rhos, U0, td.Uc(), this->d(), mus);
 
 
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     // 3. Compute heat- and momentum transfers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Heat transfer
     // ~~~~~~~~~~~~~
 
@@ -542,9 +511,14 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
             Sph
         );
 
-
     this->Cp_ = CpEff(cloud, td, pc, this->T_, idG, idL, idS);
-
+    // this->CpEff_ = composition.Cp(0, Y_, td.pc(), T0);
+    // this->Cp() = liquids.Cp(pc0, T0, X0);
+    
+    if (YLiquid_[0] != 0) // added condition
+    {
+        (void)Solidification(this->T_, Tm0, YLiquid_, YSolid_);
+    }
 
     // Motion
     // ~~~~~~
@@ -556,40 +530,19 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
 
     // 4. Accumulate carrier phase source terms
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     if (cloud.solution().coupled())
     {
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+        // Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl; 
         // Transfer mass lost to carrier mass, momentum and enthalpy sources
-        forAll(YGas_, i)
-        {
-            Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
-            scalar dm = np0*dMassGas[i];
-            label gid = composition.localToCarrierId(GAS, i);
-            scalar hs = composition.carrier().Hs(gid, pc, T0);
-            cloud.rhoTrans(gid)[this->cell()] += dm;
-            cloud.UTrans()[this->cell()] += dm*U0;
-            cloud.hsTrans()[this->cell()] += dm*hs;
-        }
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << " => YLiquid_: " << YLiquid_ << endl;
-        forAll(YLiquid_, i)
+        /*forAll(YLiquid_, i)
         {
             scalar dm = np0*dMassLiquid[i];
-            Pout << __FILE__ << ": " << __LINE__ << " is reached" << " => dm: " << dm << endl;
-            Pout << __FILE__ << ": " << __LINE__ << " is reached" << " => LIQ: " << LIQ << endl;
             label gid = composition.localToCarrierId(LIQ, i);
-            Pout << __FILE__ << ": " << __LINE__ << " is reached" << " => gid: " << gid << endl;
             scalar hs = composition.carrier().Hs(gid, pc, T0);
-            Pout << __FILE__ << ": " << __LINE__ << " is reached" << " => hs: " << hs << endl;
             cloud.rhoTrans(gid)[this->cell()] += dm;
             cloud.UTrans()[this->cell()] += dm*U0;
             cloud.hsTrans()[this->cell()] += dm*hs;
-            Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         }
-
-        // No mapping between solid components and carrier phase
-        /*
         forAll(YSolid_, i)
         {
             scalar dm = np0*dMassSolid[i];
@@ -599,20 +552,21 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
             cloud.UTrans()[this->cell()] += dm*U0;
             cloud.hsTrans()[this->cell()] += dm*hs;
         }
-        */
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
-        forAll(dMassSRCarrier, i)
+        forAll(dMass, i)
         {
-            Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
-            scalar dm = np0*dMassSRCarrier[i];
-            Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+            scalar dm = np0*dMass[i];
             scalar hs = composition.carrier().Hs(i, pc, T0);
             cloud.rhoTrans(i)[this->cell()] += dm;
             cloud.UTrans()[this->cell()] += dm*U0;
             cloud.hsTrans()[this->cell()] += dm*hs;
-        }
+            scalar dm = np0*dMass[i];
+            label gid = composition.localToCarrierId(LIQ, i);
+            scalar hs = composition.carrier().Hs(gid, td.pc(), T0); //should I ???
 
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+            cloud.rhoTrans(gid)[this->cell()] += dm;
+            cloud.UTrans()[this->cell()] += dm*U0;
+            cloud.hsTrans()[this->cell()] += dm*hs;
+        }*/
         // Update momentum transfer
         cloud.UTrans()[this->cell()] += np0*dUTrans;
         cloud.UCoeff()[this->cell()] += np0*Spu;
@@ -620,19 +574,68 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
         // Update sensible enthalpy transfer
         cloud.hsTrans()[this->cell()] += np0*dhsTrans;
         cloud.hsCoeff()[this->cell()] += np0*Sph;
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+
         // Update radiation fields
         if (cloud.radiation())
-        {
+        {    
             const scalar ap = this->areaP();
             const scalar T4 = pow4(T0);
             cloud.radAreaP()[this->cell()] += dt*np0*ap;
             cloud.radT4()[this->cell()] += dt*np0*T4;
             cloud.radAreaPT4()[this->cell()] += dt*np0*ap*T4;
+
         }
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     }
-    // added >>
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    this->Cp_ = CpEff(cloud, td, pc, this->T_, idG, idL, idS);
+    // if ()
+    // {
+    if (td.keepParticle && YLiquid_[0] == 1)
+    {
+        // Reduce the stripped parcel mass due to evaporation
+        // assuming the number of particles remains unchanged
+        this->ms() -= this->ms()*(mass0 - this->mass())/mass0;
+
+        // Update Cp, sigma, density and diameter due to change in temperature
+        // and/or composition
+        scalar T1 = this->T();
+        scalarField X1(liquids.X(this->YLiquid()));
+
+        this->Cp() = liquids.Cp(td.pc(), T1, X1);
+
+        sigma_ = liquids.sigma(td.pc(), T1, X1);
+
+        scalar rho1 = liquids.rho(td.pc(), T1, X1);
+        this->rho() = rho1;
+
+        mu_ = liquids.mu(td.pc(), T1, X1);
+
+        scalar d1 = this->d()*cbrt(rho0/rho1);
+        this->d() = d1;
+
+        if (liquidCore() > 0.5)
+        {
+            calcAtomization(cloud, td, dt);
+
+            // Preserve the total mass/volume by increasing the number of
+            // particles in parcels due to breakup
+            scalar d2 = this->d();
+            this->nParticle() *= pow3(d1/d2);
+        }
+        else
+        {
+            // Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+            // if (YLiquid_[0] == 1) calcBreakup(cloud, td, dt);
+            calcBreakup(cloud, td, dt);
+        }
+    }
+    // }
+
+    // Restore coupled forces
+    cloud.forces().setCalcCoupled(true);
+
 }
 
 
@@ -712,9 +715,10 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calcBreakup
     TrackCloudType& cloud,
     trackingData& td,
     const scalar dt
+    // const scalarField& YLiquidEff,
 )
 {
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     auto& breakup = cloud.breakup();
 
     if (!breakup.active())
@@ -736,6 +740,9 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calcBreakup
     scalar rhoAv = td.pc()/(R*Tav);
     scalar muAv = td.muc();
     vector Urel = this->U() - td.Uc();
+    Pout << __FILE__ << ": " << __LINE__ << "this->U(): " <<  this->U() << endl;
+    Pout << __FILE__ << ": " << __LINE__ << "td.Uc(): " <<  td.Uc() << endl;
+    Pout << __FILE__ << ": " << __LINE__ << "Urel: " <<  Urel << endl;
     scalar Urmag = mag(Urel);
     scalar Re = this->Re(rhoAv, this->U(), td.Uc(), this->d(), muAv);
 
@@ -867,7 +874,7 @@ void Foam::SolidifyingSprayParcel<ParcelType>::solveTABEq
     const scalar dt
 )
 {
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     const scalar& TABCmu = cloud.breakup().TABCmu();
     const scalar& TABtwoWeCrit = cloud.breakup().TABtwoWeCrit();
     const scalar& TABComega = cloud.breakup().TABComega();

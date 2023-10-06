@@ -45,7 +45,7 @@ Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz
     msLimit_(0.03),
     weberLimit_(6.0)
 {
-	Pout<< " Test KH Constructor 1 is used " << endl;
+	// Pout<< " Test KH Constructor 1 is used " << endl;
     if (!this->defaultCoeffs(true))
     {
         this->coeffDict().readEntry("B0", b0_);
@@ -68,7 +68,7 @@ Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz(const KelvinHelmholtz<CloudTyp
     cRT_(bum.cRT_),
     msLimit_(bum.msLimit_),
     weberLimit_(bum.weberLimit_)
-{        Pout<< " Test KH Constructor 2 is used " << endl;
+{        // Pout<< " Test KH Constructor 2 is used " << endl;
 }
 
 
@@ -119,7 +119,7 @@ bool Foam::KelvinHelmholtz<CloudType>::update
     scalar mass = nParticle*d3*rhopi6;
     scalar mass0 = nParticle*d03*rhopi6;
 
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    // Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
 
     scalar weGas = rhoc*sqr(Urmag)*r/sigma;
     scalar weLiquid = rho*sqr(Urmag)*r/sigma;
@@ -127,7 +127,6 @@ bool Foam::KelvinHelmholtz<CloudType>::update
     // Note: Reitz is using radius instead of diameter for Re-number
     //scalar reLiquid = rho*Urmag*d/mu; 	//Use diameter for the Reynolds number of the liquid
     scalar reLiquid = rho*Urmag*r/mu;
-
     scalar ohnesorge = sqrt(weLiquid)/(reLiquid + VSMALL);
     scalar taylor = ohnesorge*sqrt(weGas);
 
@@ -150,7 +149,15 @@ bool Foam::KelvinHelmholtz<CloudType>::update
 
     // stable KH diameter
     scalar dc = 2.0*b0_*lambdaKH;
-    
+
+    Pout << __FILE__ << ": " << __LINE__ << "Urmag: " << Urmag << endl;
+    Pout << __FILE__ << ": " << __LINE__ << "rhoc: " <<  rhoc << endl;
+    Pout << __FILE__ << ": " << __LINE__ << "sigma: " <<  sigma << endl;
+    Pout << __FILE__ << ": " << __LINE__ << "dc: " <<  dc << endl;
+    Pout << __FILE__ << ": " << __LINE__ << "d: " <<  d << endl;
+    Pout << __FILE__ << ": " << __LINE__ << "weGas: " <<  weGas << endl;
+    Pout << __FILE__ << ": " << __LINE__ << "weberLimit_: " <<  weberLimit_ << endl;
+
     if (dc < d)
     {
         // no breakup below Weber = 12

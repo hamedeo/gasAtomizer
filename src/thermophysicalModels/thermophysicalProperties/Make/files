@@ -4,4 +4,7 @@ liquidProperties/Fe/Fe.C
 liquidProperties/Benz/Benz.C
 liquidProperties/liquidProperties/liquidProperties.C
 
+solidProperties/SolidFe/SolidFe.C
+solidProperties/solidProperties/solidProperties.C
+
 LIB = $(FOAM_USER_LIBBIN)/libmyThermophysicalProperties

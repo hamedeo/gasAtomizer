@@ -55,13 +55,14 @@ Foam::Benz::Benz()
         0.3449,
         4.7813e+4
     ),
-rho_(									//Density (Benz)
-    824
+    rho_(									//Density (Benz)
+    	824
     ),
-    pv_(73.649, -7258.2, -7.3037, 4.1653e-06, 2),
-    hl_(647.13, 2889425.47876769, 0.3199, -0.212, 0.25795, 0),
+    	pv_(73.649, -7258.2, -7.3037, 4.1653e-06, 2),
+    	hl_(647.13, 2889425.47876769, 0.3199, -0.212, 0.25795, 0),
     Cp_
     (
+	//2000
         15341.1046350264,
        -116.019983347211,
         0.451013044684985,
@@ -112,6 +113,7 @@ Foam::Benz::Benz
     const NSRDSfunc1& vapourPressure,
     const NSRDSfunc6& heatOfVapourisation,
     const NSRDSfunc0& heatCapacity,
+    // const thermophysicalConstant& heatCapacity,
     const NSRDSfunc0& enthalpy,
     const NSRDSfunc7& idealGasHeatCapacity,
     const NSRDSfunc4& secondVirialCoeff,

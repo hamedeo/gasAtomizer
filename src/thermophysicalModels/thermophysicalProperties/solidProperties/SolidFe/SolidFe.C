@@ -6,6 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2017 OpenFOAM Foundation
+    Copyright (C) 2018-2019 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -25,87 +26,55 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-inline Foam::scalar Foam::Fe::rho(scalar p, scalar T) const
+#include "SolidFe.H"
+#include "addToRunTimeSelectionTable.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
 {
-    return rho_.f(p, T);
+    defineTypeNameAndDebug(SolidFe, 0);
+    addToRunTimeSelectionTable(solidProperties, SolidFe,);
+    addToRunTimeSelectionTable(solidProperties, SolidFe, dictionary);
+}
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::SolidFe::SolidFe()
+:
+    solidProperties(7870, 444, 80.4, 0.0, 0.35, 55.845, 0.0, 0.0)
+{
+    if (debug)
+    {
+        WarningInFunction
+            << "Properties of solid Fe need to be checked!!!"
+            << endl;
+    }
 }
 
 
-inline Foam::scalar Foam::Fe::pv(scalar p, scalar T) const
+Foam::SolidFe::SolidFe(const dictionary& dict)
+:
+    SolidFe()
 {
-    return pv_.f(p, T);
+    readIfPresent(dict);
 }
 
 
-inline Foam::scalar Foam::Fe::hl(scalar p, scalar T) const
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void Foam::SolidFe::writeData(Ostream& os) const
 {
-    return hl_.f(p, T);
+    solidProperties::writeData(os);
 }
 
 
-inline Foam::scalar Foam::Fe::Cp(scalar p, scalar T) const
+// * * * * * * * * * * * * * * IOStream operators  * * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const SolidFe& s)
 {
-    return Cp_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::h(scalar p, scalar T) const
-{
-    return h_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::Cpg(scalar p, scalar T) const
-{
-    return Cpg_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::B(scalar p, scalar T) const
-{
-    return B_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::mu(scalar p, scalar T) const
-{
-    return mu_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::mug(scalar p, scalar T) const
-{
-    return mug_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::kappa(scalar p, scalar T) const
-{
-    return kappa_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::kappag(scalar p, scalar T) const
-{
-    return kappag_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::sigma(scalar p, scalar T) const
-{
-    return sigma_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::D(scalar p, scalar T) const
-{
-    return D_.f(p, T);
-}
-
-
-inline Foam::scalar Foam::Fe::D(scalar p, scalar T, scalar Wb) const
-{
-    return D_.f(p, T, Wb);
+    s.writeData(os);
+    return os;
 }
 
 

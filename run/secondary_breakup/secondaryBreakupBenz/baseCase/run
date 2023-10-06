@@ -57,7 +57,8 @@ display_help() {
     echo -e "\e[1;35m  -s, --solver         Specify the Solver                                                     \e[0m"
     echo -e "\e[1;35m  -p, --parallel       Run in parallel                                                        \e[0m"
     echo -e "\e[1;35m  -n                   Number of solver lines to be printed out into console                  \e[0m"
-    echo -e "\e[1;35m  -tp, --targetphrase  Print output into the console containing target phrase 			  	   \e[0m"
+    echo -e "\e[1;35m  -P                   Print out everything into the console                  		   \e[0m"
+    echo -e "\e[1;35m  -tp, --targetphrase  Print output into the console containing target phrase 		   \e[0m"
     echo -e "\e[1;35m  -lt, --latestTime    Run the Solver from the result of  the simulation                      \e[0m"
     echo -e "\e[1;35m  --search             Search phrases in the Solver's cosole output                           \e[0m"
     echo -e "\e[1;35m  -debug               debug mode:ON - modify run file to appropriate debug switch design     /
@@ -89,7 +90,7 @@ spinner() {
 # Array to store PIDs of the running processes
 pids=()
 # nctrl_c=0
-
+:`
 ctrl_c() {
     	local exit_status=$?
     	if [[ $exit_status -eq 130 ]]; then
@@ -106,6 +107,7 @@ ctrl_c() {
 	# kill $(ps aux | grep -E '\./run(\s|$)' | awk '{print $2}')
 	exit 0
 }
+`
 
 #######################################################################
 #########   Solver Input User
@@ -134,9 +136,9 @@ cleanOutPutDir() {
 		if [ -n "$(ls -A outPut)" ]; then
 		echo -e "\e[1;32mCleaning outPut directory\e[0m"
 		  if $latest_time; then
-			[ -f "outPut/$veryoldsolver.log" ] && mv outPut/veryold$solver.log outPut/oldest$solver.log
-			[ -f "outPut/$oldersolver.log" ] && mv outPut/older$solver.log outPut/veryold$solver.log
-			[ -f "outPut/$oldsolver.log" ] && mv outPut/old$solver.log outPut/older$solver.log
+			[ -f "outPut/veryold$solver.log" ] && mv outPut/veryold$solver.log outPut/oldest$solver.log
+			[ -f "outPut/older$solver.log" ] && mv outPut/older$solver.log outPut/veryold$solver.log
+			[ -f "outPut/old$solver.log" ] && mv outPut/old$solver.log outPut/older$solver.log
 		  	[ -f "outPut/$solver.log" ] && mv outPut/$solver.log outPut/old$solver.log
 		  	[ -f "outPut/foamToVTK.log" ] && rm outPut/foamToVTK.log
 		  	[ -f "outPut/search.log" ] && rm outPut/search.log
@@ -155,7 +157,8 @@ cleanOutPutDir() {
 #######################################################################
 cleanCaseFunction(){
 	! $latest_time && { echo -e "\e[1;31mCleaning the case ...\e[0m"; foamCleanTutorials > /dev/null; }
-	$latest_time && { echo -e "\e[1;31mCleaning the time steps after 0.003 ...\e[0m"; sleep 3; rm -rf VTK; find . -maxdepth 2 \( -name "[0-9]*.[0-9]*" -o -name "[0-9]*e*" \) -not -name "0.003" -exec rm -rf {} +; }
+	# $latest_time && { echo -e "\e[1;31mCleaning the time steps after 0.003 ...\e[0m"; sleep 3; rm -rf VTK; find . -maxdepth 2 \( -name "[0-9]*.[0-9]*" -o -name "[0-9]*e*" \) -not -name "0.003" -exec rm -rf {} +; }
+	$latest_time && { echo -e "\e[1;31mCleaning the time steps after 0.003 ...\e[0m"; sleep 3; rm -rf VTK; find . -maxdepth 2 \( -name "[0-9]*.[0-9]*" -o -name "[0-9]*e*" \) -not \( -name "0.003" -o -name "0.00305" -o -name "0.0031" -o -name "0.00315" \) -exec rm -rf {} +; }
 	#find . -maxdepth 2 \( -name "0.00[0-9]*" -o -name "[1-9]*.[0-9]*[^/]" -o -name "[0-9]*e-[0-2]*" -o -name "[3-9]*e-3*" \) -not \( -name "0.003" -o -path "./constant/*" \) -exec rm -rf {} +
 }
 
@@ -249,7 +252,7 @@ targetPhraseFunction(){
 	    echo -e "target phrase detected 			: \n\n\n\n"
 	    sleep 1;
 	    # Print the context lines after finding the desired phrase
-     	    tail -n +$((line_count - 6)) outPut/$solver.log | head -n 160 | tee outPut/debug.log
+     	    tail -n +$((line_count - 6)) outPut/$solver.log | head -n 150 | tee outPut/debug.log
      	    open_files+=" debug.log"
      	    echo -e "\n\n\n\n\n"
 	    return
@@ -259,6 +262,7 @@ targetPhraseFunction(){
         # Store the process ID (PID) of the function
         pids+=($!)
 }
+
 
 printInitialLinesFunction(){
 	# Print the first 200 lines from solver.log as they are produced
@@ -279,20 +283,24 @@ printInitialLinesFunction(){
 solveParallelFunction(){
   echo -e "\e[1;31mRunning $solver in parallel ...\e[0m"
 
-  # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
-  mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
+  if ! $printConsole; then
+    # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
+    mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
 
-  # Store the process ID (PID) of the solver command
-  solver_pid=$!
+    # Store the process ID (PID) of the solver command
+    solver_pid=$!
 
-  $print_phrase && targetPhraseFunction || printInitialLinesFunction
+    $print_phrase && targetPhraseFunction || printInitialLinesFunction
 
-  # Call the spinner function in the background
-  spinner $solver_pid
+    # Call the spinner function in the background
+    spinner $solver_pid
 
-  # Wait for sprayFoam to terminate
-  wait $solver_pid
-
+    # Wait for sprayFoam to terminate
+    wait $solver_pid
+  else
+    # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
+    mpirun -np $n $solver -parallel 2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log
+  fi
 }
 
 #######################################################################
@@ -301,19 +309,25 @@ solveParallelFunction(){
 solveSerialFunction(){
   echo -e "\e[1;31mRunning $solver in serial ...\e[0m"
 
-  # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
-  $solver  2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
+  if ! $printConsole; then
+    # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
+    $solver  2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log > /dev/null &
 
-  # Store the process ID (PID) of the solver command
-  solver_pid=$!
+    # Store the process ID (PID) of the solver command
+    solver_pid=$!
 
-  $print_phrase && targetPhraseFunction || printInitialLinesFunction
+    $print_phrase && targetPhraseFunction || printInitialLinesFunction
 
-  # Call the spinner function in the background
-  spinner $solver_pid
+    # Call the spinner function in the background
+    spinner $solver_pid
 
-  # Wait for sprayFoam to terminate
-  wait $solver_pid
+    # Wait for sprayFoam to terminate
+    wait $solver_pid
+  else
+    # Run solver and redirect stderr to errors.log and stderr + stdout to solver.log
+    $solver  2> >(tee -a outPut/errors.log 2>&1) | tee outPut/$solver.log
+  fi
+
 }
 
 
@@ -357,6 +371,7 @@ origCaseDir=$(pwd)
 solver_inserted=false
 parallel_inserted=false
 nout_inserted=false
+printConsole=false
 search_flag=false
 debug_search=false
 print_phrase=false
@@ -378,6 +393,10 @@ while [[ $# -gt 0 ]]; do
     -p|--parallel)
       parallel=true
       parallel_inserted=true     # Update flag to indicate parallel mode is enabled
+      shift 1
+      ;;
+    -P|--print)
+      printConsole=true       # Update flag to indicate printing into the console
       shift 1
       ;;
     -n)
@@ -431,6 +450,8 @@ if ! $parallel_inserted; then
   [[ "$0" == "${BASH_SOURCE[0]}" ]] && { echo -e "\e[1;31mFor parallel run use -p [eg: ./run -p]\e[0m"; parallel=false; } || { parallel=true; echo -e "\e[1;35mMode == parallel\e[0m"; }
 fi
 
+# Printing into the console will turn off the inline search features
+$printConsole && print_phrase=false || debug_search=false
 
 # Decide number of lines to print
 if ! $nout_inserted; then
@@ -442,14 +463,18 @@ fi
 if $print_phrase; then
     read -p $'\e[1;36mEnter the line or phrase to search for and print snippet into the console in case of occurance    \e[5m:\e[0m' target_phrase
     # If the user pressed Enter without entering a value, assign an automatic value
-    [ -z "$target_phrase" ] && target_phrase="parcels       = 1"
-    echo "The chosen target phrase is	:$target_phrase"
+    [ -z "$target_phrase" ] && target_phrase=("parcels       = 1")
+    # [ -z "$target_phrases" ] && target_phrases=("Added 1 new parcels" "Time = 0.0033\b" "0.0035\b" "Time = 0.0037\b")
+    echo "The chosen target phrases are	:$target_phrase "
 fi
 
 # Search flag
-$search_flag && IFS=',' read -rp "Enter the search phrases (comma-separated): " -a phrases
-$debug_search && phrases='is reached\|new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*'
-
+if $search_flag; then
+    IFS=',' read -rp "Enter the search phrases (comma-separated): " -a phrases
+    [ -z "$phrases" ] && phrases='Added 1 new parcels|Time = 0.0033\b|Time = 0.0035\b|Time = 0.0037\b'
+    echo "The chosen target phrases are :\n $phrases "
+fi
+$debug_search && phrases='Added 1 new parcels|Time = 0.0033\b|Time = 0.0035\b|Time = 0.0037\b'   # 'Switch is activated\|is reached\|new parcels\|Current number of parcels\|[^nk]Time =*\|Test*\|Level of*'
 
 sleep 3
 
@@ -463,7 +488,7 @@ sleep 3
 ##############################################################################
 ##############################################################################
 
-trap ctrl_c EXIT ERR SIGINT
+#trap ctrl_c EXIT ERR SIGINT
 
 start=$(date +%s.%N)
 
@@ -513,12 +538,13 @@ cd outPut/
 		# Loop through files and search for each phrase
 		for phrase in "${phrases[@]}"; do
 		  echo -e "${Red}Searching for '$phrase':${Def}" >> search.log
-		  grep --color=auto -r -n -A 2 -B 2 "$phrase" --exclude=search.log >> search.log
+		  # grep --color=auto -r -n -A 48 -B 48 "$phrase" --exclude=search.log >> search.log
+                  grep --color=auto -E -A 48 -B 48 "$phrase" $solver.log >> search.log
 		done
 
 	elif $debug_search; then
         	echo -e "\e[1;31mThese were predefined search results : (Can be changed inside the ./run file under phrases)\e[0m"
-		grep --color=always 'is reached' $solver.log | tail -n 10
+		grep --color=always 'Switch is activated' $solver.log | tail -n 10
 		# grep --color=always 'is reached' $solver.log | less -R +G -n
 		grep --color=auto "$phrases" $solver.log 2>&1 | tee search.log > /dev/null
 	fi

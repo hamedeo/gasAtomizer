@@ -88,12 +88,10 @@ Foam::SolidifyingSprayCloud<CloudType>::SolidifyingSprayCloud
     atomizationModel_(nullptr),
     breakupModel_(nullptr)
 {
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     if (this->solution().active())
     {
         setModels();
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
-
         averageParcelMass_ = this->injectors().averageParcelMass();
 
         if (readFields)
@@ -101,7 +99,6 @@ Foam::SolidifyingSprayCloud<CloudType>::SolidifyingSprayCloud
             parcelType::readFields(*this, this->composition());
             this->deleteLostParticles();
         }
-
         Info << "Average parcel mass: " << averageParcelMass_ << endl;
     }
 
@@ -163,45 +160,43 @@ void Foam::SolidifyingSprayCloud<CloudType>::setParcelThermoProperties
     const scalar lagrangianDt
 )
 {
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     CloudType::setParcelThermoProperties(parcel, lagrangianDt);
-
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     const liquidMixtureProperties& liqMix = this->composition().liquids();
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     label idGas = this->composition().idGas();  // added
     label idLiquid = this->composition().idLiquid();  // added
     label idSolid = this->composition().idSolid();  // added
+    // Pout << __FILE__ << ": " << __LINE__ << " => idGas, idLiquid, idSolid: " << idGas << ", " << idLiquid << ", " << idSolid << endl;
 
-    const scalarField& Y(parcel.Y());
+    parcel.YGas() = this->composition().Y0(idGas);  // added
+    parcel.YLiquid() = this->composition().Y0(idLiquid);  // added
+    parcel.YSolid() = this->composition().Y0(idSolid);  // added
+    // Pout << __FILE__ << ": " << __LINE__ << " => YGas(), YLiquid(), YSolid: " << parcel.YGas() << ", " << parcel.YLiquid() << ", " << parcel.YSolid() << endl;
+
+    // const scalarField& Y(parcel.Y());
+    const scalarField& Y(parcel.YLiquid());
     scalarField X(liqMix.X(Y));
     const scalar pc = this->p()[parcel.cell()];
 
     // override rho and Cp from constantProperties
     parcel.Cp() = liqMix.Cp(pc, parcel.T(), X);
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     parcel.rho() = liqMix.rho(pc, parcel.T(), X);
     parcel.sigma() = liqMix.sigma(pc, parcel.T(), X);
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     parcel.mu() = liqMix.mu(pc, parcel.T(), X);
-    parcel.YGas() = this->composition().Y0(idGas);  // added
-    parcel.YLiquid() = this->composition().Y0(idLiquid);  // added
-    parcel.YSolid() = this->composition().Y0(idSolid);  // added
+    // Pout << __FILE__ << ": " << __LINE__ << " => Cp: " << liqMix.Cp(pc, parcel.T(), X) << " => rho: " << liqMix.rho(pc, parcel.T(), X) << " => sigma: " << liqMix.sigma(pc, parcel.T(), X) << " => mu: " << liqMix.mu(pc, parcel.T(), X) << endl;
+
 
     // If rho0 was given in constProp use it. If not use the composition
     // to set tho
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     if (constProps_.rho0() == -1)   // added
     {
+        // Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         const scalarField& Ygas = this->composition().Y0(idGas);
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         const scalarField& Yliq = this->composition().Y0(idLiquid);
         const scalarField& Ysol = this->composition().Y0(idSolid);
         const scalar p0 =
             this->composition().thermo().thermo().p()[parcel.cell()];
         const scalar T0 = constProps_.T0();
-
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         parcel.rho() = this->composition().rho(Ygas, Yliq, Ysol, T0, p0);
     }
 
@@ -216,6 +211,7 @@ void Foam::SolidifyingSprayCloud<CloudType>::checkParcelProperties
     const bool fullyDescribed
 )
 {
+    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     CloudType::checkParcelProperties(parcel, lagrangianDt, fullyDescribed);
 
     // store the injection position and initial drop size
@@ -227,32 +223,27 @@ void Foam::SolidifyingSprayCloud<CloudType>::checkParcelProperties
 
     parcel.liquidCore() = atomization().initLiquidCore();
 
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    // Pout << __FILE__ << ": " << __LINE__ << " => fullyDescribed: " << fullyDescribed << endl;
 
     if (fullyDescribed) // added
     {
         label idGas = this->composition().idGas();
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         label idLiquid = this->composition().idLiquid();
         label idSolid = this->composition().idSolid();
 
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         this->checkSuppliedComposition
         (
             parcel.YGas(),
             this->composition().Y0(idGas),
             "YGas"
         );
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         this->checkSuppliedComposition
         (
             parcel.YLiquid(),
             this->composition().Y0(idLiquid),
             "YLiquid"
         );
-        
-        Pout << "SSC line 238" << endl,
-        
+
         this->checkSuppliedComposition
         (
             parcel.YSolid(),
@@ -295,16 +286,16 @@ void Foam::SolidifyingSprayCloud<CloudType>::resetSourceTerms()
 template<class CloudType>
 void Foam::SolidifyingSprayCloud<CloudType>::evolve()
 {
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     if (this->solution().canEvolve())
     {
         typename parcelType::trackingData td(*this);
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+        // Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         this->solve(*this, td);
     }
     else
     {
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+        // Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
     }
 }
 
@@ -338,10 +329,10 @@ void Foam::SolidifyingSprayCloud<CloudType>::info()
 template<class CloudType>   // added
 void Foam::SolidifyingSprayCloud<CloudType>::writeFields() const
 {
-    Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     if (this->compositionModel_)
     {
-        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+        // Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         CloudType::particleType::writeFields(*this, this->composition());
     }
 }

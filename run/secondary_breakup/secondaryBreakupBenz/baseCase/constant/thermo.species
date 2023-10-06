@@ -35,7 +35,8 @@ N2
     }
 }
 
-Fe // properties of solid iron!!
+
+SolidFe // properties of solid iron!!
 {
     specie
     {
@@ -45,6 +46,27 @@ Fe // properties of solid iron!!
     {
         Tlow            200;
         Thigh           2000; 	// 2000
+        Tcommon         1900; //Melting point Fe 1811 K
+        highCpCoeffs    ( -435.752 0.768222 -0.000446743 8.66768e-08 0 187860 2449.72 );
+        lowCpCoeffs     7 { 0 };
+    }
+    transport
+    {
+        As              1.67212e-06;
+        Ts              170.672;
+    }
+}
+
+Fe // properties of solid iron!!
+{
+    specie
+    {
+        molWeight       55.847;
+    }
+    thermodynamics
+    {
+        Tlow            200;
+        Thigh           2000;   // 2000
         Tcommon         1900; //Melting point Fe 1811 K
         highCpCoeffs    ( -435.752 0.768222 -0.000446743 8.66768e-08 0 187860 2449.72 );
         lowCpCoeffs     7 { 0 };
@@ -80,21 +102,22 @@ H2O
 
 Benz
 {
-	specie
-	{
-		molWeight 		18.0153;
-	}
-	thermodynamics
-	{
-		Tlow 			200;
-		Thigh 			6000;
-		Tcommon 		1000;
-		highCpCoeffs 	( 2.67704 0.00297318 -7.73769e-07 9.44335e-11 -4.269e-15 -29885.9 6.88255 );
-		lowCpCoeffs 	( 4.19864 -0.0020364 6.52034e-06 -5.48793e-09 1.77197e-12 -30293.7 -0.849009 );
-	}
-	transport
-	{
-		As 				1.67212e-06;
-		Ts 				170.672;
-	}
+        specie
+        {
+                molWeight               18.0153;
+        }
+        thermodynamics
+        {
+                Tlow                    200;
+                Thigh                   6000;
+                Tcommon                 1000;
+                highCpCoeffs    ( 2.67704 0.00297318 -7.73769e-07 9.44335e-11 -4.269e-15 -29885.9 6.88255 );
+                lowCpCoeffs     ( 4.19864 -0.0020364 6.52034e-06 -5.48793e-09 1.77197e-12 -30293.7 -0.849009 );
+        }
+                transport
+        {
+                As                              1.67212e-06;
+                Ts                              170.672;
+        }
 }
+

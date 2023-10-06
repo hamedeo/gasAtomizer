@@ -75,7 +75,7 @@ class liquidProperties
 
         //- Normal boiling temperature [K]
         scalar Tb_;
-        
+
         //- Normal melting temperature [K]
         scalar Tm_;
 

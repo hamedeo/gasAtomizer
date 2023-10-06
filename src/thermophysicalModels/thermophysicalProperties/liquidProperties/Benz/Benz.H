@@ -68,7 +68,8 @@ class Benz
         NSRDSfunc1 pv_;
         NSRDSfunc6 hl_;
         NSRDSfunc0 Cp_;
-        NSRDSfunc0 h_;
+        // thermophysicalConstant Cp_;
+	    NSRDSfunc0 h_;
         NSRDSfunc7 Cpg_;
         NSRDSfunc4 B_;
         thermophysicalConstant mu_;
@@ -101,14 +102,15 @@ public:
             const NSRDSfunc1& vapourPressure,
             const NSRDSfunc6& heatOfVapourisation,
             const NSRDSfunc0& heatCapacity,
+	    // const thermophysicalConstant& heatCapacity,
             const NSRDSfunc0& enthalpy,
             const NSRDSfunc7& idealGasHeatCapacity,
             const NSRDSfunc4& secondVirialCoeff,
             const thermophysicalConstant& dynamicViscosity,
             const NSRDSfunc2& vapourDynamicViscosity,
             const NSRDSfunc0& thermalConductivity,
-            const NSRDSfunc2& vapourThermalConductivity,            
-    	    //const NSRDSfunc6& surfaceTension,  
+            const NSRDSfunc2& vapourThermalConductivity,
+    	    //const NSRDSfunc6& surfaceTension,
             const thermophysicalConstant& surfaceTension,
             const APIdiffCoefFunc& vapourDiffussivity
         );

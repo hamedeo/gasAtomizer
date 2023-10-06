@@ -14,7 +14,8 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-rho0            824;                    // Benz: 824 // Fe: 7874
+Tdrop              1830;
+rhoDrop            #eval {8711.946 - 0.926 * $Tdrop}; // 7017.366; //824;                    // Benz: 824 // Fe: 7874
 
 solution
 {
@@ -58,12 +59,13 @@ solution
 
 constantProperties
 {
-    T0              300;
+    T0              1830; //300;
 
     // place holders for rho0 and Cp0
     // - reset from liquid properties using T0
-    rho0            $rho0; 	// Benz: 824 // Fe: 7874
-    Cp0             825; 	// Benz:825  // Fe: 451
+    // rho0            $rho0; // N2:1.126;	// Benz: 824 // Fe: 7874
+    Cp0                 825; // 1.040; // 4217;	// Benz:2000  // Fe: 825
+    // rho0            1.126;
 
     // epsilon0        1;	// particle emissivity		// added
     // f0              0.5;	// particle scattering factor	// added
@@ -82,55 +84,52 @@ subModels
 
   injectionModels
   {
-	/*
-        model1
-        {
-            type            manualInjection;
-            massTotal       #eval {$rho0 * 4/3 * pi() * pow(0.00017/2, 3)};
-            parcelBasisType mass;
-            SOI             3e-03;
-            positionsFile   "sprayCloud1Positions";
-            U0              (0 -16 0);
-            sizeDistribution
-            {
-                type        RosinRammler;
-                RosinRammlerDistribution
-                {
-                    minValue        0.00017;
-                    maxValue        0.00017;
-                    d               1;
-                    n               1;
-                }
-            }
-        }
-	*/
-
+    /*
+    model1
+    {
+       type            manualInjection;
+       massTotal       #eval {$rho0 * 4/3 * pi() * pow(0.00017/2, 3)};
+       parcelBasisType mass;
+       nParticle       1;
+       SOI             3e-03;
+       positionsFile   "sprayCloud1Positions";
+       U0              (0 -16 0);
+       sizeDistribution
+       {
+          type        fixedValue;
+          fixedValueDistribution
+          {
+      	 	value           0.00017;
+          }
+       }
+    }
+    */
     model1
     {
         type            coneNozzleInjection;
 
-    // Times
-        SOI			3e-3;    // injection start time
-        // nP			2;
-	duration	#eval { 2 * 2.5e-5}; // injection duration
-
     // Quantities
         // massTotal will be calculated based on variables later
         parcelBasisType mass;   // -fixed -number -mass
-        parcelsPerSecond	4e04;
+        parcelsPerSecond	5e3;	// 4e04;
         flowRateProfile constant 1;  // Normalized profile of droplets
-        //nParticle        1;   // Only if parcelBasisType is set to "fixed"
+        // nParticle        1;   // Only if parcelBasisType is set to "fixed"
+
+    // Times
+        SOI                     3.1e-3;    // injection start time
+        nP                         1;
+        duration                #eval {$nP/$parcelsPerSecond};//$nP/$parcelsPerSecond}; // Injection duration
 
     // Particle-size distribution modle
         sizeDistribution   // size distribution of the injected particles
         {
-            type        fixedValue;       //fixedValue; //uniform; //RosinRammler;
+            type        fixedValue;       // fixedValue; // uniform; // RosinRammler;
             fixedValueDistribution        //<type>Distribution
             {
-                value           0.00017;
+                value           #eval{1 * 0.00017};
                 // minValue        0.00017;
-                // maxValue        0.00017;
-                // lambda          1;   // RosinRammler
+		// maxValue        0.00017;
+                // d          	   1;   // RosinRammler
                 // n               1;   // RosinRammler
             }
         }
@@ -145,7 +144,7 @@ subModels
         //inject over a disc:
         injectionMethod point; // -point -disc
         innerDiameter   0; // inner diameter of FUEL Nozzle injector
-        outerDiameter   170e-6;  // outer diameter of FUEL Nozzle injector
+        outerDiameter   #eval{1 * 0.00017};  // outer diameter of FUEL Nozzle injector
 
     //Parcel Velocity - Calculate the partical initial velocity profile
         // - Inject with constant velocity
@@ -153,17 +152,57 @@ subModels
         UMag            16;  // fuel droplet initial velocity Liu et al. 1993
 
     //massTotal
-        massTotal       #eval {$rho0 * 4/3 * pi() * pow($outerDiameter/2, 3) * $duration * $parcelsPerSecond * 1}; //Total mass to inject per each parcel (Blob)
+        massTotal       #eval {$rhoDrop * 4/3 * pi() * pow($outerDiameter/2, 3) * $nP}; // Total mass to inject per each parcel (Blob)
+    }
+/*
+        model1
+        {
+            type            coneNozzleInjection;
+            SOI             3e-3;//3e-03;				// start of injection if velocity is at 200 m/s, after 10 timesteps.
+            massTotal       2.11861661e-9;//2.165995140561160e-09;//1.299597084336696e-07; //Benz
+            parcelBasisType mass;
+            injectionMethod disc;
+            flowType        constantVelocity; 		//flowRateAndDischarge
+            UMag            16; 				//Same value as in Paper [16]
+            outerDiameter   170e-6;//3e-4;
+            innerDiameter   0;
+            duration        2e-4;//2e-3;
+            position        (0 -0.0047625 0.055); //(0 -0.0047625 0.055);
+            direction       (0 1 0);
+            parcelsPerSecond 5e3;//5e3;
+            //nParticle        1;
+
+	    flowRateProfile constant 1;//10;
+
+            Cd              constant 0.9; //0.9
+
+
+	// Inner and outer half-cone angles
+            thetaInner      constant 0.0;
+            thetaOuter      constant 0.0;
+
+            sizeDistribution
+            {
+                type        uniform;
+                uniformDistribution
+                {
+                    minValue        0.00017;
+                    maxValue        0.00017;
+                    d               0.00017;
+                    n               1;
+                }
+            }
+          }
+*/
   }
-}
 
     dispersionModel none;
 
     patchInteractionModel standardWallInteraction;
 
-    heatTransferModel none; // RanzMarshall;
+    heatTransferModel none;	// RanzMarshall;
 
-    compositionModel singlePhaseMixture; // valid options: (none singlePhaseMixture singleMixtureFraction)
+    compositionModel singleMixtureFraction; // valid options: (none singlePhaseMixture singleMixtureFraction)
 
     phaseChangeModel none; // valid options: (liquidEvapFuchsKnudsen liquidEvaporation liquidEvaporationBoil none)
 
@@ -179,7 +218,7 @@ subModels
 
     standardWallInteractionCoeffs
     {
-        type            escape; //rebound;
+        type            escape; // rebound;
     }
 
     RanzMarshallCoeffs
@@ -193,9 +232,9 @@ subModels
 	(
 	    liquid
 	    {
-                Fe              0;
-                H2O             0;
-                Benz            1; // Mass Fraction of the phase
+                Fe                 1;
+                //H2O              1;
+                // Benz            1; // Mass Fraction of the phase
 	    }
 	);
     }
@@ -206,31 +245,33 @@ subModels
         (
             gas
             {
-                //H2O             1;
+                // H2O          1;
+		        // N2	    	0;
             }
             liquid
             {
-                Fe		0;
-                H2O		0;
-                Benz		1; // Mass Fraction of the phase
+                Fe	    	    1;
+                // H2O		    0;
+                // Benz		    1; // Mass Fraction of the phase
             }
             solid
             {
-                //ash             0;
-                //Fe              1;
+                //ash           0;
+                SolidFe         1;
+		        // H2O		    1;
             }
+	    );
         YGasTot0        	0;
-        YLiquidTot0     	0;
+        YLiquidTot0     	1;
         YSolidTot0      	0;
-        );
     }
 
-    liquidEvaporationBoilCoeffs
+    /*liquidEvaporationBoilCoeffs
     {
         enthalpyTransfer enthalpyDifference;
 
         activeLiquids    ( H2O );
-    }
+    }*/
 
     /*
     liquidEvaporationCoeffs	// added
@@ -276,6 +317,13 @@ subModels
     KelvinHelmholtzCoeffs
     {
         solveOscillationEq yes;
+ /*       B0              0.61;
+        B1              40;
+        Ctau            1;
+        CRT             0.1;
+        msLimit         0.2;
+        WeberLimit      6;
+*/
         B0              0.61;
         B1              1.73;           //Sqrt(3)
         Ctau            1;
@@ -289,7 +337,6 @@ subModels
         Comega          8;
         WeCrit          6;
         SMDCalculationMethod    method1;
-
     }
 
     ReitzKHRTCoeffs
@@ -318,7 +365,7 @@ subModels
 
 cloudFunctions
 {
-    WeberNumber1
+/*    WeberNumber1
     {
         type    WeberNumber;
     }
@@ -337,8 +384,8 @@ cloudFunctions
     {
         type    HeatTransferCoeff;
     }
+*/
 }
 
 
 // ************************************************************************* //
-

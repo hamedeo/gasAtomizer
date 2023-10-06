@@ -145,6 +145,19 @@ private:
 
     // Private Member Functions
 
+        //- Return the solidification switch
+        //template<class TrackCloudType>
+        bool Solidification
+        (
+            // TrackCloudType& cloud,
+            // trackingData& td,
+            // const scalar p,
+            const scalar T,
+            const scalar Tth,
+            scalarField& YLiquid_,
+            scalarField& YSolid_
+        );
+
         //- Return the mixture effective specific heat capacity
         template<class TrackCloudType>
         scalar CpEff
@@ -248,6 +261,13 @@ protected:
 
             //- Mass fractions of solids []
             scalarField YSolid_;  // added
+
+            //- Mass fractions Mixture []
+            scalarField YMixture0_; //added
+
+            //- Mass fractions of mixture []
+            // scalarField Y_;
+
     // added <<
     // Protected Member Functions
 
@@ -519,6 +539,9 @@ public:
 
             //- Return access to mass fractions of solids
             inline scalarField& YSolid(); // added
+
+            //- Return access to mass fractions of mixture []
+            // inline scalarField& Y();
 
             //- Return access to the canCombust flag
             inline label& canCombust(); // added

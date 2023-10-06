@@ -37,7 +37,8 @@ SourceFiles
 #ifndef Fe_H
 #define Fe_H
 
-#include "../liquidProperties/liquidProperties.H"
+// #include "../liquidProperties/liquidProperties.H"
+#include "liquidProperties.H"
 #include "NSRDSfunc0.H"
 #include "NSRDSfunc1.H"
 #include "NSRDSfunc2.H"
@@ -69,9 +70,15 @@ class Fe
         thermophysicalConstant hl_;
         thermophysicalConstant Cp_;
         thermophysicalConstant h_;
+        NSRDSfunc7 Cpg_;
+        NSRDSfunc4 B_;
         NSRDSfunc3 mu_;
+        NSRDSfunc2 mug_;
         thermophysicalConstant kappa_;
+        NSRDSfunc2 kappag_;
         NSRDSfunc0 sigma_;
+	    // thermophysicalConstant sigma_;
+        APIdiffCoefFunc D_;
 
 
 public:
@@ -96,9 +103,15 @@ public:
             const thermophysicalConstant& heatOfVapourisation,
             const thermophysicalConstant& heatCapacity,
             const thermophysicalConstant& enthalpy,
+            const NSRDSfunc7& idealGasHeatCapacity,
+            const NSRDSfunc4& secondVirialCoeff,
             const NSRDSfunc3& dynamicViscosity,
+            const NSRDSfunc2& vapourDynamicViscosity,
             const thermophysicalConstant& thermalConductivity,
-            const NSRDSfunc0& surfaceTension
+            const NSRDSfunc2& vapourThermalConductivity,
+            const NSRDSfunc0& surfaceTension,
+            //const thermophysicalConstant& surfaceTension
+            const APIdiffCoefFunc& vapourDiffussivity
         );
 
         //- Construct from dictionary
@@ -128,11 +141,23 @@ public:
         //- Liquid Enthalpy [J/(kg)]
         inline scalar h(scalar p, scalar T) const;
 
+        //- Ideal gas heat capacity [J/(kg K)]
+        inline scalar Cpg(scalar p, scalar T) const;
+
+        //- Second Virial Coefficient [m^3/kg]
+        inline scalar B(scalar p, scalar T) const;
+
         //- Liquid viscosity [Pa s]
         inline scalar mu(scalar p, scalar T) const;
 
+        //- Vapour viscosity [Pa s]
+        inline scalar mug(scalar p, scalar T) const;
+
         //- Liquid thermal conductivity  [W/(m K)]
         inline scalar kappa(scalar p, scalar T) const;
+
+        //- Vapour thermal conductivity  [W/(m K)]
+        inline scalar kappag(scalar p, scalar T) const;
 
         //- Surface tension [N/m]
         inline scalar sigma(scalar p, scalar T) const;

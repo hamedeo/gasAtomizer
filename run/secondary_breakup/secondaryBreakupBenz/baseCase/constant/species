@@ -1,9 +1,9 @@
 species
 (
     N2
-    Fe
-    H2O
     Benz
+    Fe
+    SolidFe
 );
 
 reactions
