@@ -74,9 +74,9 @@ template<class ParcelType>
 bool Foam::SolidifyingSprayParcel<ParcelType>::Solidification
 (
     const scalar T,
-    const scalar Tm0, // Add Tm0 as a function parameter
-    scalarField& YLiquid_,
-    scalarField& YSolid_
+    const scalar Tm0 // Add Tm0 as a function parameter
+    // scalarField& this->YLiquid_,
+    // scalarField& this->YSolid_
 ) 
 {
     scalarField& YMix = this->Y();
@@ -84,16 +84,17 @@ bool Foam::SolidifyingSprayParcel<ParcelType>::Solidification
     // Introduce a flag to track whether the condition has been entered
     static bool conditionEntered = false;
 
-    Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
+    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     if (T <= Tm0 && !conditionEntered) 
     {
         // Pout << __FILE__ << ": " << __LINE__ << ": " << "Switch is activated." << endl;
         //forAll(YLIQ, i) {
-            YSolid_[0] = 1;
-            YLiquid_[0] = 0;
+            this->YSolid_[0] = 1;
+            this->YLiquid_[0] = 0;
             YMix[1] = 0;
             YMix[2] = 1;
-        // Pout << __FILE__ << ": " << __LINE__ << ": " << "Switch is applied. YMix: " << YMix << endl;
+            // composition.YMixture0() = Ymix;
+        Pout << __FILE__ << ": " << __LINE__ << ": " << "Switch is applied. YMix: " << YMix << endl;
         // Pout << __FILE__ << ": " << __LINE__ << ": " << "YLiquid_ : " << YLiquid_ << endl;
         // Pout << __FILE__ << ": " << __LINE__ << ": " << "YSolid_ : " << YSolid_ << endl;
         // Pout << __FILE__ << " : " << __LINE__ << " => YMixture0_: " << YMixture0_ << endl;
@@ -271,13 +272,17 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
 
     const auto& liquids = composition.liquids();
     // const auto& solids = composition.solids();
-    
+
+    // Pout << __FILE__ << " : " << __LINE__ << " => this YSolid_ " << this->YSolid_[0] << endl;
+    // Pout << __FILE__ << " : " << __LINE__ << " => this YLiquid_ " << this->YLiquid_[0] << endl;
+
+
     // added >>
-    // Pout << __FILE__ << " : " << __LINE__ << " => YLiquid_ " << YLiquid_ << endl;
+    Pout << __FILE__ << " : " << __LINE__ << " => YLiquid_ " << YLiquid_ << endl;
     // Pout << __FILE__ << " : " << __LINE__ << " => YLiquid_[0] " << YLiquid_[0] << endl;
-    // Pout << __FILE__ << " : " << __LINE__ << " => YSolid_ " << YSolid_ << endl;
+    Pout << __FILE__ << " : " << __LINE__ << " => YSolid_ " << YSolid_ << endl;
     // Pout << __FILE__ << " : " << __LINE__ << " => YSolid_[0] " << YSolid_[0] << endl;
-    Pout << __FILE__ << " : " << __LINE__ << " => YMixture0_: " << composition.YMixture0() << ", " << this->Y() << endl;
+    Pout << __FILE__ << " : " << __LINE__ << " => YMixture0_: " << composition.YMixture0() << ", this->Y(): " << this->Y() << endl;
 
     // Check if parcel belongs to liquid core
     if (liquidCore() > 0.5)
@@ -515,9 +520,9 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
     // this->CpEff_ = composition.Cp(0, Y_, td.pc(), T0);
     // this->Cp() = liquids.Cp(pc0, T0, X0);
     
-    if (YLiquid_[0] != 0) // added condition
+    if (YMix[idL] != 0) // added condition
     {
-        (void)Solidification(this->T_, Tm0, YLiquid_, YSolid_);
+        (void)Solidification(this->T_, Tm0); //, YLiquid_, YSolid_);
     }
 
     // Motion
@@ -592,7 +597,7 @@ void Foam::SolidifyingSprayParcel<ParcelType>::calc
     this->Cp_ = CpEff(cloud, td, pc, this->T_, idG, idL, idS);
     // if ()
     // {
-    if (td.keepParticle && YLiquid_[0] == 1)
+    if (td.keepParticle && YMix[1] == 1)
     {
         // Reduce the stripped parcel mass due to evaporation
         // assuming the number of particles remains unchanged

@@ -82,11 +82,12 @@ int main(int argc, char *argv[])
 
         ++runTime;
 
+        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        //Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         parcels.evolve();
-        //Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
 
         if (pimple.solveFlow())
         {

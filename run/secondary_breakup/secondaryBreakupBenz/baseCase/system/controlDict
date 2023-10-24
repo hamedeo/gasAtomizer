@@ -18,17 +18,17 @@ application     solidifyingSprayFoam;
 
 startFrom       startTime;
 
-startTime       3.15e-03;
+startTime       3.2e-03;
 
 stopAt          endTime;
 
-endTime         5e-3;
+endTime         5e-03;
 
 deltaT          2.5e-06;
 
 writeControl    adjustable;
 
-writeInterval   5e-05; //1e-05
+writeInterval   1e-05; //1e-05
 
 purgeWrite      0;
 
@@ -75,7 +75,7 @@ functions
         timeVsFile
         (
             (-1 		"<system>/controlDict_start")
-            (3.15e-03		"<system>/controlDict_checkPoint-1")
+            (3.2e-03		"<system>/controlDict_checkPoint-1")
         );
 	}
 

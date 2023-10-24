@@ -22,7 +22,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         5e-3;
+endTime         5e-03;
 
 deltaT          1e-05;	//2.5e-06;
 
@@ -75,7 +75,7 @@ functions
         timeVsFile
         (
             (-1 		"<system>/controlDict_start")
-            (3.15e-03		"<system>/controlDict_checkPoint-1")
+            (3.2e-03		"<system>/controlDict_checkPoint-1")
         );
 	}
 

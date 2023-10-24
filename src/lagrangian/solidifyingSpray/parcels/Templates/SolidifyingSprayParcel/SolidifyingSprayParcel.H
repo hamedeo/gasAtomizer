@@ -153,9 +153,9 @@ private:
             // trackingData& td,
             // const scalar p,
             const scalar T,
-            const scalar Tth,
-            scalarField& YLiquid_,
-            scalarField& YSolid_
+            const scalar Tth
+            // scalarField& YLiquid_,
+            // scalarField& YSolid_
         );
 
         //- Return the mixture effective specific heat capacity

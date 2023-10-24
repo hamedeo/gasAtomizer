@@ -39,7 +39,7 @@ Foam::KelvinHelmholtz<CloudType>::KelvinHelmholtz
 :
     BreakupModel<CloudType>(dict, owner, typeName, true),
     b0_(0.61),
-    b1_(40.0),
+    b1_(1.73),//40.0
     cTau_(1.0),
     cRT_(0.1),
     msLimit_(0.03),
@@ -142,7 +142,7 @@ bool Foam::KelvinHelmholtz<CloudType>::update
        *r
        *(1.0 + 0.45*sqrt(ohnesorge))
        *(1.0 + 0.4*pow(taylor, 0.7))
-       /pow(1.0 + 0.865*pow(weGas, 1.67), 0.6);
+       /pow(1.0 + 0.87*pow(weGas, 1.67), 0.6);//0.865
 
     // characteristic Kelvin-Helmholtz breakup time
     scalar tauKH = 3.726*b1_*r/(omegaKH*lambdaKH);
@@ -167,8 +167,11 @@ bool Foam::KelvinHelmholtz<CloudType>::update
 
             // reduce the diameter according to the rate-equation
             d = (fraction*dc + d)/(1.0 + fraction);
+            // d = fraction*dc + d*(1.0 - fraction);
 
-            //scalar ms0 = rho*pow3(dc)*mathematicalConstant::pi/6.0;
+            // addParcel = true;
+
+            // scalar ms0 = rho*pow3(dc)*mathematicalConstant::pi/6.0;
             scalar ms0 = mass0*(1.0 - pow3(d/d0));
             ms += ms0;
 
@@ -214,13 +217,12 @@ bool Foam::KelvinHelmholtz<CloudType>::update
                 }
             }
         }
-   }
-
-/*    else if (KHindex < 0.5)
+    }
+ /*   else if (KHindex < 0.5)
     {
         // Case of larger drops after breakup (Reitz, Atomization & Spray
         // Technology 3 (1987) 309-337, p.322) pIndKH() should be introduced
-
+        Pout << __FILE__ << ": " << __LINE__ << " KHindex is set to 1.0:" << KHindex << endl;
         scalar lengthScale =
             min(lambdaKH, constant::mathematical::twoPi*Urmag/omegaKH);
         scalar diameterLargerDrop = cbrt(1.5*d*d*lengthScale);

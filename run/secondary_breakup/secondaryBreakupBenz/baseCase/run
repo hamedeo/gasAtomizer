@@ -158,7 +158,7 @@ cleanOutPutDir() {
 cleanCaseFunction(){
 	! $latest_time && { echo -e "\e[1;31mCleaning the case ...\e[0m"; foamCleanTutorials > /dev/null; }
 	# $latest_time && { echo -e "\e[1;31mCleaning the time steps after 0.003 ...\e[0m"; sleep 3; rm -rf VTK; find . -maxdepth 2 \( -name "[0-9]*.[0-9]*" -o -name "[0-9]*e*" \) -not -name "0.003" -exec rm -rf {} +; }
-	$latest_time && { echo -e "\e[1;31mCleaning the time steps after 0.003 ...\e[0m"; sleep 3; rm -rf VTK; find . -maxdepth 2 \( -name "[0-9]*.[0-9]*" -o -name "[0-9]*e*" \) -not \( -name "0.003" -o -name "0.00305" -o -name "0.0031" -o -name "0.00315" \) -exec rm -rf {} +; }
+	$latest_time && { echo -e "\e[1;31mCleaning the time steps after 0.00315 ...\e[0m"; sleep 3; rm -rf VTK; find . -maxdepth 2 \( -name "[0-9]*.[0-9]*" -o -name "[0-9]*e*" \) -not \( -name "0.003" -o -name "0.00305" -o -name "0.0031" -o -name "0.00315" -o -name "0.0032" \) -exec rm -rf {} +; }
 	#find . -maxdepth 2 \( -name "0.00[0-9]*" -o -name "[1-9]*.[0-9]*[^/]" -o -name "[0-9]*e-[0-2]*" -o -name "[3-9]*e-3*" \) -not \( -name "0.003" -o -path "./constant/*" \) -exec rm -rf {} +
 }
 
@@ -498,7 +498,7 @@ start=$(date +%s.%N)
 	! $latest_time && buildMesh && open_files+=" blockMesh.log" && $parallel && decomposeFunction && open_files+=" decomposePar.log"
 	$parallel && solveParallelFunction || solveSerialFunction
 	open_files+=" $solver.log"
-	! $debug_switch && foamToVTKFunction && open_files+=" foamToVTK.log"
+	foamToVTKFunction && open_files+=" foamToVTK.log"
 
 end=$(date +%s.%N)
 runtime=$(echo "$end - $start" | bc)

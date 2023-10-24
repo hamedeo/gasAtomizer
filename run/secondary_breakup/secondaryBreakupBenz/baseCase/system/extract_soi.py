@@ -20,7 +20,7 @@ def get_soi_value():
         return soi_value
     else:
         # If the SOI value is not found, return None or raise an exception
-        return "3.15e-3"
+        return "3e-3"
 
 # Call the function to get the SOI value
 soi_value = get_soi_value()

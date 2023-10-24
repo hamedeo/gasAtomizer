@@ -14,8 +14,8 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Tdrop              1830;
-rhoDrop            #eval {8711.946 - 0.926 * $Tdrop}; // 7017.366; //824;                    // Benz: 824 // Fe: 7874
+Tdrop              300;
+rhoDrop            824;//#eval {8711.946 - 0.926 * $Tdrop}; // 7017.366; //824;                    // Benz: 824 // Fe: 7874
 
 solution
 {
@@ -59,12 +59,12 @@ solution
 
 constantProperties
 {
-    T0              1830; //300;
+    T0              $Tdrop; //300;
 
     // place holders for rho0 and Cp0
     // - reset from liquid properties using T0
     // rho0            $rho0; // N2:1.126;	// Benz: 824 // Fe: 7874
-    Cp0                 825; // 1.040; // 4217;	// Benz:2000  // Fe: 825
+    Cp0                 2000; // 1.040; // 4217;	// Benz:2000  // Fe: 825
     // rho0            1.126;
 
     // epsilon0        1;	// particle emissivity		// added
@@ -114,11 +114,12 @@ subModels
         parcelsPerSecond	5e3;	// 4e04;
         flowRateProfile constant 1;  // Normalized profile of droplets
         // nParticle        1;   // Only if parcelBasisType is set to "fixed"
+	bDiameter		#eval{0.00017};
 
     // Times
-        SOI                     3.1e-3;    // injection start time
-        nP                         1;
-        duration                #eval {$nP/$parcelsPerSecond};//$nP/$parcelsPerSecond}; // Injection duration
+        SOI                     3.05e-3;    // injection start time
+        nP                      1;
+        duration                #eval {1 * $nP/$parcelsPerSecond};//$nP/$parcelsPerSecond}; // Injection duration
 
     // Particle-size distribution modle
         sizeDistribution   // size distribution of the injected particles
@@ -126,7 +127,7 @@ subModels
             type        fixedValue;       // fixedValue; // uniform; // RosinRammler;
             fixedValueDistribution        //<type>Distribution
             {
-                value           #eval{1 * 0.00017};
+                value           #eval{1 * $bDiameter};
                 // minValue        0.00017;
 		// maxValue        0.00017;
                 // d          	   1;   // RosinRammler
@@ -137,14 +138,14 @@ subModels
     // Geometry
         // Inner and outer half-cone angles
         direction       (0 1 0); // nozzleAxis: main axis for fuel injection
-        position        (0 -0.0047625 0.055);   // Nozzle position in the domain
+        position        (0 -0.0055000 0.055);   // Nozzle position in the domain
         thetaInner      constant 0.0;
         thetaOuter      constant 0.0;
 
         //inject over a disc:
         injectionMethod point; // -point -disc
         innerDiameter   0; // inner diameter of FUEL Nozzle injector
-        outerDiameter   #eval{1 * 0.00017};  // outer diameter of FUEL Nozzle injector
+        outerDiameter   $bDiameter;  // outer diameter of FUEL Nozzle injector
 
     //Parcel Velocity - Calculate the partical initial velocity profile
         // - Inject with constant velocity
@@ -232,9 +233,9 @@ subModels
 	(
 	    liquid
 	    {
-                Fe                 1;
+                // Fe                 1;
                 //H2O              1;
-                // Benz            1; // Mass Fraction of the phase
+                Benz            1; // Mass Fraction of the phase
 	    }
 	);
     }
@@ -250,15 +251,15 @@ subModels
             }
             liquid
             {
-                Fe	    	    1;
+                // Fe	    	    1;
                 // H2O		    0;
-                // Benz		    1; // Mass Fraction of the phase
+                Benz		    1; // Mass Fraction of the phase
             }
             solid
             {
                 //ash           0;
-                SolidFe         1;
-		        // H2O		    1;
+                // SolidFe         1;
+		// H2O		    1;
             }
 	    );
         YGasTot0        	0;
@@ -317,26 +318,12 @@ subModels
     KelvinHelmholtzCoeffs
     {
         solveOscillationEq yes;
- /*       B0              0.61;
-        B1              40;
-        Ctau            1;
-        CRT             0.1;
-        msLimit         0.2;
-        WeberLimit      6;
-*/
         B0              0.61;
         B1              1.73;           //Sqrt(3)
         Ctau            1;
         CRT             0.1;
         msLimit         0.03;
-        WeberLimit      6;              //6;
-	// TABcoeffs
-        y0              0;
-        yDot0           0;
-        Cmu             5;//10;
-        Comega          8;
-        WeCrit          6;
-        SMDCalculationMethod    method1;
+        WeberLimit      6;
     }
 
     ReitzKHRTCoeffs

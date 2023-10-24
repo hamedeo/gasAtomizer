@@ -88,16 +88,22 @@ Foam::SolidifyingSprayCloud<CloudType>::SolidifyingSprayCloud
     atomizationModel_(nullptr),
     breakupModel_(nullptr)
 {
-    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
+    Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     if (this->solution().active())
     {
         setModels();
+        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
+
         averageParcelMass_ = this->injectors().averageParcelMass();
+        Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
 
         if (readFields)
         {
+            Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
             parcelType::readFields(*this, this->composition());
+            Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
             this->deleteLostParticles();
+            Pout << __FILE__ << ": " << __LINE__ << " is reached" << endl;
         }
         Info << "Average parcel mass: " << averageParcelMass_ << endl;
     }
@@ -160,7 +166,7 @@ void Foam::SolidifyingSprayCloud<CloudType>::setParcelThermoProperties
     const scalar lagrangianDt
 )
 {
-    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
+    Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     CloudType::setParcelThermoProperties(parcel, lagrangianDt);
     const liquidMixtureProperties& liqMix = this->composition().liquids();
     label idGas = this->composition().idGas();  // added
@@ -286,7 +292,7 @@ void Foam::SolidifyingSprayCloud<CloudType>::resetSourceTerms()
 template<class CloudType>
 void Foam::SolidifyingSprayCloud<CloudType>::evolve()
 {
-    // Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
+    Pout << __FILE__ << ": " << __LINE__ << ": " <<  __FUNCTION__<< " is reached" << endl;
     if (this->solution().canEvolve())
     {
         typename parcelType::trackingData td(*this);
