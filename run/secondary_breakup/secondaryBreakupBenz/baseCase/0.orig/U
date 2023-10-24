@@ -1,0 +1,116 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2106                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+// ************************************************************************* //
+
+dimensions          [0 1 -1 0 0 0 0];
+
+internalField       uniform (0 0 0);
+
+
+boundaryField
+{
+
+    inlet
+    {
+   	type            codedFixedValue;
+    	value           uniform (0 0 0);
+    	name	   	flatProfile;			//redirectType    flatProfile;
+
+	code
+    	#{
+            const fvPatch& boundaryPatch = patch();
+            const vectorField& Cf = boundaryPatch.Cf();
+            vectorField& field = *this;
+
+	    scalar t = this->db().time().value();
+
+        const scalar rNozzle = 0.0047625;
+
+ 		const scalar tstep = 1e-5;			//time step used in the simulation [In controlDict]
+		const scalar vstep = -20;			//Desired increase in velocity per t [m/s]
+ 		const scalar vstep_actual = vstep/tstep;	//Transformation for to the right order for really increase with the desired vstep
+
+ 		/*--------------------------------*- C++ -*------------------------------------*\
+		| Cases	U										|
+		| 2            59								|
+		| 3            79								|
+		| 4            100								|
+		| 9            250								|
+		\*-----------------------------------------------------------------------------*/
+ 		const scalar vmax = -59;			//Desired end velocity [m/s]
+
+ 		const scalar tmax = (vmax/vstep)*tstep;		//Needed time for developing the flowfield to vmax [for if-condition]
+
+
+ 	    	forAll(Cf, facei)
+        	{
+			const scalar xPos = Cf[facei].x();
+			const scalar yPos = Cf[facei].y();
+
+			scalar rFacei = sqrt(xPos*xPos + yPos*yPos);
+
+		    if (rFacei < rNozzle)
+		    {
+				if (t < tmax)
+				{
+					field[facei] = vector(0, 0, vstep_actual*t);
+				}
+				else
+				{
+					field[facei] = vector(0, 0, vmax);
+				}
+		    }
+
+		    else
+		    {
+				field[facei] = vector(0, 0, 0);
+		    }
+  		}
+
+   	#};
+
+  	codeOptions
+  	#{
+
+            -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude
+
+   	#};
+
+  	codeInclude
+   	#{
+      	    #include "fvCFD.H"
+      	    #include <cmath>
+     	    #include <iostream>
+  	#};
+    }
+
+    walls
+    {
+    	type	zeroGradient;
+    }
+
+    outlet
+    {
+	type	zeroGradient;
+    }
+
+}
+
+
+
+
+
+// ************************************************************************* //
